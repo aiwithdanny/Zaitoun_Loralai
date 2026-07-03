@@ -5,7 +5,7 @@ Order API endpoints with JWT protection for admin operations
 import secrets
 from datetime import datetime
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Query
 from sqlalchemy.orm import Session
 
 from src.models.database import get_db
@@ -19,6 +19,51 @@ router = APIRouter()
 def generate_order_number():
     """Generate unique order number"""
     return f"ZL-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4).upper()}"
+
+
+@router.get("/")
+async def get_orders(
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    limit: int = Query(20, ge=1, le=100, description="Items per page"),
+    status: Optional[str] = Query(None, description="Filter by order status"),
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all orders with pagination and optional status filter - Admin only (requires JWT token)"""
+    query = db.query(Order)
+
+    # Filter by status if provided
+    if status:
+        valid_statuses = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"]
+        if status not in valid_statuses:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid status. Valid statuses: {', '.join(valid_statuses)}"
+            )
+        query = query.filter(Order.status == status)
+
+    # Count total before pagination
+    total_count = query.count()
+
+    # Apply sorting and pagination
+    orders = query.order_by(Order.created_at.desc()).offset((page - 1) * limit).limit(limit).all()
+
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": o.id,
+                "order_number": o.order_number,
+                "customer_name": o.customer_name,
+                "total_amount": o.total_amount,
+                "status": o.status,
+                "payment_status": o.payment_status,
+                "created_at": o.created_at.isoformat() if o.created_at else None
+            }
+            for o in orders
+        ],
+        "count": total_count
+    }
 
 
 @router.post("/")

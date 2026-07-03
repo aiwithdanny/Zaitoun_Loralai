@@ -1,0 +1,17 @@
+{
+  "name": "zaitoun-fullstack",
+  "version": "1.0.0",
+  "description": "Zaitoun e-commerce platform - Full stack",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" --names \"BACKEND,FRONTEND\" --prefix \"[{name}]\" --kill-others-on-exit",
+    "dev:backend": "cd backend && python seed.py && uvicorn src.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:frontend": "cd frontend && pnpm -C artifacts/zaitoun-loralai dev",
+    "start": "npm run dev",
+    "build": "cd frontend && pnpm run build && cd ../backend && echo 'Backend build not needed'",
+    "install:all": "cd frontend && pnpm install && cd ../backend && pip install -r requirements.txt"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.3"
+  }
+}
