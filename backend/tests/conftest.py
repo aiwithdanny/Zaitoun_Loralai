@@ -5,6 +5,7 @@ Pytest configuration and fixtures for Zaitoun Loralai backend tests
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 import os
 
@@ -13,19 +14,19 @@ from src.models.database import Base, get_db
 from src.config.auth import create_access_token
 
 
-# Use in-memory SQLite for testing
-TEST_SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-
-
 @pytest.fixture(scope="function")
 def test_db():
-    """Create a test database and yield a session"""
+    """Create a fresh in-memory test database for each test"""
+    # Use in-memory SQLite with StaticPool to ensure all connections share the same DB
+    # (without StaticPool, each connection gets its own in-memory database)
     engine = create_engine(
-        TEST_SQLALCHEMY_DATABASE_URL,
+        "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+    # Create all tables fresh for this test
     Base.metadata.create_all(bind=engine)
 
     def override_get_db():
@@ -37,9 +38,13 @@ def test_db():
 
     app.dependency_overrides[get_db] = override_get_db
 
-    yield TestingSessionLocal()
+    session = TestingSessionLocal()
+    yield session
 
+    # Cleanup after test
+    session.close()
     Base.metadata.drop_all(bind=engine)
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

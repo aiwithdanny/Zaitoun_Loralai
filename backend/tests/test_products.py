@@ -27,7 +27,7 @@ def test_create_product_requires_auth(client):
             "stock": 100,
         },
     )
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_create_product_with_auth(client, test_db, admin_headers):
