@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product
+from src.models import AdminUser, Product, Order
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -116,6 +116,8 @@ async def get_admin_stats(
     db: Session = Depends(get_db)
 ):
     """Get admin dashboard statistics - requires JWT token"""
+    from sqlalchemy import func
+
     # Verify user exists and is admin
     user = db.query(AdminUser).filter(AdminUser.username == current_user).first()
     if not user or not user.is_admin:
@@ -124,17 +126,56 @@ async def get_admin_stats(
             detail="Not authorized to access admin stats"
         )
 
+    # Total active products
     total_products = db.query(Product).filter(Product.is_active == True).count()
 
-    # Get recent orders (last 30 days)
-    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    recent_orders = db.query(Product).filter(Product.created_at >= thirty_days_ago).count()
+    # Total revenue (only paid orders)
+    total_revenue_result = db.query(func.sum(Order.total_amount)).filter(
+        Order.payment_status == "paid"
+    ).first()
+    total_revenue = float(total_revenue_result[0] or 0)
+
+    # Revenue this month (only paid orders)
+    now = datetime.utcnow()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    month_revenue_result = db.query(func.sum(Order.total_amount)).filter(
+        Order.payment_status == "paid",
+        Order.created_at >= month_start
+    ).first()
+    month_revenue = float(month_revenue_result[0] or 0)
+
+    # Order status breakdown (all orders, regardless of payment status)
+    status_breakdown = db.query(
+        Order.status,
+        func.count(Order.id).label('count')
+    ).group_by(Order.status).all()
+
+    status_counts = {status: count for status, count in status_breakdown}
+
+    # Low stock products (stock < 5)
+    low_stock = db.query(Product).filter(
+        Product.stock < 5,
+        Product.is_active == True
+    ).order_by(Product.stock.asc()).all()
+
+    low_stock_products = [
+        {
+            "id": p.id,
+            "name": p.name,
+            "stock": p.stock,
+            "price": p.price
+        }
+        for p in low_stock
+    ]
 
     return {
         "success": True,
         "data": {
             "total_products": total_products,
-            "recent_orders": recent_orders
+            "total_revenue": total_revenue,
+            "revenue_this_month": month_revenue,
+            "order_status_breakdown": status_counts,
+            "low_stock_products": low_stock_products
         }
     }
 

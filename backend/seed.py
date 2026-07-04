@@ -1,5 +1,6 @@
 """
 Seed database with initial product data
+All prices are in PKR (Pakistani Rupees)
 Run this script once to populate the database with sample products
 """
 
@@ -31,7 +32,7 @@ products_data = [
         "slug": "extra-virgin-250ml",
         "description": "Cold-pressed extra virgin olive oil in 250ml bottle. Hand-harvested from the mountains of Loralai with early harvest grapes for a robust, peppery finish.",
         "short_description": "Premium quality, early harvest",
-        "price": 24.99,
+        "price": 24.99,  # PKR
         "discount_price": None,
         "stock": 50,
         "category": "Bottles",
@@ -44,8 +45,8 @@ products_data = [
         "slug": "extra-virgin-500ml",
         "description": "Cold-pressed extra virgin olive oil in 500ml bottle. Perfect for everyday cooking and finishing dishes. Our bestseller with balanced flavor and aroma.",
         "short_description": "Best seller, family size",
-        "price": 44.99,
-        "discount_price": 39.99,
+        "price": 44.99,  # PKR
+        "discount_price": 39.99,  # PKR
         "stock": 100,
         "category": "Bottles",
         "image_url": None,

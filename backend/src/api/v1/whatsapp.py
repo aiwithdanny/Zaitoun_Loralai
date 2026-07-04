@@ -14,6 +14,7 @@ from src.models.database import get_db
 from src.models import Order
 from src.schemas import WhatsAppMessage, WhatsAppPaymentLink
 from src.payment_processor import process_payment_webhook
+from src.utils.currency import format_price
 
 router = APIRouter()
 
@@ -83,7 +84,7 @@ async def create_payment_link(
     message = (
         f"*Zaitoun Loralai Payment Request*\n\n"
         f"Order: {order_number}\n"
-        f"Amount: ${amount:.2f}\n"
+        f"Amount: {format_price(amount)}\n"
         f"Description: {description}\n\n"
         f"Please confirm payment via WhatsApp."
     )
@@ -210,7 +211,7 @@ async def get_payment_template(
         f"Thank you for your order!\n\n"
         f"Order Details:\n"
         f"Order Number: {order_number}\n"
-        f"Total Amount: ${amount:.2f}\n\n"
+        f"Total Amount: {format_price(amount)}\n\n"
         f"To complete your order, please send payment via WhatsApp.\n\n"
         f"Once payment is confirmed, your order will be processed immediately."
     )
