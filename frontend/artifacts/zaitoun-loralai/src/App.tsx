@@ -10,6 +10,9 @@ import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AdminOrders from "@/pages/admin/AdminOrders";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
+import RefundPolicy from "@/pages/RefundPolicy";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -20,6 +23,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      <Route path="/refund-policy" component={RefundPolicy} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={ProtectedRoute(AdminDashboard)} />
       <Route path="/admin/products" component={ProtectedRoute(AdminProducts)} />

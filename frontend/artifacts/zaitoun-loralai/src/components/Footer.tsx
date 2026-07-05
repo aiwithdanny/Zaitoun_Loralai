@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { BRAND } from "@/lib/constants";
 import { useNewsletterSubscription } from "@/hooks/useNewsletter";
 import logoUrl from "@assets/Official_Logo_1782757596768.png";
@@ -87,8 +88,9 @@ export function Footer() {
         <div className="pt-8 border-t border-[#FAF7F2]/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[#FAF7F2]/40">
           <p>&copy; {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
           </div>
         </div>
       </div>
