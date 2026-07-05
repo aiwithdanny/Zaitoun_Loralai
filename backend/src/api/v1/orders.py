@@ -158,7 +158,7 @@ async def get_order(order_number: str, db: Session = Depends(get_db)):
 @router.put("/{order_number}/status")
 async def update_order_status(
     order_number: str,
-    status: str,
+    status_update: OrderStatusUpdate,
     current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -168,14 +168,8 @@ async def update_order_status(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    valid_statuses = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"]
-    if status not in valid_statuses:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid status. Valid statuses: {', '.join(valid_statuses)}"
-        )
-
-    order.status = status
+    # OrderStatusUpdate schema already validates the status via Pydantic validator
+    order.status = status_update.status
     order.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(order)
@@ -186,8 +180,7 @@ async def update_order_status(
 @router.put("/{order_number}/payment")
 async def update_payment_status(
     order_number: str,
-    payment_status: str,
-    whatsapp_message_id: Optional[str] = None,
+    payment_update: OrderPaymentUpdate,
     current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -197,18 +190,12 @@ async def update_payment_status(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    valid_statuses = ["unpaid", "paid", "refunded"]
-    if payment_status not in valid_statuses:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid payment status. Valid statuses: {', '.join(valid_statuses)}"
-        )
-
-    order.payment_status = payment_status
-    order.whatsapp_message_id = whatsapp_message_id
+    # OrderPaymentUpdate schema already validates the payment_status via Pydantic validator
+    order.payment_status = payment_update.payment_status
+    order.whatsapp_message_id = payment_update.whatsapp_message_id
     order.updated_at = datetime.utcnow()
 
-    if payment_status == "paid" and order.status == "pending":
+    if payment_update.payment_status == "paid" and order.status == "pending":
         order.status = "confirmed"
 
     db.commit()
@@ -217,5 +204,5 @@ async def update_payment_status(
     return {
         "success": True,
         "data": order.to_dict(),
-        "message": f"Payment status updated to {payment_status}"
+        "message": f"Payment status updated to {payment_update.payment_status}"
     }
