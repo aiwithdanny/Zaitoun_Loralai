@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { ShoppingBag, Menu, X } from "lucide-react";
+import { ShoppingBag, Menu, X, User, ChevronDown, Package, LogOut } from "lucide-react";
 import { BRAND } from "@/lib/constants";
 import { useCart } from "@/store/cart";
+import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import logoUrl from "@assets/Official_Logo_1782757596768.png";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -10,7 +11,10 @@ export function Header() {
   const [_, navigate] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
   const cartTotal = useCart((state: any) => state.getTotalItems());
+  const { isLoggedIn, customer, logout } = useCustomerAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +22,17 @@ export function Header() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close account dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -63,7 +78,53 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Customer Auth - Desktop */}
+          <div className="hidden md:flex items-center gap-3">
+            {isLoggedIn ? (
+              <div className="relative" ref={accountRef}>
+                <button
+                  onClick={() => setAccountOpen(!accountOpen)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted transition-colors text-sm"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-sm">{customer?.name?.split(" ")[0]}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${accountOpen ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence>
+                  {accountOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-xl shadow-lg py-2"
+                    >
+                      <button
+                        onClick={() => { navigate("/account/orders"); setAccountOpen(false); }}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-muted transition-colors text-left"
+                      >
+                        <Package className="w-4 h-4" />
+                        Orders
+                      </button>
+                      <button
+                        onClick={() => { logout(); setAccountOpen(false); navigate("/"); }}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-muted transition-colors text-left text-red-600"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <>
+                <a href="/login" className="text-sm tracking-wide hover:text-primary transition-colors">Login</a>
+                <a href="/register" className="text-sm px-4 py-1.5 bg-accent text-accent-foreground rounded-lg font-medium hover:opacity-90 transition">Register</a>
+              </>
+            )}
+          </div>
+
           <button
             onClick={() => navigate("/cart")}
             className="p-2 hover:bg-muted rounded-full transition-colors relative"
@@ -137,6 +198,40 @@ export function Header() {
               >
                 Cart {cartTotal > 0 && `(${cartTotal})`}
               </button>
+
+              {/* Customer auth in mobile menu */}
+              {isLoggedIn ? (
+                <>
+                  <span className="text-sm text-muted-foreground">{customer?.name}</span>
+                  <button
+                    onClick={() => { navigate("/account/orders"); setMobileMenuOpen(false); }}
+                    className="text-lg font-serif text-foreground hover:text-primary transition-colors"
+                  >
+                    My Orders
+                  </button>
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); navigate("/"); }}
+                    className="text-lg font-serif text-red-600 hover:text-red-700 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => { navigate("/login"); setMobileMenuOpen(false); }}
+                    className="text-lg font-serif text-foreground hover:text-primary transition-colors"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => { navigate("/register"); setMobileMenuOpen(false); }}
+                    className="text-lg font-serif text-foreground hover:text-primary transition-colors"
+                  >
+                    Register
+                  </button>
+                </>
+              )}
             </nav>
           </motion.div>
         )}

@@ -42,8 +42,8 @@ async def admin_login(request: AdminLogin, db: Session = Depends(get_db)):
             detail="User account is inactive"
         )
 
-    # Create JWT token
-    access_token = create_access_token(data={"sub": user.username})
+    # Create JWT token with explicit token_type='admin'
+    access_token = create_access_token(data={"sub": user.username, "token_type": "admin"})
 
     # Update last login
     user.last_login = datetime.utcnow()

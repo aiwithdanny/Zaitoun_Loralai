@@ -14,7 +14,11 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import RefundPolicy from "@/pages/RefundPolicy";
 import FAQs from "@/pages/FAQs";
+import CustomerLogin from "@/pages/CustomerLogin";
+import CustomerRegister from "@/pages/CustomerRegister";
+import AccountOrders from "@/pages/AccountOrders";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { CustomerProtectedRoute } from "@/components/CustomerProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +32,9 @@ function Router() {
       <Route path="/terms-of-service" component={TermsOfService} />
       <Route path="/refund-policy" component={RefundPolicy} />
       <Route path="/faqs" component={FAQs} />
+      <Route path="/login" component={CustomerLogin} />
+      <Route path="/register" component={CustomerRegister} />
+      <Route path="/account/orders" component={CustomerProtectedRoute(AccountOrders)} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={ProtectedRoute(AdminDashboard)} />
       <Route path="/admin/products" component={ProtectedRoute(AdminProducts)} />

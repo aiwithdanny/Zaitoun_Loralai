@@ -41,13 +41,15 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
+    # Default token_type to "admin" for backward compatibility
+    to_encode.setdefault("token_type", "admin")
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def verify_token(token: str) -> str:
-    """Verify JWT token and return username"""
+def verify_token(token: str) -> dict:
+    """Verify JWT token and return the full payload dict"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -56,15 +58,37 @@ def verify_token(token: str) -> str:
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        if payload.get("sub") is None:
             raise credentials_exception
-        return username
+        return payload
     except JWTError:
         raise credentials_exception
 
 
-async def get_current_user(credentials: HTTPAuthCredentials = Depends(security)) -> str:
-    """Dependency to verify JWT token"""
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    """Dependency: verify JWT token and require token_type == 'admin'.
+    Customer tokens are explicitly rejected at this layer."""
     token = credentials.credentials
-    return verify_token(token)
+    payload = verify_token(token)
+    if payload.get("token_type") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return payload.get("sub")
+
+
+async def get_current_customer(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    """Dependency: verify JWT token and require token_type == 'customer'.
+    Admin tokens are explicitly rejected at this layer.
+    Returns the full payload dict (includes sub=email, customer_id, token_type)."""
+    token = credentials.credentials
+    payload = verify_token(token)
+    if payload.get("token_type") != "customer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return payload

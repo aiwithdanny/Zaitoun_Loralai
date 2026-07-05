@@ -62,11 +62,13 @@ class Order(Base):
     payment_method = Column(String(50), default="whatsapp")
     payment_status = Column(String(50), default="unpaid")
     whatsapp_message_id = Column(String(255))
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     items = relationship("OrderItem", back_populates="order")
+    customer = relationship("Customer", back_populates="orders")
 
     def to_dict(self):
         return {
@@ -138,6 +140,33 @@ class AdminUser(Base):
         }
 
 
+class Customer(Base):
+    __tablename__ = "customers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    phone = Column(String(50))
+    password_hash = Column(String(255), nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_login = Column(DateTime, nullable=True)
+
+    # Relationships
+    orders = relationship("Order", back_populates="customer")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "phone": self.phone,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "last_login": self.last_login.isoformat() if self.last_login else None
+        }
+
+
 class NewsletterSubscription(Base):
     __tablename__ = "newsletter_subscriptions"
 
@@ -158,5 +187,5 @@ class NewsletterSubscription(Base):
 
 
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "NewsletterSubscription"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription"]
 

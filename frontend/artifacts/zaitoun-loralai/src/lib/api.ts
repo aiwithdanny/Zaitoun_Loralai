@@ -15,7 +15,9 @@ async function apiFetch<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('admin_token');
+  const adminToken = localStorage.getItem('admin_token');
+  const customerToken = localStorage.getItem('customer_token');
+  const token = adminToken || customerToken;
 
   const config: RequestInit = {
     ...options,
@@ -30,11 +32,19 @@ async function apiFetch<T>(
 
   // Handle 401 Unauthorized
   if (response.status === 401) {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_user');
-    // Only redirect if we're in admin area
-    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/login')) {
-      window.location.href = '/admin/login';
+    // Check if customer token was rejected
+    if (customerToken && !adminToken) {
+      localStorage.removeItem('customer_token');
+      localStorage.removeItem('customer_profile');
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/account') && !window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    } else {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/login')) {
+        window.location.href = '/admin/login';
+      }
     }
   }
 
@@ -346,6 +356,92 @@ export const adminApi = {
       console.error('Failed to check token expiry:', error);
       return true; // Treat errors as expired
     }
+  },
+};
+
+// ==================== CUSTOMER API ====================
+
+export interface CustomerLoginData {
+  email: string;
+  password: string;
+}
+
+export interface CustomerRegisterData {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+
+export interface CustomerProfile {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  is_active: boolean;
+  created_at: string;
+  last_login: string | null;
+}
+
+export interface CustomerAuthResponse {
+  success: boolean;
+  access_token: string;
+  token_type: string;
+  customer: CustomerProfile;
+}
+
+export interface CustomerOrdersResponse {
+  success: boolean;
+  data: Order[];
+}
+
+export const customerApi = {
+  // Register
+  register: async (data: CustomerRegisterData): Promise<{ success: boolean; message: string; customer: CustomerProfile }> => {
+    return apiFetch('/customers/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Login
+  login: async (credentials: CustomerLoginData): Promise<CustomerAuthResponse> => {
+    const response = await apiFetch<CustomerAuthResponse>('/customers/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+    localStorage.setItem('customer_token', response.access_token);
+    localStorage.setItem('customer_profile', JSON.stringify(response.customer));
+    return response;
+  },
+
+  // Get profile
+  getProfile: async (): Promise<CustomerProfile> => {
+    const response = await apiFetch<{ success: boolean; data: CustomerProfile }>('/customers/me');
+    return response.data;
+  },
+
+  // Get my orders
+  getMyOrders: async (): Promise<Order[]> => {
+    const response = await apiFetch<CustomerOrdersResponse>('/customers/me/orders');
+    return response.data;
+  },
+
+  // Logout
+  logout: () => {
+    localStorage.removeItem('customer_token');
+    localStorage.removeItem('customer_profile');
+  },
+
+  // Check if logged in
+  isAuthenticated: (): boolean => {
+    return !!localStorage.getItem('customer_token');
+  },
+
+  // Get stored profile
+  getCurrentCustomer: (): CustomerProfile | null => {
+    const raw = localStorage.getItem('customer_profile');
+    return raw ? JSON.parse(raw) : null;
   },
 };
 
