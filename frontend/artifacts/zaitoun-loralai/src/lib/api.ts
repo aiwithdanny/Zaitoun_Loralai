@@ -10,14 +10,36 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 
 /**
  * Custom fetch wrapper with auth and error handling
+ *
+ * Token selection is endpoint-aware:
+ *   - Endpoints under /customers/ → customer_token
+ *   - Endpoints under /admin/     → admin_token
+ *   - Other admin-only endpoints  → explicit authType='admin' (products CRUD, orders list/status/payment)
+ *   - Public endpoints             → no token
+ *
+ * This allows admin and customer sessions to coexist in the same browser
+ * without either interfering with the other.
  */
 async function apiFetch<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  /** Explicit auth type override. When omitted, inferred from endpoint path. */
+  authType?: 'admin' | 'customer'
 ): Promise<T> {
-  const adminToken = localStorage.getItem('admin_token');
-  const customerToken = localStorage.getItem('customer_token');
-  const token = adminToken || customerToken;
+  // Infer auth type from endpoint if not explicitly provided
+  const effectiveAuth = authType ?? (
+    endpoint.startsWith('/admin') ? 'admin' :
+    endpoint.startsWith('/customers') ? 'customer' :
+    undefined
+  );
+
+  // Pick the matching token — no blind fallback to whichever exists
+  let token: string | null = null;
+  if (effectiveAuth === 'admin') {
+    token = localStorage.getItem('admin_token');
+  } else if (effectiveAuth === 'customer') {
+    token = localStorage.getItem('customer_token');
+  }
 
   const config: RequestInit = {
     ...options,
@@ -30,16 +52,15 @@ async function apiFetch<T>(
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-  // Handle 401 Unauthorized
+  // Handle 401 Unauthorized — clear the token that was actually used
   if (response.status === 401) {
-    // Check if customer token was rejected
-    if (customerToken && !adminToken) {
+    if (effectiveAuth === 'customer' || endpoint.startsWith('/customers')) {
       localStorage.removeItem('customer_token');
       localStorage.removeItem('customer_profile');
       if (typeof window !== 'undefined' && window.location.pathname.startsWith('/account') && !window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
-    } else {
+    } else if (effectiveAuth === 'admin' || endpoint.startsWith('/admin')) {
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_user');
       if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/login')) {
@@ -127,7 +148,7 @@ export const productsApi = {
     const response = await apiFetch<{ success: boolean; data: Product }>('/products', {
       method: 'POST',
       body: JSON.stringify(productData),
-    });
+    }, 'admin');
     return response.data;
   },
 
@@ -136,13 +157,13 @@ export const productsApi = {
     const response = await apiFetch<{ success: boolean; data: Product }>(`/products/${slug}`, {
       method: 'PUT',
       body: JSON.stringify(productData),
-    });
+    }, 'admin');
     return response.data;
   },
 
   // Delete product (admin only)
   deleteProduct: async (slug: string): Promise<void> => {
-    await apiFetch(`/products/${slug}`, { method: 'DELETE' });
+    await apiFetch(`/products/${slug}`, { method: 'DELETE' }, 'admin');
   },
 };
 
@@ -203,7 +224,7 @@ export const ordersApi = {
     const queryString = queryParams.toString();
     const endpoint = `/orders?${queryString}`;
 
-    const response = await apiFetch<OrdersListResponse>(endpoint);
+    const response = await apiFetch<OrdersListResponse>(endpoint, {}, 'admin');
     return response;
   },
 
@@ -229,7 +250,8 @@ export const ordersApi = {
       {
         method: 'PUT',
         body: JSON.stringify({ status }),
-      }
+      },
+      'admin'
     );
     return response.data;
   },
@@ -245,7 +267,8 @@ export const ordersApi = {
       {
         method: 'PUT',
         body: JSON.stringify({ payment_status, whatsapp_message_id }),
-      }
+      },
+      'admin'
     );
     return response.data;
   },
