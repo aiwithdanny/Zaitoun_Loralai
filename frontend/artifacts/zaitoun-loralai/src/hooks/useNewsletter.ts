@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '@/lib/api';
 
 export interface NewsletterSubscription {
   email: string;
@@ -8,7 +9,9 @@ export interface NewsletterSubscription {
 
 /**
  * Hook for subscribing to newsletter
- * Falls back to local storage if API is unavailable
+ * Falls back to local storage only if the backend is genuinely unreachable
+ * (network error, server down). When the backend responds with a validation error
+ * (e.g. duplicate email), that error message is shown to the user.
  */
 export function useNewsletterSubscription() {
   return useMutation({
@@ -18,26 +21,24 @@ export function useNewsletterSubscription() {
         throw new Error('Invalid email address');
       }
 
-      // Try API first
+      let response: Response;
+
+      // Attempt the API call — only a thrown exception means the backend
+      // is genuinely unreachable (network error, DNS failure, server down).
       try {
-        const response = await fetch('http://localhost:8000/api/v1/newsletter/subscribe', {
+        response = await fetch(`${API_BASE_URL}/newsletter/subscribe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
-
-        if (!response.ok) {
-          throw new Error('API subscription failed');
-        }
-
-        return response.json();
-      } catch (apiError) {
-        // Fallback to local storage
-        const subscriptions = JSON.parse(
+      } catch {
+        // Fetch itself failed to send — backend is unreachable.
+        // Fall back to local storage as best-effort.
+        const subscriptions: NewsletterSubscription[] = JSON.parse(
           localStorage.getItem('newsletter_subscriptions') || '[]'
         );
 
-        const exists = subscriptions.some((sub: NewsletterSubscription) => sub.email === email);
+        const exists = subscriptions.some((sub) => sub.email === email);
         if (exists) {
           throw new Error('Email already subscribed');
         }
@@ -51,8 +52,16 @@ export function useNewsletterSubscription() {
 
         return { success: true, email };
       }
+
+      // Backend responded — parse the real error message if it's an error.
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Failed to subscribe');
+      }
+
+      return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success('Thank you for subscribing! Check your email for updates.');
     },
     onError: (error: any) => {
