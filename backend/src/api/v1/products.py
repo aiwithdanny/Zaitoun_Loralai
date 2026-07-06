@@ -35,7 +35,7 @@ async def get_products(
             (Product.description.ilike(f"%{search}%"))
         )
 
-    products = query.order_by(Product.created_at.desc()).all()
+    products = query.order_by(Product.sort_order.asc(), Product.created_at.desc()).all()
     return {
         "success": True,
         "data": [p.to_dict() for p in products],

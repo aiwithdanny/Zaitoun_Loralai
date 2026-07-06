@@ -56,6 +56,7 @@ class ProductUpdate(BaseModel):
     image_url: Optional[str] = Field(None, max_length=500)
     is_active: Optional[bool] = None
     is_featured: Optional[bool] = None
+    sort_order: Optional[int] = Field(None, ge=1, description="Display order (lower = first)")
 
     @validator("discount_price")
     def discount_must_be_less_than_price(cls, v, values):
