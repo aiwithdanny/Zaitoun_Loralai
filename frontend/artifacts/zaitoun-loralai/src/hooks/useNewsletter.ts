@@ -50,7 +50,7 @@ export function useNewsletterSubscription() {
 
         localStorage.setItem('newsletter_subscriptions', JSON.stringify(subscriptions));
 
-        return { success: true, email };
+        return { success: true, email, _source: 'local' as const };
       }
 
       // Backend responded — parse the real error message if it's an error.
@@ -59,10 +59,14 @@ export function useNewsletterSubscription() {
         throw new Error(errorData.detail || 'Failed to subscribe');
       }
 
-      return response.json();
+      return response.json().then((data) => ({ ...data, _source: 'api' as const }));
     },
-    onSuccess: () => {
-      toast.success('Thank you for subscribing! Check your email for updates.');
+    onSuccess: (data) => {
+      if (data._source === 'local') {
+        toast.success("Saved! We'll add you to our list once you're back online.");
+      } else {
+        toast.success('Thank you for subscribing! Check your email for updates.');
+      }
     },
     onError: (error: any) => {
       const message = error.message || 'Failed to subscribe';
