@@ -111,12 +111,20 @@ export const productsApi = {
     category?: string;
     featured?: boolean;
     search?: string;
+    sort_by?: 'price' | 'name' | 'created_at' | 'sort_order';
+    sort_dir?: 'asc' | 'desc';
+    min_price?: number;
+    max_price?: number;
   }): Promise<Product[]> => {
     try {
       const queryParams = new URLSearchParams();
       if (params?.category) queryParams.append('category', params.category);
       if (params?.featured !== undefined) queryParams.append('featured', String(params.featured));
       if (params?.search) queryParams.append('search', params.search);
+      if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+      if (params?.sort_dir) queryParams.append('sort_dir', params.sort_dir);
+      if (params?.min_price !== undefined) queryParams.append('min_price', String(params.min_price));
+      if (params?.max_price !== undefined) queryParams.append('max_price', String(params.max_price));
 
       const queryString = queryParams.toString();
       const endpoint = `/products${queryString ? `?${queryString}` : ''}`;

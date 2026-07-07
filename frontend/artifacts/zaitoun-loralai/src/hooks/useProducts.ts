@@ -6,11 +6,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productsApi, Product } from '@/lib/api';
 import { toast } from 'sonner';
 
+// Reusable filter type shared between hook and query keys
+export interface ProductFilters {
+  category?: string;
+  featured?: boolean;
+  search?: string;
+  sort_by?: 'price' | 'name' | 'created_at' | 'sort_order';
+  sort_dir?: 'asc' | 'desc';
+  min_price?: number;
+  max_price?: number;
+}
+
 // Query keys
 export const productKeys = {
   all: ['products'] as const,
   lists: () => [...productKeys.all, 'list'] as const,
-  list: (filters?: { category?: string; featured?: boolean; search?: string }) =>
+  list: (filters?: ProductFilters) =>
     [...productKeys.lists(), filters] as const,
   details: () => [...productKeys.all, 'detail'] as const,
   detail: (slug: string) => [...productKeys.details(), slug] as const,
@@ -21,11 +32,7 @@ export const productKeys = {
 /**
  * Fetch all products with optional filters
  */
-export function useProducts(filters?: {
-  category?: string;
-  featured?: boolean;
-  search?: string;
-}) {
+export function useProducts(filters?: ProductFilters) {
   return useQuery({
     queryKey: productKeys.list(filters),
     queryFn: () => productsApi.getProducts(filters),

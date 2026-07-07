@@ -1,6 +1,7 @@
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Loader2 } from "lucide-react";
-import { useProducts } from "@/hooks/useProducts";
+import { ShoppingBag, Loader2, Search, X } from "lucide-react";
+import { useProducts, type ProductFilters } from "@/hooks/useProducts";
 import { useCart } from "@/store/cart";
 import { toast } from "sonner";
 import { formatPrice } from "@/utils/currency";
@@ -31,10 +32,64 @@ const card = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
+const sortOptions = [
+  { value: 'default', label: 'Default' },
+  { value: 'price-asc', label: 'Price: Low–High' },
+  { value: 'price-desc', label: 'Price: High–Low' },
+  { value: 'name-asc', label: 'Name: A–Z' },
+  { value: 'name-desc', label: 'Name: Z–A' },
+  { value: 'newest', label: 'Newest' },
+] as const;
+
 export function ProductGrid() {
-  // Fetch products from backend API
-  const { data: products, isLoading, error } = useProducts();
   const addItem = useCart((state) => state.addItem);
+
+  // Filter state
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('');
+  const [sortValue, setSortValue] = useState('default');
+
+  // Debounce search input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(searchInput), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Derive sort params from the sort dropdown value
+  const sortParams = useMemo((): { sort_by?: ProductFilters['sort_by']; sort_dir?: ProductFilters['sort_dir'] } => {
+    switch (sortValue) {
+      case 'price-asc': return { sort_by: 'price', sort_dir: 'asc' };
+      case 'price-desc': return { sort_by: 'price', sort_dir: 'desc' };
+      case 'name-asc': return { sort_by: 'name', sort_dir: 'asc' };
+      case 'name-desc': return { sort_by: 'name', sort_dir: 'desc' };
+      case 'newest': return { sort_by: 'created_at', sort_dir: 'desc' };
+      default: return {};
+    }
+  }, [sortValue]);
+
+  // Build filters — only include non-empty values so the query key stays clean
+  const filters = useMemo((): ProductFilters | undefined => {
+    const f: ProductFilters = {};
+    if (search) f.search = search;
+    if (category) f.category = category;
+    if (sortParams.sort_by) {
+      f.sort_by = sortParams.sort_by;
+      f.sort_dir = sortParams.sort_dir;
+    }
+    return Object.keys(f).length > 0 ? f : undefined;
+  }, [search, category, sortParams]);
+
+  const { data: products, isLoading, error } = useProducts(filters);
+
+  // Derive categories dynamically from the currently visible products
+  const categories = useMemo(() => {
+    if (!products) return [];
+    const cats = [...new Set(products.map(p => p.category).filter(Boolean))] as string[];
+    return cats.sort();
+  }, [products]);
+
+  const hasActiveFilters = Boolean(search || category || sortValue !== 'default');
 
   const handleAddToCart = (product: any) => {
     addItem({
@@ -64,6 +119,54 @@ export function ProductGrid() {
             Whether for the everyday kitchen or a thoughtful gift, Zaitoun Loralai is available in multiple sizes — all sharing the same uncompromising quality.
           </p>
         </motion.div>
+
+        {/* Filter Bar */}
+        {!isLoading && products && (
+          <div className="flex flex-col sm:flex-row gap-3 mb-10">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 text-sm bg-card border border-border rounded-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
+              />
+              {searchInput && (
+                <button
+                  onClick={() => { setSearchInput(''); setSearch(''); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Category Filter */}
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="px-3 py-2 text-sm bg-card border border-border rounded-sm text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer min-w-[140px]"
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+
+            {/* Sort */}
+            <select
+              value={sortValue}
+              onChange={(e) => setSortValue(e.target.value)}
+              className="px-3 py-2 text-sm bg-card border border-border rounded-sm text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer min-w-[160px]"
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Loading State */}
         {isLoading && (
@@ -180,7 +283,11 @@ export function ProductGrid() {
         {/* No Products State */}
         {!isLoading && !error && products && products.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-muted-foreground">No products available at the moment.</p>
+            <p className="text-muted-foreground">
+              {hasActiveFilters
+                ? 'No products match your filters. Try adjusting your search or clearing filters.'
+                : 'No products available at the moment.'}
+            </p>
           </div>
         )}
       </div>
