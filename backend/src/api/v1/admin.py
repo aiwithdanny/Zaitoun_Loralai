@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order
+from src.models import AdminUser, Product, Order, OrderItem, Customer
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -168,6 +168,49 @@ async def get_admin_stats(
         for p in low_stock
     ]
 
+    # ── Pending orders (from status breakdown) ─────────────────────
+    pending_orders = status_counts.get("pending", 0)
+
+    # ── Orders today ──────────────────────────────────────────────
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    orders_today = db.query(func.count(Order.id)).filter(
+        Order.created_at >= today_start
+    ).scalar() or 0
+
+    # ── New customers this month (registered accounts only) ───────
+    new_customers_this_month = db.query(func.count(Customer.id)).filter(
+        Customer.created_at >= month_start
+    ).scalar() or 0
+
+    # ── Top 5 products by revenue (using subtotal = price × qty) ──
+    top_products_raw = (
+        db.query(
+            OrderItem.product_id,
+            Product.name,
+            Product.slug,
+            func.sum(OrderItem.quantity).label("total_sold"),
+            func.sum(OrderItem.subtotal).label("revenue"),
+        )
+        .join(Product, OrderItem.product_id == Product.id)
+        .join(Order, OrderItem.order_id == Order.id)
+        .filter(Order.payment_status == "paid")
+        .group_by(OrderItem.product_id, Product.name, Product.slug)
+        .order_by(func.sum(OrderItem.subtotal).desc())
+        .limit(5)
+        .all()
+    )
+
+    top_products = [
+        {
+            "id": row.product_id,
+            "name": row.name,
+            "slug": row.slug,
+            "total_sold": int(row.total_sold),
+            "revenue": float(row.revenue),
+        }
+        for row in top_products_raw
+    ]
+
     return {
         "success": True,
         "data": {
@@ -175,7 +218,11 @@ async def get_admin_stats(
             "total_revenue": total_revenue,
             "revenue_this_month": month_revenue,
             "order_status_breakdown": status_counts,
-            "low_stock_products": low_stock_products
+            "low_stock_products": low_stock_products,
+            "pending_orders": pending_orders,
+            "orders_today": orders_today,
+            "new_customers_this_month": new_customers_this_month,
+            "top_products": top_products
         }
     }
 

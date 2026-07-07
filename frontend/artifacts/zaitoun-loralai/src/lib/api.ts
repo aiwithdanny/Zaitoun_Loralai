@@ -310,6 +310,16 @@ export interface AdminStatsResponse {
       stock: number;
       price: number;
     }>;
+    pending_orders: number;
+    orders_today: number;
+    new_customers_this_month: number;
+    top_products: Array<{
+      id: number;
+      name: string;
+      slug: string;
+      total_sold: number;
+      revenue: number;
+    }>;
   };
 }
 
