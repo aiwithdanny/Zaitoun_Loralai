@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from src.models.database import get_db
 from src.models import Order, OrderItem, Product
-from src.config.auth import get_current_user
+from src.config.auth import get_current_user, get_optional_customer
 from src.schemas import OrderCreate, OrderStatusUpdate, OrderPaymentUpdate
 
 router = APIRouter()
@@ -69,9 +69,10 @@ async def get_orders(
 @router.post("/")
 async def create_order(
     order_data: OrderCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    customer_payload: Optional[dict] = Depends(get_optional_customer)
 ):
-    """Create a new order - Public endpoint"""
+    """Create a new order - Public endpoint (supports guest + logged-in customers)"""
     # Calculate total
     total_amount = 0.0
     order_items = []
@@ -104,6 +105,9 @@ async def create_order(
         # Update stock
         product.stock -= item.quantity
 
+    # Extract customer_id from optional JWT (None for guest orders)
+    customer_id = customer_payload.get("customer_id") if customer_payload else None
+
     # Create order
     order = Order(
         order_number=generate_order_number(),
@@ -115,6 +119,7 @@ async def create_order(
         payment_method=order_data.payment_method,
         status="pending",
         payment_status="unpaid",
+        customer_id=customer_id,
         created_at=datetime.utcnow()
     )
 

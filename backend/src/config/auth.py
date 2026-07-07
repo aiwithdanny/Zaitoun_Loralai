@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 
@@ -92,3 +92,24 @@ async def get_current_customer(credentials: HTTPAuthorizationCredentials = Depen
             headers={"WWW-Authenticate": "Bearer"},
         )
     return payload
+
+
+async def get_optional_customer(request: Request) -> Optional[dict]:
+    """Dependency: read a customer JWT if present, but NEVER reject the request.
+
+    - No Authorization header → returns None (guest checkout continues)
+    - Invalid / expired token   → returns None (silently ignored)
+    - Valid admin token         → returns None (don't link orders to admin users)
+    - Valid customer token      → returns payload dict (includes customer_id)
+    """
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None
+    try:
+        token = auth_header.split(" ", 1)[1]
+        payload = verify_token(token)
+        if payload.get("token_type") == "customer":
+            return payload
+    except Exception:
+        pass
+    return None
