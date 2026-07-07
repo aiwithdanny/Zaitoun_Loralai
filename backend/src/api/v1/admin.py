@@ -193,7 +193,7 @@ async def get_admin_stats(
         )
         .join(Product, OrderItem.product_id == Product.id)
         .join(Order, OrderItem.order_id == Order.id)
-        .filter(Order.payment_status == "paid")
+        .filter(Order.payment_status == "paid", Product.is_active == True)
         .group_by(OrderItem.product_id, Product.name, Product.slug)
         .order_by(func.sum(OrderItem.subtotal).desc())
         .limit(5)
