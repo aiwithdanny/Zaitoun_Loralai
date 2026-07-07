@@ -10,6 +10,7 @@ import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AdminOrders from "@/pages/admin/AdminOrders";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import RefundPolicy from "@/pages/RefundPolicy";
@@ -19,6 +20,7 @@ import CustomerRegister from "@/pages/CustomerRegister";
 import AccountOrders from "@/pages/AccountOrders";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { CustomerProtectedRoute } from "@/components/CustomerProtectedRoute";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const queryClient = new QueryClient();
 
@@ -36,9 +38,9 @@ function Router() {
       <Route path="/register" component={CustomerRegister} />
       <Route path="/account/orders" component={CustomerProtectedRoute(AccountOrders)} />
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/dashboard" component={ProtectedRoute(AdminDashboard)} />
-      <Route path="/admin/products" component={ProtectedRoute(AdminProducts)} />
-      <Route path="/admin/orders" component={ProtectedRoute(AdminOrders)} />
+      <Route path="/admin/dashboard" component={ProtectedRoute(AdminDashboard, AdminLayout)} />
+      <Route path="/admin/products" component={ProtectedRoute(AdminProducts, AdminLayout)} />
+      <Route path="/admin/orders" component={ProtectedRoute(AdminOrders, AdminLayout)} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -52,6 +54,7 @@ function App() {
           <Router />
         </WouterRouter>
         <Toaster />
+        <WhatsAppButton />
       </TooltipProvider>
     </QueryClientProvider>
   );

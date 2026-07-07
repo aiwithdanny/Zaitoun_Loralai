@@ -15,10 +15,14 @@ interface ProtectedRouteProps {
 /**
  * Wraps a component and protects it with JWT authentication
  * Returns a new component that checks token validity before rendering
+ * Optionally wraps the protected component in a layout
  */
-export function ProtectedRoute(Component: React.ComponentType<any>) {
+export function ProtectedRoute(
+  Component: React.ComponentType<any>,
+  Layout?: React.ComponentType<{ children: React.ReactNode }>
+) {
   return function ProtectedRouteComponent(props: ProtectedRouteProps) {
-    const [location, setLocation] = useLocation();
+    const [, setLocation] = useLocation();
     const { isLoggedIn, isExpired, loading } = useAdminAuth();
 
     useEffect(() => {
@@ -51,7 +55,13 @@ export function ProtectedRoute(Component: React.ComponentType<any>) {
       return null;
     }
 
-    // Render protected component
-    return <Component {...props} />;
+    const rendered = <Component {...props} />;
+
+    if (Layout) {
+      return <Layout>{rendered}</Layout>;
+    }
+
+    // Render protected component standalone
+    return rendered;
   };
 }

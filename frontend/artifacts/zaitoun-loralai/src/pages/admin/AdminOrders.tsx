@@ -170,184 +170,177 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="p-6">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">View Orders</h1>
-              <p className="text-gray-600 text-sm mt-1">
-                Total orders: <span className="font-medium">{state.count}</span>
-              </p>
-            </div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">View Orders</h1>
+          <p className="text-gray-600 text-sm mt-1">
+            Total orders: <span className="font-medium">{state.count}</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Filters */}
+      {!loading && (
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <label className="text-sm font-medium text-gray-700">Filter by Status</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => handleFilterChange(e.target.value)}
+            className="mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          >
+            {STATUS_FILTERS.map((status) => (
+              <option key={status} value={status}>
+                {status === '' ? 'All Orders' : status.charAt(0).toUpperCase() + status.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <h3 className="text-red-800 font-medium mb-1">Error Loading Orders</h3>
+          <p className="text-red-700 text-sm">{error}</p>
+          <button
+            onClick={fetchOrders}
+            className="mt-3 text-red-600 hover:text-red-700 font-medium text-sm underline"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading orders...</p>
           </div>
         </div>
-      </header>
+      )}
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Filters */}
-        {!loading && (
-          <div className="bg-white rounded-lg shadow p-4 mb-6">
-            <label className="text-sm font-medium text-gray-700">Filter by Status</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => handleFilterChange(e.target.value)}
-              className="mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            >
-              {STATUS_FILTERS.map((status) => (
-                <option key={status} value={status}>
-                  {status === '' ? 'All Orders' : status.charAt(0).toUpperCase() + status.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && !loading && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <h3 className="text-red-800 font-medium mb-1">Error Loading Orders</h3>
-            <p className="text-red-700 text-sm">{error}</p>
-            <button
-              onClick={fetchOrders}
-              className="mt-3 text-red-600 hover:text-red-700 font-medium text-sm underline"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading orders...</p>
-            </div>
-          </div>
-        )}
-
-        {/* Orders Table */}
-        {!loading && state.orders.length > 0 && (
-          <>
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th
-                        onClick={() => handleSort('order_number')}
-                        className="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
-                      >
-                        Order #{getSortIndicator('order_number')}
-                      </th>
-                      <th
-                        onClick={() => handleSort('customer_name')}
-                        className="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
-                      >
-                        Customer{getSortIndicator('customer_name')}
-                      </th>
-                      <th
-                        onClick={() => handleSort('created_at')}
-                        className="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
-                      >
-                        Date{getSortIndicator('created_at')}
-                      </th>
-                      <th
-                        onClick={() => handleSort('total_amount')}
-                        className="px-6 py-3 text-right text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
-                      >
-                        Total{getSortIndicator('total_amount')}
-                      </th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Status</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Payment</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Actions</th>
+      {/* Orders Table */}
+      {!loading && state.orders.length > 0 && (
+        <>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th
+                      onClick={() => handleSort('order_number')}
+                      className="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
+                    >
+                      Order #{getSortIndicator('order_number')}
+                    </th>
+                    <th
+                      onClick={() => handleSort('customer_name')}
+                      className="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
+                    >
+                      Customer{getSortIndicator('customer_name')}
+                    </th>
+                    <th
+                      onClick={() => handleSort('created_at')}
+                      className="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
+                    >
+                      Date{getSortIndicator('created_at')}
+                    </th>
+                    <th
+                      onClick={() => handleSort('total_amount')}
+                      className="px-6 py-3 text-right text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition"
+                    >
+                      Total{getSortIndicator('total_amount')}
+                    </th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Status</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Payment</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {sortedOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 text-sm text-gray-900 font-mono font-medium">{order.order_number}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{order.customer_name}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {new Date(order.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
+                        {formatPrice(order.total_amount)}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getPaymentColor(order.payment_status)}`}>
+                          {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={() => handleOrderClick(order.order_number)}
+                          className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                        >
+                          View Details
+                        </button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {sortedOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-gray-50 transition">
-                        <td className="px-6 py-4 text-sm text-gray-900 font-mono font-medium">{order.order_number}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{order.customer_name}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {new Date(order.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
-                          {formatPrice(order.total_amount)}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getPaymentColor(order.payment_status)}`}>
-                            {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <button
-                            onClick={() => handleOrderClick(order.order_number)}
-                            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-                          >
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Pagination */}
+          {state.totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Page <span className="font-medium">{state.page}</span> of{' '}
+                <span className="font-medium">{state.totalPages}</span> (
+                <span className="font-medium">{state.count}</span> total orders)
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(state.page - 1)}
+                  disabled={state.page === 1}
+                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(state.page + 1)}
+                  disabled={state.page === state.totalPages}
+                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition"
+                >
+                  Next
+                </button>
               </div>
             </div>
+          )}
+        </>
+      )}
 
-            {/* Pagination */}
-            {state.totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  Page <span className="font-medium">{state.page}</span> of{' '}
-                  <span className="font-medium">{state.totalPages}</span> (
-                  <span className="font-medium">{state.count}</span> total orders)
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handlePageChange(state.page - 1)}
-                    disabled={state.page === 1}
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => handlePageChange(state.page + 1)}
-                    disabled={state.page === state.totalPages}
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Empty State */}
-        {!loading && state.orders.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-600 mb-4">
-              {statusFilter ? `No orders found with status "${statusFilter}".` : 'No orders found.'}
-            </p>
-            {statusFilter && (
-              <button
-                onClick={() => handleFilterChange('')}
-                className="text-blue-600 hover:text-blue-700 font-medium text-sm underline"
-              >
-                View All Orders
-              </button>
-            )}
-          </div>
-        )}
-      </main>
+      {/* Empty State */}
+      {!loading && state.orders.length === 0 && (
+        <div className="bg-white rounded-lg shadow p-12 text-center">
+          <p className="text-gray-600 mb-4">
+            {statusFilter ? `No orders found with status "${statusFilter}".` : 'No orders found.'}
+          </p>
+          {statusFilter && (
+            <button
+              onClick={() => handleFilterChange('')}
+              className="text-blue-600 hover:text-blue-700 font-medium text-sm underline"
+            >
+              View All Orders
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Order Detail Modal */}
       {selectedOrder && (
