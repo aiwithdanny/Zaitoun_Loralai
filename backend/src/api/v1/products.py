@@ -4,6 +4,7 @@ Product API endpoints with JWT protection for admin operations
 
 from fastapi import APIRouter, HTTPException, Depends, Query, status
 from sqlalchemy.orm import Session
+from sqlalchemy import asc, desc
 from typing import Optional
 from datetime import datetime
 
@@ -14,12 +15,24 @@ from src.schemas import ProductCreate, ProductUpdate, ProductResponse
 
 router = APIRouter()
 
+# Allowed sort columns mapped to actual Product model attributes
+SORT_COLUMNS = {
+    "price": Product.price,
+    "name": Product.name,
+    "created_at": Product.created_at,
+    "sort_order": Product.sort_order,
+}
+
 
 @router.get("/")
 async def get_products(
     category: Optional[str] = Query(None, description="Filter by category"),
     featured: Optional[bool] = Query(None, description="Filter featured products"),
     search: Optional[str] = Query(None, description="Search by name or description"),
+    sort_by: Optional[str] = Query(None, description="Sort column: price, name, created_at, sort_order"),
+    sort_dir: Optional[str] = Query("asc", description="Sort direction: asc or desc"),
+    min_price: Optional[float] = Query(None, description="Minimum price filter"),
+    max_price: Optional[float] = Query(None, description="Maximum price filter"),
     db: Session = Depends(get_db)
 ):
     """Get all products with optional filters - Public endpoint"""
@@ -34,8 +47,20 @@ async def get_products(
             (Product.name.ilike(f"%{search}%")) |
             (Product.description.ilike(f"%{search}%"))
         )
+    if min_price is not None:
+        query = query.filter(Product.price >= min_price)
+    if max_price is not None:
+        query = query.filter(Product.price <= max_price)
 
-    products = query.order_by(Product.sort_order.asc(), Product.created_at.desc()).all()
+    # Apply sorting
+    if sort_by and sort_by in SORT_COLUMNS:
+        column = SORT_COLUMNS[sort_by]
+        order_func = desc if sort_dir == "desc" else asc
+        query = query.order_by(order_func(column), Product.id.asc())
+    else:
+        query = query.order_by(Product.sort_order.asc(), Product.created_at.desc())
+
+    products = query.all()
     return {
         "success": True,
         "data": [p.to_dict() for p in products],
