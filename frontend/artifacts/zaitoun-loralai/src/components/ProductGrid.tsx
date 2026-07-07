@@ -80,14 +80,7 @@ export function ProductGrid() {
     return Object.keys(f).length > 0 ? f : undefined;
   }, [search, category, sortParams]);
 
-  const { data: products, isLoading, error } = useProducts(filters);
-
-  // Derive categories dynamically from the currently visible products
-  const categories = useMemo(() => {
-    if (!products) return [];
-    const cats = [...new Set(products.map(p => p.category).filter(Boolean))] as string[];
-    return cats.sort();
-  }, [products]);
+  const { data: products, isPending, isFetching, error } = useProducts(filters);
 
   const hasActiveFilters = Boolean(search || category || sortValue !== 'default');
 
@@ -120,64 +113,62 @@ export function ProductGrid() {
           </p>
         </motion.div>
 
-        {/* Filter Bar */}
-        {!isLoading && products && (
-          <div className="flex flex-col sm:flex-row gap-3 mb-10">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 text-sm bg-card border border-border rounded-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
-              />
-              {searchInput && (
-                <button
-                  onClick={() => { setSearchInput(''); setSearch(''); }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Category Filter */}
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="px-3 py-2 text-sm bg-card border border-border rounded-sm text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer min-w-[140px]"
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-
-            {/* Sort */}
-            <select
-              value={sortValue}
-              onChange={(e) => setSortValue(e.target.value)}
-              className="px-3 py-2 text-sm bg-card border border-border rounded-sm text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer min-w-[160px]"
-            >
-              {sortOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+        {/* Filter Bar — always rendered regardless of loading state */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-10">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full pl-9 pr-8 py-2 text-sm bg-card border border-border rounded-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
+            />
+            {searchInput && (
+              <button
+                onClick={() => { setSearchInput(''); setSearch(''); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        )}
 
-        {/* Loading State */}
-        {isLoading && (
+          {/* Category Filter */}
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="px-3 py-2 text-sm bg-card border border-border rounded-sm text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer min-w-[140px]"
+          >
+            <option value="">All Categories</option>
+            {(products ? [...new Set(products.map(p => p.category).filter((c): c is string => !!c))] : []).sort().map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+
+          {/* Sort */}
+          <select
+            value={sortValue}
+            onChange={(e) => setSortValue(e.target.value)}
+            className="px-3 py-2 text-sm bg-card border border-border rounded-sm text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer min-w-[160px]"
+          >
+            {sortOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Initial Loading State (only on very first load — no data yet) */}
+        {isPending && (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
             <span className="ml-3 text-muted-foreground">Loading products...</span>
           </div>
         )}
 
-        {/* Error State */}
-        {error && (
+        {/* Error State (only show if we have nothing to display) */}
+        {error && !products && (
           <div className="text-center py-20">
             <p className="text-red-500 mb-4">Failed to load products. Please try again later.</p>
             <p className="text-sm text-muted-foreground">{error.message}</p>
@@ -185,14 +176,15 @@ export function ProductGrid() {
         )}
 
         {/* Products Grid */}
-        {!isLoading && !error && products && (
-          <motion.div
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
+        {products && (
+          <>
+            <motion.div
+              variants={container}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-60px" }}
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
+            >
             {products.map((product) => (
               <motion.div
                 key={product.id}
@@ -278,17 +270,18 @@ export function ProductGrid() {
               </motion.div>
             ))}
           </motion.div>
-        )}
 
-        {/* No Products State */}
-        {!isLoading && !error && products && products.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground">
-              {hasActiveFilters
-                ? 'No products match your filters. Try adjusting your search or clearing filters.'
-                : 'No products available at the moment.'}
-            </p>
-          </div>
+            {/* Empty state inside the fragment so it coexists with the filter bar */}
+            {products.length === 0 && !isFetching && (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground">
+                  {hasActiveFilters
+                    ? 'No products match your filters. Try adjusting your search or clearing filters.'
+                    : 'No products available at the moment.'}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>

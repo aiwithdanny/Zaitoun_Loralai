@@ -2,7 +2,7 @@
  * React Query hooks for products API
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { productsApi, Product } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -37,6 +37,7 @@ export function useProducts(filters?: ProductFilters) {
     queryKey: productKeys.list(filters),
     queryFn: () => productsApi.getProducts(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    placeholderData: keepPreviousData,
   });
 }
 
