@@ -8,15 +8,17 @@ import bottle250ml from "@assets/250_ml_Bottle_1782790472883.png";
 import bottle500ml from "@assets/500_ml_Bottle_1782790552258.png";
 import can300ml from "@assets/Can_300_ml_1782790980890.png";
 import can500ml from "@assets/500_ml_can_1782791441460.png";
+import threeL from "@assets/3L.png";
+import fiveL from "@assets/5L.png";
 
-// Fallback images for products (mapped by product ID from backend)
-const productImages: Record<number, string> = {
-  1: bottle500ml,
-  2: bottle500ml,
-  3: bottle250ml,
-  4: bottle250ml,
-  5: can500ml,
-  6: bottle500ml,
+// Fallback images keyed by product slug (stable across re-seeds).
+const productImages: Record<string, string> = {
+  "extra-virgin-250ml": bottle250ml,
+  "extra-virgin-500ml": bottle500ml,
+  "extra-virgin-300ml-can": can300ml,
+  "extra-virgin-500ml-can": can500ml,
+  "extra-virgin-3l": threeL,
+  "extra-virgin-5l": fiveL,
 };
 
 const container = {
@@ -39,7 +41,7 @@ export function ProductGrid() {
       id: product.id,
       name: product.name,
       price: product.discount_price || product.price,
-      image_url: product.image_url || productImages[product.id],
+      image_url: product.image_url || productImages[product.slug],
     });
     toast.success(`${product.name} added to cart`);
   };
@@ -106,15 +108,15 @@ export function ProductGrid() {
                       Sale
                     </span>
                   )}
-                  {productImages[product.id] || product.image_url ? (
+                  {productImages[product.slug] || product.image_url ? (
                     <img
-                      src={product.image_url || productImages[product.id]}
+                      src={product.image_url || productImages[product.slug]}
                       alt={product.name}
                       className="w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
                         // Fallback to local image if URL fails
-                        if (product.image_url && productImages[product.id]) {
-                          e.currentTarget.src = productImages[product.id];
+                        if (product.image_url && productImages[product.slug]) {
+                          e.currentTarget.src = productImages[product.slug];
                         }
                       }}
                     />
