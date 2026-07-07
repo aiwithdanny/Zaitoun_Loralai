@@ -4,11 +4,12 @@
  */
 
 import { useEffect, useState } from 'react';
-import { adminApi } from '@/lib/api';
+import { adminApi, ordersApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatPrice } from '@/utils/currency';
+import { OrderDetailModal } from '@/components/admin/OrderDetailModal';
 
 interface DashboardStats {
   total_products: number;
@@ -43,6 +44,18 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Recent orders state
+  const [recentOrders, setRecentOrders] = useState<Array<{
+    id: number;
+    order_number: string;
+    customer_name: string;
+    total_amount: number;
+    status: string;
+    payment_status: string;
+    created_at: string;
+  }>>([]);
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+
   // Fetch stats on mount
   useEffect(() => {
     const fetchStats = async () => {
@@ -60,7 +73,17 @@ export default function AdminDashboard() {
     };
 
     fetchStats();
+    fetchRecentOrders();
   }, []);
+
+  const fetchRecentOrders = async () => {
+    try {
+      const response = await ordersApi.getOrders(1, 5);
+      setRecentOrders(response.data);
+    } catch {
+      // Non-critical — don't block dashboard
+    }
+  };
 
   // Prepare chart data — include ALL statuses, fill zeros for missing
   const chartData = ALL_STATUSES.map((status) => ({
@@ -288,6 +311,76 @@ export default function AdminDashboard() {
                 </table>
               </div>
             </div>
+          )}
+
+          {/* Recent Orders Widget */}
+          {recentOrders.length > 0 && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
+                <Link href="/admin/orders">
+                  <a className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                    View all &rarr;
+                  </a>
+                </Link>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Order #</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Customer</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
+                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Total</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {recentOrders.map((order) => (
+                      <tr
+                        key={order.id}
+                        onClick={() => setSelectedOrder(order.order_number)}
+                        className="hover:bg-gray-50 transition cursor-pointer"
+                      >
+                        <td className="px-6 py-4 text-sm text-gray-900 font-mono font-medium">{order.order_number}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{order.customer_name}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {new Date(order.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
+                          {formatPrice(order.total_amount)}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                            order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                            order.status === 'processing' ? 'bg-purple-100 text-purple-800' :
+                            order.status === 'shipped' ? 'bg-indigo-100 text-indigo-800' :
+                            order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                            order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Order Detail Modal */}
+          {selectedOrder && (
+            <OrderDetailModal
+              orderNumber={selectedOrder}
+              onClose={() => setSelectedOrder(null)}
+              onOrderUpdated={() => {
+                // Refetch recent orders after status change
+                fetchRecentOrders();
+              }}
+            />
           )}
         </>
       )}
