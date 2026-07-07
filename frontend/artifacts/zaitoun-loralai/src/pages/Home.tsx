@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { FeaturedProduct } from "@/components/FeaturedProduct";
 import { ProductGrid } from "@/components/ProductGrid";
 import { QualityFeatures } from "@/components/QualityFeatures";
+import { TestimonialSection } from "@/components/TestimonialSection";
 import { Story } from "@/components/Story";
 import { About } from "@/components/About";
 import { TastingNotes } from "@/components/TastingNotes";
@@ -18,6 +19,7 @@ function Home() {
         <FeaturedProduct />
         <ProductGrid />
         <QualityFeatures />
+        <TestimonialSection />
         <Story />
         <About />
         <TastingNotes />
