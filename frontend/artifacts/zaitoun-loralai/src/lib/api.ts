@@ -165,6 +165,29 @@ export const productsApi = {
   deleteProduct: async (slug: string): Promise<void> => {
     await apiFetch(`/products/${slug}`, { method: 'DELETE' }, 'admin');
   },
+
+  // Upload product image to Cloudinary (admin only)
+  uploadImage: async (file: File): Promise<string> => {
+    const token = localStorage.getItem('admin_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/products/upload-image`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(errorData.detail || 'Image upload failed');
+    }
+
+    const data = await response.json();
+    return data.url;
+  },
 };
 
 // ==================== ORDER API ====================

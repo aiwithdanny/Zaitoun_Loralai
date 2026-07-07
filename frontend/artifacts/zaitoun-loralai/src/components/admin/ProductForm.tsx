@@ -2,11 +2,13 @@
  * Product Form Component
  * Reusable form for creating and editing products
  * Used in modals by AdminProducts page
+ * Supports both file upload (Cloudinary) and URL image input.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Product, productsApi } from '@/lib/api';
 import { toast } from 'sonner';
+import { Loader2, Upload, X, ImageIcon } from 'lucide-react';
 
 interface ProductFormProps {
   product?: Product;
@@ -15,7 +17,11 @@ interface ProductFormProps {
   isLoading?: boolean;
 }
 
+const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp';
+
 export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: ProductFormProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -29,6 +35,9 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Pre-fill form if editing
   useEffect(() => {
@@ -46,6 +55,13 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
       });
     }
   }, [product]);
+
+  // Clean up preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (filePreview) URL.revokeObjectURL(filePreview);
+    };
+  }, [filePreview]);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -95,12 +111,58 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate type
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      toast.error('Invalid file type. Accepted: JPEG, PNG, WebP');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // Validate size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum: 5MB`);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+    setFilePreview(URL.createObjectURL(file));
+    // Clear any URL text when a file is selected — file takes priority
+    setFormData((prev) => ({ ...prev, image_url: '' }));
+  };
+
+  const clearFileSelection = () => {
+    setSelectedFile(null);
+    if (filePreview) URL.revokeObjectURL(filePreview);
+    setFilePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
+    }
+
+    let imageUrl = formData.image_url || null;
+
+    // If a file was selected, upload to Cloudinary first
+    if (selectedFile) {
+      setIsUploading(true);
+      try {
+        imageUrl = await productsApi.uploadImage(selectedFile);
+      } catch (err: any) {
+        toast.error(err.message || 'Image upload failed');
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
     }
 
     const submitData: Partial<Product> = {
@@ -111,12 +173,14 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
       discount_price: formData.discount_price ? parseFloat(formData.discount_price) : null,
       stock: parseInt(formData.stock, 10),
       category: formData.category || null,
-      image_url: formData.image_url || null,
+      image_url: imageUrl,
       is_featured: formData.is_featured,
     };
 
     onSubmit(submitData);
   };
+
+  const showUrlInput = !selectedFile; // hide URL field when a file is selected
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -132,7 +196,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
             errors.name ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="e.g., Premium Olive Oil"
-          disabled={isLoading}
+          disabled={isLoading || isUploading}
         />
         {errors.name && <p className="text-red-600 text-xs mt-1">{errors.name}</p>}
       </div>
@@ -149,7 +213,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
             errors.description ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Detailed product description (min 10 characters)"
-          disabled={isLoading}
+          disabled={isLoading || isUploading}
         />
         {errors.description && <p className="text-red-600 text-xs mt-1">{errors.description}</p>}
       </div>
@@ -164,7 +228,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
           onChange={handleChange}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Brief one-liner for listings"
-          disabled={isLoading}
+          disabled={isLoading || isUploading}
         />
       </div>
 
@@ -183,7 +247,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
               errors.price ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="0.00"
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
           />
           {errors.price && <p className="text-red-600 text-xs mt-1">{errors.price}</p>}
         </div>
@@ -201,7 +265,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
               errors.discount_price ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Leave blank if no discount"
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
           />
           {errors.discount_price && <p className="text-red-600 text-xs mt-1">{errors.discount_price}</p>}
         </div>
@@ -220,7 +284,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
             errors.stock ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="0"
-          disabled={isLoading}
+          disabled={isLoading || isUploading}
         />
         {errors.stock && <p className="text-red-600 text-xs mt-1">{errors.stock}</p>}
       </div>
@@ -235,23 +299,84 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
           onChange={handleChange}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="e.g., Oils, Spices"
-          disabled={isLoading}
+          disabled={isLoading || isUploading}
         />
       </div>
 
-      {/* Image URL */}
+      {/* ===== Image Section ===== */}
+
+      {/* Option 1: File Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-        <input
-          type="url"
-          name="image_url"
-          value={formData.image_url}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="https://example.com/image.jpg"
-          disabled={isLoading}
-        />
+        <label className="block text-sm font-medium text-gray-700 mb-1">Upload Image</label>
+        <div
+          className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition ${
+            filePreview ? 'border-green-400 bg-green-50/30' : 'border-gray-300'
+          }`}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_IMAGE_TYPES}
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={isLoading || isUploading}
+          />
+
+          {filePreview ? (
+            <div className="relative inline-block">
+              <img
+                src={filePreview}
+                alt="Preview"
+                className="max-h-32 mx-auto rounded object-contain"
+              />
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); clearFileSelection(); }}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 shadow hover:bg-red-600"
+                disabled={isUploading}
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <p className="text-xs text-gray-500 mt-1">{selectedFile?.name} ({(selectedFile!.size / 1024).toFixed(0)}KB)</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-1 text-gray-400">
+              <Upload className="w-6 h-6" />
+              <p className="text-sm font-medium">Click to upload an image</p>
+              <p className="text-xs">JPEG, PNG, or WebP &middot; Max 5MB</p>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Option 2: Image URL (shown when no file selected) */}
+      {showUrlInput && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Or paste image URL</label>
+          <input
+            type="url"
+            name="image_url"
+            value={formData.image_url}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="https://example.com/image.jpg"
+            disabled={isLoading || isUploading}
+          />
+        </div>
+      )}
+
+      {/* Image preview for URL-based images */}
+      {!filePreview && formData.image_url && (
+        <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+          <img src={formData.image_url} alt="" className="w-12 h-12 rounded object-cover border" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-gray-500 truncate">{formData.image_url}</p>
+            <p className="text-xs text-green-600">URL image</p>
+          </div>
+          <ImageIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        </div>
+      )}
 
       {/* Featured Checkbox */}
       <div className="flex items-center">
@@ -262,7 +387,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
           onChange={handleChange}
           id="is_featured"
           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          disabled={isLoading}
+          disabled={isLoading || isUploading}
         />
         <label htmlFor="is_featured" className="ml-2 block text-sm text-gray-700">
           Mark as Featured Product
@@ -274,17 +399,18 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
         <button
           type="button"
           onClick={onCancel}
-          disabled={isLoading}
+          disabled={isLoading || isUploading}
           className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
-          disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition disabled:opacity-50"
+          disabled={isLoading || isUploading}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition disabled:opacity-50 flex items-center gap-2"
         >
-          {isLoading ? 'Saving...' : product ? 'Update Product' : 'Add Product'}
+          {(isUploading) && <Loader2 className="w-4 h-4 animate-spin" />}
+          {isUploading ? 'Uploading image...' : isLoading ? 'Saving...' : product ? 'Update Product' : 'Add Product'}
         </button>
       </div>
     </form>
