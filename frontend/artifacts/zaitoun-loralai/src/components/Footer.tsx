@@ -28,8 +28,8 @@ export function Footer() {
               {BRAND.tagline}. Purveyors of exceptionally crafted extra virgin olive oil from the mountains.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-[#FAF7F2]/60 hover:text-accent transition-colors"><Instagram className="w-5 h-5" /></a>
-              <a href="#" className="text-[#FAF7F2]/60 hover:text-accent transition-colors"><Facebook className="w-5 h-5" /></a>
+              <a href="https://www.instagram.com/zaitounloralai" target="_blank" rel="noopener noreferrer" className="text-[#FAF7F2]/60 hover:text-accent transition-colors"><Instagram className="w-5 h-5" /></a>
+              <a href="https://www.facebook.com/zaitounloralai" target="_blank" rel="noopener noreferrer" className="text-[#FAF7F2]/60 hover:text-accent transition-colors"><Facebook className="w-5 h-5" /></a>
               <a href="#" className="text-[#FAF7F2]/60 hover:text-accent transition-colors"><Twitter className="w-5 h-5" /></a>
             </div>
           </div>
