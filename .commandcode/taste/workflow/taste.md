@@ -1,0 +1,12 @@
+# workflow
+- Present a plan and get user approval before writing any code or final content. Confidence: 0.82
+- Implement in this order: database migration first (with verification), then backend files, then frontend files — with build/import checks after each major step. Confidence: 0.78
+- Show real proof at each checkpoint (e.g., before/after data snapshots, live request/response output) rather than just confirmation statements. Confidence: 0.77
+- Investigate and report findings with file/line references before proposing or implementing any fix. Confidence: 0.73
+- Use phased implementation plans: for each phase specify exact new/modified files, backend endpoints with response schemas, and build/test checkpoints between phases. Confidence: 0.78
+- Explicitly call out what is NOT in scope to maintain focus and prevent scope creep. Confidence: 0.73
+- When told to \"continue\" and the next task is ambiguous, ask the user to clarify what to continue with rather than picking up unrelated pending changes autonomously. Confidence: 0.85
+- Show a dry-run/preview before executing any data-modifying operations (database updates, backfills, bulk changes) — let the user review and approve before running the real thing. Confidence: 0.80
+- Investigate first without making any code changes — user will explicitly say when to proceed to implementation; do not skip ahead to proposing or writing fixes during the investigation phase. Confidence: 0.78
+- When debugging, prefer direct code reading and analysis over runtime reproduction/tooling — if browser automation or similar tools repeatedly fail, switch to reading the relevant source files and reasoning through the logic by hand. Confidence: 0.80
+- Do not re-verify already-confirmed facts (e.g. backend verified working) — once confirmed, move on to the actual root cause and do not re-test the same thing repeatedly. Confidence: 0.80

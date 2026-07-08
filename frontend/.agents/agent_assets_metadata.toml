@@ -1,0 +1,38 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "FNsSjhGSkUhzoW-1Rvjxz"
+uri = "file://artifacts/zaitoun-loralai/src/assets/hero-bg.png"
+type = "image"
+title = "Olive grove at golden hour"
+
+[[generated]]
+id = "v0lxpGu9-K-u9vr54ECvT"
+uri = "file://artifacts/zaitoun-loralai/src/assets/product-bottle.png"
+type = "image"
+title = "Premium olive oil bottle"
+
+[[generated]]
+id = "4E_ZSYe67QzDNLjwAHyMQ"
+uri = "file://artifacts/zaitoun-loralai/src/assets/story-landscape.png"
+type = "image"
+title = "Mountain olive grove"
+
+[[generated]]
+id = "sKtyxO8mFl5NGJu-LVr6c"
+uri = "file://artifacts/zaitoun-loralai/src/assets/recipe-roasted-veg.png"
+type = "image"
+title = "Roasted vegetables plating"
+
+[[generated]]
+id = "cmZ8h_bcwz5svwW87eeJZ"
+uri = "file://artifacts/zaitoun-loralai/src/assets/recipe-bread.png"
+type = "image"
+title = "Fresh bread with oil"
+
+[[generated]]
+id = "AD-zc7abnfkGOl_p65Lak"
+uri = "file://artifacts/zaitoun-loralai/src/assets/recipe-salad.png"
+type = "image"
+title = "Fresh summer salad"

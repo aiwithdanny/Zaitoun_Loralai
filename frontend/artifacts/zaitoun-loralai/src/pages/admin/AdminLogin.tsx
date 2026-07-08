@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { motion } from 'framer-motion';
 import { adminApi } from '@/lib/api';
 import { toast } from 'sonner';
 import logoImg from "@assets/Official_Logo_1782757596768.png";
@@ -51,12 +52,20 @@ export default function AdminLogin() {
       <div className="w-full md:w-[40%] flex items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-sm">
           {/* Brand */}
-          <div className="mb-8 text-center md:text-left">
-            <img
-              src={logoImg}
-              alt="Zaitoun Loralai"
-              className="h-12 mx-auto md:mx-0 mb-4"
-            />
+          <div className="mb-10 text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <div className="w-48 h-48 mx-auto rounded-full overflow-hidden bg-card border border-card-border shadow-sm flex items-center justify-center mb-5">
+                <img
+                  src={logoImg}
+                  alt="Zaitoun Loralai"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </motion.div>
             <h1 className="text-2xl font-serif text-foreground">Zaitoun Loralai</h1>
             <p className="text-muted-foreground text-sm mt-1">
               Welcome back. Sign in to the dashboard.

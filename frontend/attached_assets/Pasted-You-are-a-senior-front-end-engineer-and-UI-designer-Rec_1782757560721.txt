@@ -1,0 +1,117 @@
+You are a senior front-end engineer and UI designer.
+
+Recreate a premium olive oil ecommerce landing page inspired by a modern Vercel-hosted product site. Build a polished, production-ready website for the brand “Zaitoun Loralai” with the same visual mood, hierarchy, spacing, and luxury editorial feel, but do not copy any copyrighted text verbatim. Use original copy while preserving the structure and experience.
+
+Design goals:
+- Elegant, premium, minimal, and warm.
+- Olive oil brand aesthetic: deep olive greens, ivory backgrounds, soft beige accents, subtle gold highlights.
+- High-end ecommerce feel with large imagery, refined typography, and generous whitespace.
+- Smooth transitions, subtle hover states, and a modern premium product presentation.
+
+Branding:
+- Site name: Zaitoun Loralai.
+- Include the official logo that I will provide. Place it in the header, mobile menu, and footer where appropriate.
+- Use the logo exactly as supplied, without redesigning or altering its proportions.
+- Make the logo feel integrated with the premium brand identity.
+
+Owner / CEO section:
+- Add a CEO/owner profile card with the photo I will provide.
+- Name: Abdul Naqeeb.
+- Include a short professional description under the photo, such as:
+  “Abdul Naqeeb leads Zaitoun Loralai with a commitment to quality, authenticity, and premium olive oil crafted from the heart of Pakistan.”
+- Keep the description short, polished, and trustworthy.
+- Make the about section feel elegant and brand-focused.
+
+Tech stack:
+- Next.js 14+ App Router.
+- React + TypeScript.
+- Tailwind CSS.
+- shadcn/ui style components if useful.
+- Fully responsive for mobile, tablet, desktop.
+- Use optimized images and clean component structure.
+
+Page structure:
+1. Sticky header
+   - Left: official Zaitoun Loralai logo.
+   - Center or right navigation links: Shop, Story, Quality, Recipes, Contact.
+   - Cart icon or small action button.
+   - Transparent or lightly blurred header over hero, becoming solid on scroll.
+
+2. Hero section
+   - Large split layout or centered editorial layout.
+   - Strong headline about premium extra virgin olive oil.
+   - Short supporting paragraph focused on harvest, purity, and flavor.
+   - Primary CTA: Shop Now.
+   - Secondary CTA: Learn More.
+   - Large product bottle image and/or olive grove imagery.
+   - Background gradients or soft textured ivory canvas.
+
+3. Featured product area
+   - Product card with bottle image, name, tasting notes, origin, size, and price.
+   - A refined “add to cart” or “view product” button.
+   - Make the product feel artisanal and luxurious.
+
+4. Quality / benefits section
+   - 3 to 4 feature blocks with icons.
+   - Examples: Cold-pressed, Harvested early, Single origin, Small batch.
+   - Keep copy short and premium.
+
+5. Story section
+   - Editorial layout with a landscape image and story text.
+   - Describe origin, craft, and heritage.
+   - Include a quote-style highlight.
+   - Mention Loralai as the origin story and source of the olives where relevant.
+
+6. About / leadership section
+   - Include the CEO/owner photo provided by me.
+   - Add the name Abdul Naqeeb.
+   - Add a short elegant description beneath the photo.
+   - Present this as a clean profile card or editorial block.
+
+7. Product details / tasting notes
+   - Use cards or a clean grid.
+   - Show flavor profile, aroma, acidity, pairings, and certifications.
+   - Keep the language premium and accurate.
+
+8. Recipe or serving ideas section
+   - 2 or 3 recipe cards or usage cards.
+   - Example ideas: salads, grilled vegetables, fresh bread.
+   - Keep it elegant and minimal.
+
+9. Footer
+   - Brand text, links, newsletter field, and social links.
+   - Dark olive or near-black footer with ivory text.
+
+Visual style:
+- Typography: sophisticated serif for headings and clean sans-serif for body.
+- Use large, expressive headlines and smaller refined body text.
+- Rounded corners should be subtle, not overly playful.
+- Use soft shadows, thin borders, and delicate dividers.
+- Animation should feel premium, not flashy.
+
+Content direction:
+- Write original copy that sounds like a luxury olive oil brand.
+- Avoid generic filler language.
+- Make it sound authentic, artisanal, and confident.
+- Use a consistent voice throughout.
+- Reference Pakistan and Loralai naturally and tastefully.
+
+Implementation requirements:
+- Create reusable components.
+- Put all data in a single config file or constants object.
+- Use semantic HTML and accessible labels.
+- Add responsive spacing and layout behavior.
+- Include placeholder images if actual assets are unavailable, but structure the code so real assets can be dropped in later.
+- Make the page visually impressive even with placeholder content.
+
+Output requirements:
+- Provide the full Next.js page code.
+- Provide any supporting components needed.
+- Include the Tailwind class names.
+- Keep the code clean and ready to paste into a project.
+
+Important:
+- Match the premium visual feel of a modern olive oil storefront.
+- Prioritize layout, spacing, typography, and atmosphere.
+- Do not use copyrighted text from any existing website.
+- If you are uncertain about a detail, make a tasteful design choice that fits a luxury olive oil brand.

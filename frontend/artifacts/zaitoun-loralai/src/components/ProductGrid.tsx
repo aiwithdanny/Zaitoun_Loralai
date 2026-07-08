@@ -182,7 +182,7 @@ export function ProductGrid() {
               variants={container}
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ margin: "-60px" }}
               className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
             >
             {products.map((product) => (
