@@ -1,9 +1,0 @@
-fix: product cards stuck invisible after clearing search filter
-
-Removed viewport={{ once: true }} from the grid container's whileInView
-config. This caused newly mounted child motion.div elements to inherit
-initial="hidden" (opacity: 0, y: 32) without ever receiving the "show"
-variant — because whileInView had already fired its single permitted time
-on the previous render cycle.
-
-Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

@@ -181,8 +181,7 @@ export function ProductGrid() {
             <motion.div
               variants={container}
               initial="hidden"
-              whileInView="show"
-              viewport={{ margin: "-60px" }}
+              animate="show"
               className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
             >
             {products.map((product) => (
