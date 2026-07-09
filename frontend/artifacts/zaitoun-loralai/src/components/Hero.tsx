@@ -1,8 +1,18 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
 import heroImg from "@/assets/hero-bg.png";
 
 export function Hero() {
+  const [displayedChars, setDisplayedChars] = useState(0);
+  const headline = BRAND.hero.headline;
+
+  useEffect(() => {
+    if (displayedChars >= headline.length) return;
+    const timer = setTimeout(() => setDisplayedChars((c) => c + 1), 50);
+    return () => clearTimeout(timer);
+  }, [displayedChars, headline.length]);
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center pt-20">
       <div className="absolute inset-0 z-0">
@@ -12,7 +22,7 @@ export function Hero() {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-background"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent"></div>
       </div>
 
       <div className="container relative z-10 mx-auto px-4 text-center max-w-4xl mt-16">
@@ -29,9 +39,9 @@ export function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6 leading-tight"
+          className="text-4xl md:text-5xl lg:text-5xl font-['Cinzel'] uppercase text-white mb-6 leading-tight"
         >
-          {BRAND.hero.headline}
+          {headline.slice(0, displayedChars)}
         </motion.h1>
         
         <motion.p
@@ -50,7 +60,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <a 
-            href="#shop" 
+            href="#products" 
             className="px-8 py-4 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
           >
             {BRAND.hero.primaryCta}
