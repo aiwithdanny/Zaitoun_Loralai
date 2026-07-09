@@ -1,6 +1,6 @@
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { FeaturedProduct } from "@/components/FeaturedProduct";
+
 import { ProductGrid } from "@/components/ProductGrid";
 import { QualityFeatures } from "@/components/QualityFeatures";
 import { TestimonialSection } from "@/components/TestimonialSection";
@@ -16,7 +16,6 @@ function Home() {
       <Header />
       <main>
         <Hero />
-        <FeaturedProduct />
         <ProductGrid />
         <QualityFeatures />
         <TestimonialSection />

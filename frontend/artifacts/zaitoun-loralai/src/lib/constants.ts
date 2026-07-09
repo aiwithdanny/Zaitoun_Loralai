@@ -2,7 +2,7 @@ export const BRAND = {
   name: "Zaitoun Loralai",
   tagline: "Crafted from the heart of Pakistan",
   navLinks: [
-    { label: "Shop", href: "#shop" },
+    { label: "Shop", href: "#products" },
     { label: "Story", href: "#story" },
     { label: "Quality", href: "#quality" },
     { label: "Recipes", href: "#recipes" },

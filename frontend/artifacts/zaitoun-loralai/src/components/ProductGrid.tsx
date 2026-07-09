@@ -258,7 +258,7 @@ export function ProductGrid() {
                     </div>
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="flex items-center gap-2 text-xs uppercase tracking-widest text-primary border border-primary px-3 py-2 hover:bg-primary hover:text-primary-foreground transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={product.stock === 0}
                     >
                       <ShoppingBag className="w-3.5 h-3.5" />
