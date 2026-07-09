@@ -27,14 +27,14 @@ def run_migration():
         with engine.connect() as conn:
             conn.execute(text("""
                 CREATE TABLE customers (
-                    id INTEGER NOT NULL PRIMARY KEY,
+                    id SERIAL NOT NULL PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     email VARCHAR(255) NOT NULL UNIQUE,
                     phone VARCHAR(50),
                     password_hash VARCHAR(255) NOT NULL,
-                    is_active BOOLEAN DEFAULT 1,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    last_login DATETIME
+                    is_active BOOLEAN DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_login TIMESTAMP
                 )
             """))
             conn.commit()

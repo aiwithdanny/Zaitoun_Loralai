@@ -1,5 +1,5 @@
 """
-Database configuration for PlanetScale MySQL
+Database configuration — supports PostgreSQL (primary), MySQL, and SQLite (local dev/tests)
 """
 
 from sqlalchemy import create_engine
@@ -10,8 +10,8 @@ import os
 
 load_dotenv()
 
-# Database URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+# Database URL from environment (e.g. postgresql://..., mysql+pymysql://..., sqlite:///...)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is not set")
