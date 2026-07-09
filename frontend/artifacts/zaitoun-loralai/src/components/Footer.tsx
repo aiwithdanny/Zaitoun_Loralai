@@ -63,6 +63,7 @@ export function Footer() {
               <li>Loralai, Balochistan</li>
               <li>Pakistan</li>
               <li><a href="mailto:info@Zaitoun.loralai@gmail.com" className="hover:text-white">info@Zaitoun.loralai@gmail.com</a></li>
+              <li><a href="tel:03425583198" className="hover:text-white">03425583198</a></li>
             </ul>
           </div>
 
