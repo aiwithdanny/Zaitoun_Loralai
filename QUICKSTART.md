@@ -20,7 +20,7 @@ Starts both services in one terminal with labeled output:
   - API Docs (Swagger): http://localhost:8000/docs
   - Automatically seeds database with 6 products
   
-- **Frontend**: http://localhost:5173
+- **Frontend**: http://localhost:3000
   - React app with Zaitoun e-commerce interface
 
 ## First Time Setup
@@ -58,7 +58,7 @@ pnpm -C artifacts/zaitoun-loralai dev
 
 ## What to Test After Startup
 
-1. **Frontend loads**: Visit http://localhost:5173
+1. **Frontend loads**: Visit http://localhost:3000
 2. **API works**: Visit http://localhost:8000/docs
 3. **Products show**: Check if 6 items appear on homepage
 4. **Add to cart**: Click "Add" on any product
@@ -76,14 +76,14 @@ Press `Ctrl+C` in the terminal — both services stop together.
 - Run: `npm install concurrently --save-dev`
 
 **"CORS error" in browser**
-- Verify backend `.env` has: `FRONTEND_URL=http://localhost:5173`
+- Verify backend `.env` has: `FRONTEND_URL=http://localhost:3000`
 - Restart backend
 
 **Frontend shows "Loading products..."**
 - Check backend is running: `curl http://localhost:8000/api/v1/products`
 - If backend is down, frontend uses mock data (check console)
 
-**Port 5173 or 8000 already in use**
+**Port 3000 or 8000 already in use**
 - Kill process on that port or change in the scripts
 
 ---

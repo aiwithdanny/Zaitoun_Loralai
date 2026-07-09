@@ -11,7 +11,7 @@ pip install -r requirements.txt
 
 ### 2. Initialize Database
 
-The database is configured to use SQLite locally for development (`zaitoun.db`). Tables auto-create on first run.
+The database is configured to use SQLite for local development (`zaitoun.db`). Tables auto-create on first run.
 
 ### 3. Seed Initial Products
 
@@ -57,6 +57,15 @@ API available at `http://localhost:8000`
 - `GET /api/v1/admin/profile` — Get profile (requires token)
 - `GET /api/v1/admin/stats` — Get stats (requires token)
 
+### Customers
+- `POST /api/v1/customers/register` — Register customer account
+- `POST /api/v1/customers/login` — Login → JWT (customer token)
+- `GET /api/v1/customers/me` — Get profile (requires customer token)
+- `GET /api/v1/customers/me/orders` — Get order history (requires customer token)
+
+### Upload (Admin)
+- `POST /api/v1/products/upload-image` — Upload product image to Cloudinary (multipart, admin)
+
 ---
 
 ## Authentication
@@ -82,10 +91,13 @@ Authorization: Bearer <your_jwt_token>
 ```
 DATABASE_URL=sqlite:///./zaitoun.db
 SECRET_KEY=dev-secret-key-very-insecure-change-in-production
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=http://localhost:3000
 WHATSAPP_API_TOKEN=test-api-token-dev
 WHATSAPP_PHONE_NUMBER_ID=test-phone-id-dev
 WEBHOOK_VERIFY_TOKEN=test-webhook-token-dev
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 ---
@@ -106,6 +118,9 @@ WEBHOOK_VERIFY_TOKEN=test-webhook-token-dev
 
 **AdminUsers**
 - id, username (unique), email (unique), password_hash, is_active, is_admin, created_at, last_login
+
+**Customers**
+- id, name, email (unique), phone, password_hash, is_active, created_at, last_login
 
 ---
 
@@ -145,5 +160,5 @@ curl -X POST http://localhost:8000/api/v1/newsletter/subscribe \
 2. Run frontend: `pnpm run dev` in `frontend/artifacts/zaitoun-loralai/`
 3. Test full flow: Add to cart → Checkout → Place order
 4. Verify orders appear in database
-5. Build admin panel (future)
+5. Admin panel is built — use `/admin/login` to sign in
 

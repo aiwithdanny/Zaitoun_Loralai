@@ -31,7 +31,7 @@ Expected output:
 ```
   VITE v7.3.5  ready in XXX ms
   
-  ➜  Local:   http://localhost:5173/
+  ➜  Local:   http://localhost:3000/
   ➜  press h to show help
 ```
 
@@ -40,7 +40,7 @@ Expected output:
 ## Browser Testing Flow
 
 ### Step 1: Visit Frontend
-- Open http://localhost:5173 in browser
+- Open http://localhost:3000 in browser
 - Should see: Hero section, products grid, footer with newsletter
 
 ### Step 2: Test Product Loading
@@ -139,7 +139,7 @@ db.close()
 - Check browser console (F12) for errors
 
 ### "CORS error" in browser console
-- Verify backend's `.env` has: `FRONTEND_URL=http://localhost:5173`
+- Verify backend's `.env` has: `FRONTEND_URL=http://localhost:3000`
 - Restart backend after changing `.env`
 
 ### Products don't show prices
@@ -201,6 +201,90 @@ Once all tests pass:
 - [ ] No console errors ✓
 
 Then you can:
-1. Build admin panel to view orders/products
+1. Admin panel is built at `/admin/login` — sign in to manage products/orders
 2. Add WhatsApp payment integration
 3. Deploy to production (Vercel + Railway)
+
+---
+
+## Admin Panel Testing
+
+### Step A: Visit Admin Login
+- Open http://localhost:3000/admin/login in browser
+- Should see: split-screen layout with login form on left, brand image on right
+- Form fields: Username, Password, and "Sign In" button
+
+### Step B: Admin Login
+- Use credentials for the registered admin user (or register one-time via API)
+- `POST /api/v1/admin/register` with username, email, password (first registration only)
+- Fill in admin login form and submit
+- Should see:
+  - ✅ Toast: "Welcome back, [username]!"
+  - ✅ Redirect to `/admin/dashboard`
+  - ✅ Sidebar with navigation (Dashboard, Products, Orders, Logout)
+  - ✅ Top header showing admin username
+
+### Step C: Dashboard Analytics
+- After login, the dashboard should display:
+  - ✅ Total products count
+  - ✅ Total revenue (from paid orders)
+  - ✅ Revenue this month
+  - ✅ Order status breakdown chart/table
+  - ✅ Low stock products alert
+  - ✅ Pending orders count
+  - ✅ Orders today count
+  - ✅ New customers this month
+  - ✅ Top 5 products by revenue
+
+### Step D: Product Management
+- Navigate to Products via sidebar
+- Should see:
+  - ✅ List of all products with name, price, stock, status
+  - ✅ "Add Product" button to create new products
+  - ✅ Clicking a product opens edit form with:
+    - Name, description, short description, price, discount price
+    - Stock quantity, category, sort order
+    - Image upload (Cloudinary), featured/active toggles
+  - ✅ Products can be archived (is_active toggle)
+
+### Step E: Image Upload
+- While editing a product, click the image upload area
+- Select a JPEG/PNG/WebP image (max 5MB)
+- Should see:
+  - ✅ Image preview after upload
+  - ✅ Cloudinary URL saved to product
+
+### Step F: Order Management
+- Navigate to Orders via sidebar
+- Should see:
+  - ✅ List of all orders with order number, customer, amount, status
+  - ✅ Click an order to view details (items, payment info)
+  - ✅ Status can be updated (pending → confirmed → processing → shipped → delivered)
+  - ✅ Payment status can be updated (unpaid → paid → refunded)
+
+### Step G: Logout
+- Click Logout in sidebar footer
+- Should see:
+  - ✅ Toast: "Logged out successfully"
+  - ✅ Redirect to `/admin/login`
+
+---
+
+## Additional Test: Customer Registration & Login
+
+### Step A: Register Customer
+- Visit http://localhost:3000/register
+- Fill in name, email, phone, password
+- Submit → Should see success toast
+- Customer is now stored in the `customers` table
+
+### Step B: Customer Login
+- Visit http://localhost:3000/login
+- Enter email and password
+- Submit → Should redirect to home page
+- Header should show customer name dropdown instead of Login/Register buttons
+
+### Step C: Place Order While Logged In
+- Add items to cart, proceed to checkout
+- Order should be linked to the customer account
+- Check `/account/orders` to see order history
