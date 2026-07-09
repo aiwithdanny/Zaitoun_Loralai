@@ -76,14 +76,14 @@ export function TestimonialSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="bg-card border border-border rounded-lg p-8 md:p-12 text-center"
+                className="bg-primary text-primary-foreground rounded-lg p-8 md:p-12 text-center"
               >
                 {/* Quotation mark ornament */}
-                <span className="block font-serif text-6xl leading-none text-accent/30 mb-4">
+                <span className="block font-serif text-6xl leading-none text-accent/40 mb-4">
                   &ldquo;
                 </span>
 
-                <blockquote className="font-serif text-xl md:text-2xl text-foreground leading-relaxed mb-8">
+                <blockquote className="font-serif text-xl md:text-2xl text-white/90 leading-relaxed mb-8">
                   {testimonials[current].quote}
                 </blockquote>
 
@@ -94,16 +94,16 @@ export function TestimonialSection() {
                       className={`w-5 h-5 ${
                         i < testimonials[current].rating
                           ? "text-accent fill-accent"
-                          : "text-muted-foreground"
+                          : "text-primary-foreground/20"
                       }`}
                     />
                   ))}
                 </div>
 
-                <p className="font-semibold text-foreground">
+                <p className="font-semibold text-white">
                   {testimonials[current].name}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-primary-foreground/70">
                   {testimonials[current].location}
                 </p>
               </motion.div>
