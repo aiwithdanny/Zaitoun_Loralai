@@ -28,3 +28,8 @@ dist/
 .coverage
 htmlcov/
 .tox/
+
+# Migration scripts with credentials (never commit)
+dump_and_import.py
+check_tables.py
+sqlite_dump.json
