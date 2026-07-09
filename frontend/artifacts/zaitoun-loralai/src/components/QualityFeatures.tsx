@@ -26,10 +26,10 @@ const item = {
 
 export function QualityFeatures() {
   return (
-    <section id="quality" className="py-24 bg-muted/20 border-y border-border/50">
+    <section id="quality" className="py-24 bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 md:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-serif text-foreground mb-4">Uncompromising Quality</h2>
+          <h2 className="text-3xl md:text-4xl font-serif text-white mb-4">Uncompromising Quality</h2>
           <div className="h-px w-16 bg-accent mx-auto"></div>
         </div>
         
@@ -42,11 +42,11 @@ export function QualityFeatures() {
         >
           {BRAND.quality.map((feature, i) => (
             <motion.div key={i} variants={item} className="flex flex-col items-center text-center group">
-              <div className="w-16 h-16 rounded-full bg-background border border-border flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-full bg-primary-foreground/10 border border-primary-foreground/20 flex items-center justify-center text-accent mb-6 group-hover:scale-110 transition-transform duration-500">
                 {iconMap[feature.icon]}
               </div>
-              <h3 className="font-serif text-xl text-foreground mb-3">{feature.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <h3 className="font-serif text-xl text-white mb-3">{feature.title}</h3>
+              <p className="text-primary-foreground/80 text-sm leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

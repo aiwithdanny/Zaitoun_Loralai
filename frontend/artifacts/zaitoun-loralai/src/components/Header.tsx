@@ -70,7 +70,7 @@ export function Header() {
               key={link.label}
               href={link.href}
               className={`text-sm tracking-wide transition-colors hover:text-primary ${
-                isScrolled ? "text-foreground" : "text-foreground"
+                isScrolled ? "text-foreground" : "text-white/90"
               }`}
             >
               {link.label}
@@ -119,7 +119,7 @@ export function Header() {
               </div>
             ) : (
               <>
-                <a href="/login" className="text-sm tracking-wide hover:text-primary transition-colors">Login</a>
+                <a href="/login" className={`text-sm tracking-wide hover:text-primary transition-colors ${isScrolled ? "text-foreground" : "text-white/90"}`}>Login</a>
                 <a href="/register" className="text-sm px-4 py-1.5 bg-accent text-accent-foreground rounded-lg font-medium hover:opacity-90 transition">Register</a>
               </>
             )}
