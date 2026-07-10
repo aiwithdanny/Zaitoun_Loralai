@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm --dir artifacts/zaitoun-loralai build",
+  "installCommand": "pnpm install",
+  "outputDirectory": "artifacts/zaitoun-loralai/dist/public",
+  "env": {
+    "PORT": "3000",
+    "BASE_PATH": "/"
+  }
+}

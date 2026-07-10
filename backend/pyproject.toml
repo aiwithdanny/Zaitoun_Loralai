@@ -1,0 +1,19 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "bcrypt<5",
+    "cloudinary>=1.45.0",
+    "fastapi[standard]>=0.139.0",
+    "passlib[bcrypt]>=1.7.4",
+    "pg8000>=1.31.5",
+    "psycopg2-binary>=2.9.12",
+    "pymysql>=1.2.0",
+    "python-jose[cryptography]>=3.5.0",
+    "python-slugify>=8.0.4",
+    "slugify>=0.0.1",
+    "sqlalchemy>=2.0.51",
+]
