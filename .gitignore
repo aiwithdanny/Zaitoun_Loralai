@@ -30,3 +30,10 @@ Thumbs.db
 # Database
 *.db
 test.db
+
+# Duplicate root-level images (originals in frontend/attached_assets/ and @assets alias)
+/*.png
+/*.webp
+
+# npm lockfile (project uses pnpm)
+package-lock.json

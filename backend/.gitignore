@@ -1,4 +1,10 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
 # Virtual Environment
+.venv/
 venv/
 env/
 .env
@@ -28,6 +34,9 @@ dist/
 .coverage
 htmlcov/
 .tox/
+
+# FastAPI Cloud
+.fastapicloud/
 
 # Migration scripts with credentials (never commit)
 dump_and_import.py
