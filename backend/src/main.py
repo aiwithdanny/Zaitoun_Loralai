@@ -29,11 +29,13 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS Middleware - Restrict to frontend domain only
-frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+# CORS Middleware - Allow known frontend domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_url],  # Restrict to frontend domain
+    allow_origins=[
+        "http://localhost:3000",
+        "https://zaitoun-loralai-1mtz.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
