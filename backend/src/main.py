@@ -29,10 +29,15 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS Middleware - Allow all origins (auth via Authorization header, not cookies)
+# CORS Middleware - Allow specific frontend origins with credentials support
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://zaitoun-loralai-1mtz.vercel.app",
+        "https://zaitoun-loralai-989f2db4.fastapicloud.dev",
+    ],
+    allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
