@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
-import ceoImg from "@assets/naqeeb_professional_1782757630343.png";
+import ceoImg from "@assets/naqeeb_professional_1782757630343.webp";
 
 export function About() {
   return (
@@ -18,6 +18,7 @@ export function About() {
             <img 
               src={ceoImg} 
               alt={BRAND.about.name} 
+              loading="lazy"
               className="w-full h-full object-cover grayscale-[20%]"
             />
           </motion.div>

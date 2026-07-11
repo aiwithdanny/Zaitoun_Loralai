@@ -9,7 +9,7 @@ import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { adminApi } from '@/lib/api';
 import { toast } from 'sonner';
-import logoImg from "@assets/Official_Logo_1782757596768.png";
+import logoImg from "@assets/Official_Logo_1782757596768.webp";
 import loginImage from "@assets/admin-login-page.webp";
 
 export default function AdminLogin() {
@@ -139,6 +139,7 @@ export default function AdminLogin() {
         <img
           src={loginImage}
           alt=""
+          loading="lazy"
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Gradient overlay */}

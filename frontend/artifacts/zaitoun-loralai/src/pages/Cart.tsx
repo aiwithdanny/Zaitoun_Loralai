@@ -87,6 +87,7 @@ export function Cart() {
                     <img
                       src={item.image_url}
                       alt={item.name}
+                      loading="lazy"
                       className="w-24 h-32 object-contain flex-shrink-0"
                     />
                   )}

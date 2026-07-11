@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
-import storyImg from "@/assets/story-landscape.png";
+import storyImg from "@/assets/story-landscape.webp";
 
 export function Story() {
   return (
@@ -41,6 +41,7 @@ export function Story() {
               <img 
                 src={storyImg} 
                 alt="Loralai mountains and olive grove" 
+                loading="lazy"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
               />
             </div>

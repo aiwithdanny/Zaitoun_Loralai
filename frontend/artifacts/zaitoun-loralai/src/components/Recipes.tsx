@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
-import vegImg from "@/assets/recipe-roasted-veg.png";
-import breadImg from "@/assets/recipe-bread.png";
-import saladImg from "@/assets/recipe-salad.png";
+import vegImg from "@/assets/recipe-roasted-veg.webp";
+import breadImg from "@/assets/recipe-bread.webp";
+import saladImg from "@/assets/recipe-salad.webp";
 
 const images = [vegImg, breadImg, saladImg];
 
@@ -29,6 +29,7 @@ export function Recipes() {
                 <img 
                   src={images[i]} 
                   alt={recipe.title} 
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>

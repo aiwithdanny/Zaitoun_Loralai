@@ -4,7 +4,7 @@ import { ShoppingBag, Menu, X, User, ChevronDown, Package, LogOut } from "lucide
 import { BRAND } from "@/lib/constants";
 import { useCart } from "@/store/cart";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
-import logoUrl from "@assets/Official_Logo_1782757596768.png";
+import logoUrl from "@assets/Official_Logo_1782757596768.webp";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {

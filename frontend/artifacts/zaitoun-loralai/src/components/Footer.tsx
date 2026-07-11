@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { BRAND } from "@/lib/constants";
 import { useNewsletterSubscription } from "@/hooks/useNewsletter";
-import logoUrl from "@assets/Official_Logo_1782757596768.png";
+import logoUrl from "@assets/Official_Logo_1782757596768.webp";
 import { Facebook, ArrowRight, Loader2 } from "lucide-react";
 
 export function Footer() {

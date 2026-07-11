@@ -297,6 +297,7 @@ export default function AdminProducts() {
                         <img
                           src={product.image_url}
                           alt={product.name}
+                          loading="lazy"
                           className="w-10 h-10 rounded object-cover"
                         />
                       ) : (

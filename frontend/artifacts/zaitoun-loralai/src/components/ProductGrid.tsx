@@ -5,12 +5,12 @@ import { useProducts, type ProductFilters } from "@/hooks/useProducts";
 import { useCart } from "@/store/cart";
 import { toast } from "sonner";
 import { formatPrice } from "@/utils/currency";
-import bottle250ml from "@assets/250_ml_Bottle_1782790472883.png";
-import bottle500ml from "@assets/500_ml_Bottle_1782790552258.png";
-import can300ml from "@assets/Can_300_ml_1782790980890.png";
-import can500ml from "@assets/500_ml_can_1782791441460.png";
-import threeL from "@assets/3L.png";
-import fiveL from "@assets/5L.png";
+import bottle250ml from "@assets/250_ml_Bottle_1782790472883.webp";
+import bottle500ml from "@assets/500_ml_Bottle_1782790552258.webp";
+import can300ml from "@assets/Can_300_ml_1782790980890.webp";
+import can500ml from "@assets/500_ml_can_1782791441460.webp";
+import threeL from "@assets/3L.webp";
+import fiveL from "@assets/5L.webp";
 
 // Fallback images keyed by product slug (stable across re-seeds).
 const productImages: Record<string, string> = {
@@ -182,7 +182,7 @@ export function ProductGrid() {
               variants={container}
               initial="hidden"
               animate="show"
-              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
+              className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
             >
             {products.map((product) => (
               <motion.div
@@ -206,6 +206,7 @@ export function ProductGrid() {
                     <img
                       src={product.image_url || productImages[product.slug]}
                       alt={product.name}
+                      loading="lazy"
                       className="w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
                         // Fallback to local image if URL fails
@@ -230,7 +231,7 @@ export function ProductGrid() {
                   <p className="text-muted-foreground uppercase tracking-widest text-[10px] mb-1">
                     {product.category || 'Loralai, Pakistan'}
                   </p>
-                  <h3 className="font-serif text-lg text-foreground leading-snug mb-1">
+                  <h3 className="font-serif text-sm md:text-lg text-foreground leading-snug mb-1">
                     {product.name}
                   </h3>
                   {product.short_description && (
