@@ -95,6 +95,9 @@ export interface Product {
   image_url: string | null;
   is_active: boolean;
   is_featured: boolean;
+  sort_order?: number;
+  product_group_id?: string;
+  size_label?: string;
   created_at: string;
   updated_at: string;
 }
@@ -115,6 +118,7 @@ export const productsApi = {
     sort_dir?: 'asc' | 'desc';
     min_price?: number;
     max_price?: number;
+    product_group_id?: string;
   }): Promise<Product[]> => {
     try {
       const queryParams = new URLSearchParams();
@@ -125,6 +129,7 @@ export const productsApi = {
       if (params?.sort_dir) queryParams.append('sort_dir', params.sort_dir);
       if (params?.min_price !== undefined) queryParams.append('min_price', String(params.min_price));
       if (params?.max_price !== undefined) queryParams.append('max_price', String(params.max_price));
+      if (params?.product_group_id) queryParams.append('product_group_id', params.product_group_id);
 
       const queryString = queryParams.toString();
       const endpoint = `/products${queryString ? `?${queryString}` : ''}`;

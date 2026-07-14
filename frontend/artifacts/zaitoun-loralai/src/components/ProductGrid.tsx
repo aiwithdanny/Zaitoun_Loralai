@@ -5,6 +5,7 @@ import { useProducts, type ProductFilters } from "@/hooks/useProducts";
 import { useCart } from "@/store/cart";
 import { toast } from "sonner";
 import { formatPrice } from "@/utils/currency";
+import { ProductGroupCard } from "./ProductGroupCard";
 import bottle250ml from "@assets/250_ml_Bottle_1782790472883.webp";
 import bottle500ml from "@assets/500_ml_Bottle_1782790552258.webp";
 import can300ml from "@assets/Can_300_ml_1782790980890.webp";
@@ -93,6 +94,27 @@ export function ProductGrid() {
     });
     toast.success(`${product.name} added to cart`);
   };
+
+  // Group products by product_group_id so each product line shows as one card
+  // with a SizeSelector. Products without a group_id render as individual cards.
+  const grouped = useMemo(() => {
+    if (!products) return null;
+    const map = new Map<string, typeof products>();
+    const ungrouped: typeof products = [];
+    for (const p of products) {
+      if (p.product_group_id) {
+        const existing = map.get(p.product_group_id) || [];
+        existing.push(p);
+        map.set(p.product_group_id, existing);
+      } else {
+        ungrouped.push(p);
+      }
+    }
+    return {
+      groups: Array.from(map.entries()).map(([groupId, variants]) => ({ groupId, variants })),
+      ungrouped,
+    };
+  }, [products]);
 
   return (
     <section id="products" className="py-24 bg-muted/30">
@@ -184,13 +206,24 @@ export function ProductGrid() {
               animate="show"
               className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
             >
-            {products.map((product) => (
+            {/* Grouped product lines — one card per unique product_group_id */}
+            {grouped?.groups.map((g) => (
+              <motion.div key={g.groupId} variants={card}>
+                <ProductGroupCard
+                  variants={g.variants}
+                  productImages={productImages}
+                  onAddToCart={handleAddToCart}
+                />
+              </motion.div>
+            ))}
+
+            {/* Ungrouped products — individual cards (backward compatible) */}
+            {grouped?.ungrouped.map((product) => (
               <motion.div
                 key={product.id}
                 variants={card}
                 className="group bg-card border border-border rounded-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-500"
               >
-                {/* Image area */}
                 <div className="relative aspect-[3/4] bg-muted/40 flex items-center justify-center overflow-hidden">
                   {product.is_featured && (
                     <span className="absolute top-3 left-3 z-10 text-[10px] uppercase tracking-widest bg-primary text-primary-foreground px-2 py-1">
@@ -209,7 +242,6 @@ export function ProductGrid() {
                       loading="lazy"
                       className="w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
-                        // Fallback to local image if URL fails
                         if (product.image_url && productImages[product.slug]) {
                           e.currentTarget.src = productImages[product.slug];
                         }
@@ -226,7 +258,6 @@ export function ProductGrid() {
                   )}
                 </div>
 
-                {/* Details */}
                 <div className="p-5 flex flex-col flex-1">
                   <p className="text-muted-foreground uppercase tracking-widest text-[10px] mb-1">
                     {product.category || 'Loralai, Pakistan'}

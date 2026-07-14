@@ -15,6 +15,7 @@ export interface ProductFilters {
   sort_dir?: 'asc' | 'desc';
   min_price?: number;
   max_price?: number;
+  product_group_id?: string;
 }
 
 // Query keys
