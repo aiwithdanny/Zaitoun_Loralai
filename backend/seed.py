@@ -25,6 +25,20 @@ try:
 except Exception:
     db.rollback()  # column already exists
 
+try:
+    from sqlalchemy import text
+    db.execute(text("ALTER TABLE products ADD COLUMN product_group_id VARCHAR(100)"))
+    db.commit()
+except Exception:
+    db.rollback()  # column already exists
+
+try:
+    from sqlalchemy import text
+    db.execute(text("ALTER TABLE products ADD COLUMN size_label VARCHAR(50)"))
+    db.commit()
+except Exception:
+    db.rollback()  # column already exists
+
 # ── Products to keep (update in place by slug) ──────────────────────────
 products_data = [
     {
@@ -40,6 +54,8 @@ products_data = [
         "is_active": True,
         "is_featured": True,
         "sort_order": 1,
+        "product_group_id": "extra-virgin-olive-oil",
+        "size_label": "250ml",
     },
     {
         "slug": "extra-virgin-500ml",
@@ -54,6 +70,8 @@ products_data = [
         "is_active": True,
         "is_featured": True,
         "sort_order": 2,
+        "product_group_id": "extra-virgin-olive-oil",
+        "size_label": "500ml",
     },
     {
         "slug": "extra-virgin-300ml-can",
@@ -68,6 +86,8 @@ products_data = [
         "is_active": True,
         "is_featured": False,
         "sort_order": 3,
+        "product_group_id": "extra-virgin-olive-oil",
+        "size_label": "300ml Can",
     },
     {
         "slug": "extra-virgin-500ml-can",
@@ -82,6 +102,8 @@ products_data = [
         "is_active": True,
         "is_featured": False,
         "sort_order": 4,
+        "product_group_id": "extra-virgin-olive-oil",
+        "size_label": "500ml Can",
     },
     {
         "slug": "extra-virgin-3l",
@@ -96,6 +118,8 @@ products_data = [
         "is_active": True,
         "is_featured": False,
         "sort_order": 5,
+        "product_group_id": "extra-virgin-olive-oil",
+        "size_label": "3L",
     },
     {
         "slug": "extra-virgin-5l",
@@ -110,6 +134,8 @@ products_data = [
         "is_active": True,
         "is_featured": False,
         "sort_order": 6,
+        "product_group_id": "extra-virgin-olive-oil",
+        "size_label": "5L",
     },
 ]
 
@@ -151,7 +177,7 @@ print(f"[OK] Inactive (archived) products: {inactive_count}")
 print(f"[OK] Total products in DB: {total_count}")
 
 for p in db.query(Product).filter(Product.is_active == True).order_by(Product.sort_order.asc(), Product.id.asc()).all():
-    print(f"  sort_order={p.sort_order}  {p.id}. {p.name} — Rs. {p.price:,}  [{p.slug}]")
+    print(f"  sort_order={p.sort_order}  {p.id}. {p.name} — Rs. {p.price:,}  [{p.slug}]  group={p.product_group_id}  size={p.size_label}")
 
 for p in db.query(Product).filter(Product.is_active == False).order_by(Product.id).all():
     print(f"  {p.id}. {p.name} — INACTIVE")

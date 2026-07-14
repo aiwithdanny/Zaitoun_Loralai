@@ -24,6 +24,8 @@ class Product(Base):
     image_url = Column(String(500))
     is_active = Column(Boolean, default=True)
     is_featured = Column(Boolean, default=False)
+    product_group_id = Column(String(100), index=True, nullable=True)
+    size_label = Column(String(50), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -45,6 +47,8 @@ class Product(Base):
             "is_active": self.is_active,
             "sort_order": self.sort_order,
             "is_featured": self.is_featured,
+            "product_group_id": self.product_group_id,
+            "size_label": self.size_label,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

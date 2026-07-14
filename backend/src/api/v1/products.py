@@ -33,6 +33,7 @@ async def get_products(
     sort_dir: Optional[str] = Query("asc", description="Sort direction: asc or desc"),
     min_price: Optional[float] = Query(None, description="Minimum price filter"),
     max_price: Optional[float] = Query(None, description="Maximum price filter"),
+    product_group_id: Optional[str] = Query(None, description="Filter by product group (size variants)"),
     db: Session = Depends(get_db)
 ):
     """Get all products with optional filters - Public endpoint"""
@@ -40,6 +41,8 @@ async def get_products(
 
     if category:
         query = query.filter(Product.category == category)
+    if product_group_id:
+        query = query.filter(Product.product_group_id == product_group_id)
     if featured is not None:
         query = query.filter(Product.is_featured == featured)
     if search:
@@ -113,6 +116,8 @@ async def create_product(
         category=product_data.category,
         image_url=product_data.image_url,
         is_featured=product_data.is_featured,
+        product_group_id=product_data.product_group_id,
+        size_label=product_data.size_label,
         created_at=datetime.utcnow()
     )
 
@@ -171,6 +176,10 @@ async def update_product(
         product.is_active = product_data.is_active
     if product_data.is_featured is not None:
         product.is_featured = product_data.is_featured
+    if product_data.product_group_id is not None:
+        product.product_group_id = product_data.product_group_id
+    if product_data.size_label is not None:
+        product.size_label = product_data.size_label
 
     product.updated_at = datetime.utcnow()
     db.commit()

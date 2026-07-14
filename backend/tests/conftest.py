@@ -3,13 +3,17 @@ Pytest configuration and fixtures for Zaitoun Loralai backend tests
 """
 
 import pytest
+import os
+
+# Override DATABASE_URL to use in-memory SQLite before ANY app import
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
-import os
 
-from src.main import app
+from main import app
 from src.models.database import Base, get_db
 from src.config.auth import create_access_token
 

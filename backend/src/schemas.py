@@ -21,6 +21,8 @@ class ProductCreate(BaseModel):
     category: Optional[str] = Field(None, max_length=100, description="Product category")
     image_url: Optional[str] = Field(None, max_length=500, description="Product image URL")
     is_featured: bool = Field(default=False, description="Mark as featured product")
+    product_group_id: Optional[str] = Field(None, max_length=100, description="Group ID linking size variants of the same product line")
+    size_label: Optional[str] = Field(None, max_length=50, description="Display text for size/variant (e.g. 250ml, 500ml, 3L)")
 
     @validator("discount_price")
     def discount_must_be_less_than_price(cls, v, values):
@@ -57,6 +59,8 @@ class ProductUpdate(BaseModel):
     is_active: Optional[bool] = None
     is_featured: Optional[bool] = None
     sort_order: Optional[int] = Field(None, ge=1, description="Display order (lower = first)")
+    product_group_id: Optional[str] = Field(None, max_length=100, description="Group ID linking size variants")
+    size_label: Optional[str] = Field(None, max_length=50, description="Display text for size/variant")
 
     @validator("discount_price")
     def discount_must_be_less_than_price(cls, v, values):
@@ -80,6 +84,8 @@ class ProductResponse(BaseModel):
     image_url: Optional[str]
     is_active: bool
     is_featured: bool
+    product_group_id: Optional[str]
+    size_label: Optional[str]
     created_at: datetime
     updated_at: datetime
 
