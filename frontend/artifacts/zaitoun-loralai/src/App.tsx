@@ -17,6 +17,7 @@ import RefundPolicy from "@/pages/RefundPolicy";
 import FAQs from "@/pages/FAQs";
 import CustomerLogin from "@/pages/CustomerLogin";
 import CustomerRegister from "@/pages/CustomerRegister";
+import { ProductDetail } from "@/pages/ProductDetail";
 import AccountOrders from "@/pages/AccountOrders";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { CustomerProtectedRoute } from "@/components/CustomerProtectedRoute";
@@ -28,6 +29,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/product/:group_id" component={ProductDetail} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />

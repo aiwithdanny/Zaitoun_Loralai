@@ -1,0 +1,285 @@
+import { useState, useMemo, useEffect } from "react";
+import { useParams, useLocation } from "wouter";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Zap } from "lucide-react";
+import { useProducts } from "@/hooks/useProducts";
+import { useCart } from "@/store/cart";
+import { SizeSelector } from "@/components/SizeSelector";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { productImages } from "@/lib/productImages";
+import { formatPrice } from "@/utils/currency";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import type { Product } from "@/lib/api";
+
+/** Strip a trailing " — size" or " - size" suffix from a product name. */
+function stripSizeSuffix(name: string): string {
+  return name.replace(/\s*[—–-]\s*[^—–-]+$/, "");
+}
+
+export function ProductDetail() {
+  const { group_id } = useParams<{ group_id: string }>();
+  const [, navigate] = useLocation();
+  const addItem = useCart((state) => state.addItem);
+
+  // Fetch all variants in this product group
+  const { data: products, isPending, error } = useProducts(
+    group_id ? { product_group_id: group_id } : undefined,
+  );
+
+  // Sort variants and pick the first as default
+  const sorted = useMemo(
+    () =>
+      products
+        ? [...products].sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99))
+        : [],
+    [products],
+  );
+
+  const [selectedVariant, setSelectedVariant] = useState<Product | undefined>(undefined);
+  const [quantity, setQuantity] = useState(1);
+
+  // Reset to first variant when grouped data loads or changes
+  useEffect(() => {
+    if (sorted.length > 0) {
+      setSelectedVariant(sorted[0]);
+      setQuantity(1);
+    }
+  }, [sorted]);
+
+  const groupName = sorted.length > 0 ? stripSizeSuffix(sorted[0].name) : "";
+  const category = sorted.length > 0 ? (sorted[0].category || "Loralai, Pakistan") : "";
+
+  const currentVariant = selectedVariant ?? sorted[0];
+  const currentPrice = currentVariant?.discount_price ?? currentVariant?.price ?? 0;
+  const hasDiscount = currentVariant?.discount_price != null;
+  const inStock = (currentVariant?.stock ?? 0) > 0;
+
+  const imgSrc = currentVariant?.image_url || (currentVariant?.slug ? productImages[currentVariant.slug] : undefined);
+
+  const handleVariantChange = (variant: Product) => {
+    setSelectedVariant(variant);
+    setQuantity(1);
+  };
+
+  const getCartPayload = () => ({
+    id: currentVariant!.id,
+    name: currentVariant!.name,
+    price: currentVariant!.discount_price || currentVariant!.price,
+    image_url: currentVariant!.image_url || productImages[currentVariant!.slug],
+  });
+
+  const handleAddToCart = () => {
+    if (!currentVariant || !inStock) return;
+    addItem(getCartPayload(), quantity);
+    toast.success(`${quantity} × ${currentVariant.name} added to cart`);
+  };
+
+  const handleBuyNow = () => {
+    if (!currentVariant || !inStock) return;
+    addItem(getCartPayload(), quantity);
+    navigate("/checkout");
+  };
+
+  // Loading state
+  if (isPending) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex justify-center items-center py-40">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <span className="ml-3 text-muted-foreground">Loading product...</span>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Error / not found
+  if (error || sorted.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 md:px-8 py-24 text-center">
+          <h1 className="font-serif text-2xl text-foreground mb-4">Product not found</h1>
+          <p className="text-muted-foreground mb-8">
+            {error ? "Failed to load product information." : "This product group doesn't exist or has no variants."}
+          </p>
+          <Button onClick={() => navigate("/")} className="gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Shop
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+
+      <main className="container mx-auto px-4 md:px-8 py-8">
+        {/* Back link */}
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 mb-8 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Shop
+        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          {/* Left — Image */}
+          <div className="relative aspect-[3/4] bg-muted/30 rounded-sm flex items-center justify-center overflow-hidden">
+            {hasDiscount && (
+              <span className="absolute top-4 right-4 z-10 text-[10px] uppercase tracking-widest bg-accent text-accent-foreground px-2 py-1 rounded-sm">
+                Sale
+              </span>
+            )}
+            {imgSrc ? (
+              <img
+                src={imgSrc}
+                alt={groupName}
+                className="w-[70%] h-[85%] object-contain drop-shadow-2xl"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-muted-foreground/40">
+                <div className="w-20 h-40 rounded-sm border-2 border-dashed border-muted-foreground/20 flex items-center justify-center">
+                  <span className="text-[10px] uppercase tracking-widest rotate-90 whitespace-nowrap text-muted-foreground/30">
+                    Image
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right — Info */}
+          <div className="flex flex-col justify-center">
+            <p className="text-accent uppercase tracking-[0.2em] text-xs mb-3">
+              {category}
+            </p>
+
+            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight mb-4">
+              {groupName}
+            </h1>
+
+            {/* Rating placeholder */}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg
+                    key={star}
+                    className="w-4 h-4 text-amber-400 fill-amber-400"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="text-xs text-muted-foreground">(0 reviews)</span>
+            </div>
+
+            {/* Price */}
+            <div className="mb-6">
+              {hasDiscount ? (
+                <div className="flex items-center gap-3">
+                  <span className="font-serif text-3xl text-foreground">
+                    {formatPrice(currentPrice)}
+                  </span>
+                  <span className="text-lg text-muted-foreground line-through">
+                    {formatPrice(currentVariant!.price)}
+                  </span>
+                </div>
+              ) : (
+                <span className="font-serif text-3xl text-foreground">
+                  {formatPrice(currentPrice)}
+                </span>
+              )}
+            </div>
+
+            {/* Size Selector */}
+            <div className="mb-6">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                Select Size
+              </p>
+              <SizeSelector
+                variants={sorted}
+                selectedId={currentVariant!.id}
+                onSelect={handleVariantChange}
+              />
+            </div>
+
+            {/* Stock status */}
+            <div className="mb-6">
+              {inStock ? (
+                <p className="text-xs text-green-600 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-green-600 rounded-full" />
+                  In Stock ({currentVariant!.stock} available)
+                </p>
+              ) : (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-destructive rounded-full" />
+                  Out of Stock
+                </p>
+              )}
+            </div>
+
+            {/* Quantity + Buttons */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
+              {/* Quantity selector */}
+              <div className="flex items-center border border-border rounded-sm">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
+                  className="px-3 py-2 hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="w-10 text-center text-sm font-medium">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  disabled={!inStock}
+                  className="px-3 py-2 hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 w-full sm:w-auto">
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={!inStock}
+                  className="flex-1 sm:flex-none gap-2"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Add to Cart
+                </Button>
+                <Button
+                  onClick={handleBuyNow}
+                  disabled={!inStock}
+                  variant="secondary"
+                  className="flex-1 sm:flex-none gap-2"
+                >
+                  <Zap className="w-4 h-4" />
+                  Buy Now
+                </Button>
+              </div>
+            </div>
+
+            {/* Separator */}
+            <div className="border-t border-border pt-6">
+              <h3 className="font-serif text-lg text-foreground mb-3">Description</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {currentVariant?.description || "No description available."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

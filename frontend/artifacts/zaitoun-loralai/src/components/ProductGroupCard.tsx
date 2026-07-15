@@ -1,13 +1,11 @@
-import { useState, useMemo } from "react";
-import { ShoppingBag } from "lucide-react";
+import { useMemo } from "react";
+import { useLocation } from "wouter";
 import type { Product } from "@/lib/api";
 import { formatPrice } from "@/utils/currency";
-import { SizeSelector } from "./SizeSelector";
 
 interface ProductGroupCardProps {
   variants: Product[];
   productImages: Record<string, string>;
-  onAddToCart: (product: Product) => void;
 }
 
 /** Strip a trailing " — size" or " - size" suffix from a product name. */
@@ -15,39 +13,46 @@ function stripSizeSuffix(name: string): string {
   return name.replace(/\s*[—–-]\s*[^—–-]+$/, "");
 }
 
-export function ProductGroupCard({ variants, productImages, onAddToCart }: ProductGroupCardProps) {
-  // Sort by sort_order, default to first
+export function ProductGroupCard({ variants, productImages }: ProductGroupCardProps) {
+  const [, navigate] = useLocation();
+
   const sorted = useMemo(
     () => [...variants].sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99)),
     [variants],
   );
 
-  const [selectedVariant, setSelectedVariant] = useState<Product>(sorted[0]);
-
-  // Derive shared info from the first variant
-  const groupName = stripSizeSuffix(sorted[0].name);
-  const category = sorted[0].category || "Loralai, Pakistan";
-  const description = sorted[0].short_description;
+  const first = sorted[0];
+  const groupName = stripSizeSuffix(first.name);
+  const category = first.category || "Loralai, Pakistan";
   const isFeatured = sorted.some((v) => v.is_featured);
-  const hasDiscount = selectedVariant.discount_price != null;
+  const groupId = first.product_group_id;
 
-  // Image
-  const imgSrc = selectedVariant.image_url || productImages[selectedVariant.slug];
+  // Lowest effective price among all variants
+  const lowestPrice = useMemo(() => {
+    let min = Infinity;
+    for (const v of sorted) {
+      const p = v.discount_price ?? v.price;
+      if (p < min) min = p;
+    }
+    return min;
+  }, [sorted]);
 
-  const handleAdd = () => onAddToCart(selectedVariant);
+  const imgSrc = first.image_url || productImages[first.slug];
+
+  const handleNavigate = () => {
+    if (groupId) navigate(`/product/${groupId}`);
+  };
 
   return (
-    <div className="group bg-card border border-border rounded-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-500">
+    <div
+      className="group bg-card border border-border rounded-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-500 cursor-pointer"
+      onClick={handleNavigate}
+    >
       {/* Image area */}
       <div className="relative aspect-[3/4] bg-muted/40 flex items-center justify-center overflow-hidden">
         {isFeatured && (
           <span className="absolute top-3 left-3 z-10 text-[10px] uppercase tracking-widest bg-primary text-primary-foreground px-2 py-1">
             Featured
-          </span>
-        )}
-        {hasDiscount && (
-          <span className="absolute top-3 right-3 z-10 text-[10px] uppercase tracking-widest bg-accent text-accent-foreground px-2 py-1">
-            Sale
           </span>
         )}
 
@@ -77,49 +82,21 @@ export function ProductGroupCard({ variants, productImages, onAddToCart }: Produ
         <h3 className="font-serif text-sm md:text-lg text-foreground leading-snug mb-1">
           {groupName}
         </h3>
-        {description && (
-          <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-            {description}
-          </p>
-        )}
 
-        {/* Size Selector */}
-        <div className="mb-4">
-          <SizeSelector
-            variants={sorted}
-            selectedId={selectedVariant.id}
-            onSelect={setSelectedVariant}
-          />
-        </div>
-
-        {/* Price + Add button */}
         <div className="mt-auto flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground text-base">
-              {formatPrice(selectedVariant.discount_price || selectedVariant.price)}
-            </span>
-            {selectedVariant.discount_price ? (
-              <span className="text-xs text-muted-foreground line-through">
-                {formatPrice(selectedVariant.price)}
-              </span>
-            ) : null}
-            {selectedVariant.stock > 0 ? (
-              <span className="text-[10px] text-muted-foreground mt-0.5">
-                In Stock ({selectedVariant.stock})
-              </span>
-            ) : (
-              <span className="text-[10px] text-destructive mt-0.5">Out of Stock</span>
-            )}
-          </div>
+          <span className="font-medium text-foreground text-base">
+            From {formatPrice(lowestPrice)}
+          </span>
 
-          <button
-            onClick={handleAdd}
-            className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={selectedVariant.stock === 0}
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigate();
+            }}
+            className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 hover:bg-primary/90 transition-colors duration-300"
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            {selectedVariant.stock === 0 ? "Out of Stock" : "Add"}
-          </button>
+            Shop Now
+          </span>
         </div>
       </div>
     </div>
