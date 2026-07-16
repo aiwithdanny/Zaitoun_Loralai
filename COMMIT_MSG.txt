@@ -1,15 +1,16 @@
-Phase A.2: Admin Review Moderation UI
+Fix: approved reviews filter + add delete functionality
 
-New admin page at /admin/reviews with:
-- Filter tabs: All / Pending (with count badge) / Approved / Rejected
-- Review cards showing: reviewer name, star rating, review text,
-  product group name, date, photo thumbnail (clickable), verified buyer badge,
-  status badge (Pending/Approved/Rejected)
-- Approve/Reject actions on pending reviews (soft-delete via rejecting)
-- Pagination (10 per page, Prev/Next + page numbers)
-- Loading, error, and empty states
+Bug fix: Renamed backend parameter from status_filter to status to match
+the frontend query string (?status=approved). The mismatch caused every
+request to default to "pending" regardless of the tab selected.
 
-Sidebar: "Reviews" link added between Products and Orders
-Route: ProtectedRoute(AdminReviews, AdminLayout) at /admin/reviews
+Also improved the "pending" filter to exclude rejected reviews
+(is_approved=False AND review_text != "__rejected__") instead of just
+checking is_approved=False.
+
+New:
+- DELETE /api/v1/admin/reviews/{id} (hard delete, admin-only)
+- deleteReview() method in frontend adminApi
+- "Delete" button on every review card with AlertDialog confirmation
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

@@ -440,6 +440,10 @@ export const adminApi = {
   rejectReview: async (reviewId: number): Promise<{ success: boolean; data: ReviewData; message: string }> => {
     return apiFetch(`/admin/reviews/${reviewId}/reject`, { method: 'PUT' });
   },
+
+  deleteReview: async (reviewId: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/reviews/${reviewId}`, { method: 'DELETE' });
+  },
 };
 
 // ==================== CUSTOMER API ====================

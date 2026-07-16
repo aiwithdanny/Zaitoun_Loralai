@@ -256,19 +256,19 @@ async def get_admin_profile(
 
 @router.get("/reviews")
 async def list_reviews(
-    status_filter: str = "pending",
+    status: str = "pending",
     current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """List all reviews with optional status filter: pending / approved / rejected. Admin only."""
     query = db.query(Review)
 
-    if status_filter == "pending":
-        query = query.filter(Review.is_approved == False)
-    elif status_filter == "approved":
+    if status == "pending":
+        query = query.filter(Review.is_approved == False, Review.review_text != "__rejected__")
+    elif status == "approved":
         query = query.filter(Review.is_approved == True)
-    elif status_filter == "rejected":
-        query = query.filter(Review.is_approved == False, Review.review_text == "__rejected__")
+    elif status == "rejected":
+        query = query.filter(Review.review_text == "__rejected__")
     # "all" — no filter
 
     reviews = query.order_by(Review.created_at.desc()).all()
@@ -313,3 +313,20 @@ async def reject_review(
     db.refresh(review)
 
     return {"success": True, "data": review.to_dict(), "message": "Review rejected."}
+
+
+@router.delete("/reviews/{review_id}")
+async def delete_review(
+    review_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Permanently delete a review from the database. Admin only."""
+    review = db.query(Review).filter(Review.id == review_id).first()
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    db.delete(review)
+    db.commit()
+
+    return {"success": True, "message": "Review permanently deleted."}

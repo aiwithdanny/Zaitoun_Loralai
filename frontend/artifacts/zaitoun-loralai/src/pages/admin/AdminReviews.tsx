@@ -6,7 +6,18 @@
 import { useEffect, useState } from 'react';
 import { adminApi, type ReviewData } from '@/lib/api';
 import { toast } from 'sonner';
-import { Star, MessageSquare, BadgeCheck, Check, X, ExternalLink, Loader2 } from 'lucide-react';
+import { Star, MessageSquare, BadgeCheck, Check, X, ExternalLink, Loader2, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
 const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
@@ -44,6 +55,7 @@ export default function AdminReviews() {
   const [page, setPage] = useState(1);
   const [pendingCount, setPendingCount] = useState(0);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [reviewToDelete, setReviewToDelete] = useState<ReviewData | null>(null);
 
   const totalPages = Math.ceil(reviews.length / ITEMS_PER_PAGE);
   const paginatedReviews = reviews.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -107,6 +119,22 @@ export default function AdminReviews() {
       toast.error(err.message || 'Failed to reject review');
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!reviewToDelete) return;
+    setActionLoading(reviewToDelete.id);
+    try {
+      await adminApi.deleteReview(reviewToDelete.id);
+      toast.success('Review permanently deleted');
+      setReviews((prev) => prev.filter((r) => r.id !== reviewToDelete.id));
+      setPendingCount((prev) => Math.max(0, prev - 1));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete review');
+    } finally {
+      setActionLoading(null);
+      setReviewToDelete(null);
     }
   };
 
@@ -269,35 +297,45 @@ export default function AdminReviews() {
                     {review.is_approved ? 'Approved' : review.review_text === '__rejected__' ? 'Rejected' : 'Pending'}
                   </span>
 
-                  {/* Actions — only show for pending */}
-                  {!review.is_approved && review.review_text !== '__rejected__' && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleApprove(review.id)}
-                        disabled={actionLoading === review.id}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 disabled:opacity-50 px-2.5 py-1.5 rounded transition-colors"
-                      >
-                        {actionLoading === review.id ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <Check className="w-3 h-3" />
-                        )}
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleReject(review.id)}
-                        disabled={actionLoading === review.id}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50 px-2.5 py-1.5 rounded transition-colors"
-                      >
-                        {actionLoading === review.id ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <X className="w-3 h-3" />
-                        )}
-                        Reject
-                      </button>
-                    </div>
-                  )}
+                  {/* Actions — approve/reject for pending only; delete always visible */}
+                  <div className="flex gap-2">
+                    {!review.is_approved && review.review_text !== '__rejected__' && (
+                      <>
+                        <button
+                          onClick={() => handleApprove(review.id)}
+                          disabled={actionLoading === review.id}
+                          className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 disabled:opacity-50 px-2.5 py-1.5 rounded transition-colors"
+                        >
+                          {actionLoading === review.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <Check className="w-3 h-3" />
+                          )}
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(review.id)}
+                          disabled={actionLoading === review.id}
+                          className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 disabled:opacity-50 px-2.5 py-1.5 rounded transition-colors"
+                        >
+                          {actionLoading === review.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <X className="w-3 h-3" />
+                          )}
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => setReviewToDelete(review)}
+                      disabled={actionLoading === review.id}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-red-600 disabled:opacity-50 px-2.5 py-1.5 rounded transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -337,6 +375,34 @@ export default function AdminReviews() {
           )}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!reviewToDelete} onOpenChange={(open) => !open && setReviewToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Review?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this review from the database.
+              {reviewToDelete && (
+                <span className="block mt-2 text-xs text-muted-foreground">
+                  &ldquo;{reviewToDelete.review_text.slice(0, 100)}
+                  {reviewToDelete.review_text.length > 100 ? '...' : ''}&rdquo;
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={actionLoading === reviewToDelete?.id}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {actionLoading === reviewToDelete?.id ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
