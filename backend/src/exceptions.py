@@ -177,12 +177,15 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def generic_exception_handler(request: Request, exc: Exception):
     """Handle generic exceptions"""
     logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
+    import os
+    is_debug = os.getenv("DEBUG", "").lower() in ("true", "1", "yes")
+    detail = str(exc) if is_debug else "An internal error occurred. Please try again later."
     return _cors_response(request, JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "success": False,
             "error_code": "INTERNAL_ERROR",
-            "detail": "An internal error occurred. Please try again later.",
+            "detail": detail,
             "timestamp": __import__('datetime').datetime.utcnow().isoformat()
         }
     ))

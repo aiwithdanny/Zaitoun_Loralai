@@ -1,21 +1,14 @@
-Fix: CORS headers missing on order API error responses
+Debug: expose real backend error when DEBUG=true for order 500 issue
 
-Two issues found and fixed:
+The orders endpoint returns a generic 500 with no detail. Added
+DEBUG-aware exception handling: when DEBUG=true, the actual Python
+exception message is returned in the response body so it's visible
+in the browser console. In production (DEBUG not set), it continues
+to return the generic message.
 
-1. Exception handlers missing CORS headers:
-   generic_exception_handler, zaitoun_exception_handler, and
-   validation_exception_handler all returned JSONResponse without
-   CORS headers. Browser blocks the error response because
-   Access-Control-Allow-Origin is missing.
-   Fix: Added _cors_response() helper that echoes the Origin header
-   on all three exception handler responses.
-
-2. Trailing slash redirect on orders endpoint:
-   Frontend calls POST /api/v1/orders (no trailing slash), but the
-   route was defined as @router.post("/") requiring a trailing slash.
-   FastAPI issued a 307 redirect, which browsers handle
-   inconsistently for CORS preflighted requests.
-   Fix: Changed route patterns to @router.post("") and @router.get("")
-   + set redirect_slashes=False on the FastAPI app.
+Instructions: Set DEBUG=true on the production env, redeploy, attempt
+an order, and the browser console will show the actual error (e.g.
+missing table, column, FK constraint, etc.). Then fix and revert
+DEBUG to false.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
