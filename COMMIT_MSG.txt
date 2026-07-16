@@ -1,23 +1,29 @@
-Fix: CORS headers not reaching browser on fastapicloud.dev
+Fix: CORS headers now injected on every response including error handlers
 
-Problem: Browser reported "No 'Access-Control-Allow-Origin' header present"
-on all requests. The FastAPI CORSMiddleware was configured correctly with
-allow_origins=["*"], but the fastapicloud.dev platform's proxy layer was
-either stripping headers or intercepting OPTIONS preflight requests before
-they reached the middleware stack.
+Problem: After deploying, the browser reported CORS errors despite the
+CORSMiddleware being configured correctly. Two issues:
+
+1. FastAPI's built-in CORSMiddleware does NOT add CORS headers to
+   responses that come from exception handlers (500, 422, etc.) —
+   only normal route handlers get the headers. So when the reviews
+   endpoint threw a 500 (reviews table doesn't exist yet), the
+   response was missing Access-Control-Allow-Origin and the browser
+   rejected it.
+
+2. The outer ASGI wrapper was only handling OPTIONS preflight at that
+   layer — non-OPTIONS requests were passed through to FastAPI
+   without the CORS injection fallback.
 
 Fix:
-- Added an outer ASGI wrapper that handles OPTIONS preflight requests at
-  the raw ASGI layer, before FastAPI's middleware stack processes them
-- The wrapper responds directly to OPTIONS with proper CORS headers,
-  bypassing any proxy-level interception
-- Non-OPTIONS requests pass through to FastAPI where the existing
-  CORSMiddleware handles CORS header injection on responses
+- The ASGI wrapper now also injects CORS headers on non-OPTIONS
+  responses, but only when the CORSMiddleware hasn't already added
+  them (deduplication check via has_cors)
+- This ensures that error responses (5xx, 4xx) and successful
+  responses all have consistent CORS headers
 
-Also verified:
-- Route ordering: POST /upload-image registered before POST /{product_group_id}
-- CORS headers present on all response types (200, 404, error, OPTIONS)
-- Origin echo works for both known and unknown origins
-- All headers/access-control-allow-headers=max-age present on preflight
+Verified locally with httpx:
+- All response types (200, 204, 404) now have ACAO headers
+- OPTIONS preflight handled at ASGI layer with proper headers
+- No header duplication with CORSMiddleware
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

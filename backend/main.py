@@ -108,13 +108,15 @@ async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
         await _fastapi_app(scope, receive, send)
         return
 
+    # Read Origin once at the top
+    origin = ""
+    for key, value in scope.get("headers", []):
+        if key == b"origin":
+            origin = value.decode()
+            break
+
     # ── Handle OPTIONS preflight here (before FastAPI sees it) ──
     if scope["method"] == "OPTIONS":
-        origin = ""
-        for key, value in scope.get("headers", []):
-            if key == b"origin":
-                origin = value.decode()
-                break
         res = Response(status_code=204)
         res.headers["Access-Control-Allow-Origin"] = origin if origin else "*"
         res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
@@ -123,8 +125,24 @@ async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
         await res(scope, receive, send)
         return
 
-    # ── All other methods → FastAPI (CORSMiddleware adds CORS headers) ──
-    await _fastapi_app(scope, receive, send)
+    # ── All other methods → FastAPI, but inject CORS on every response ──
+    # We do this here as well (not just OPTIONS) because FastAPI's built-in
+    # CORSMiddleware does NOT add headers to responses from exception handlers
+    # (e.g. generic 500 errors), which causes CORS failures in the browser.
+
+    async def _send_with_cors(message):
+        if message["type"] == "http.response.start":
+            headers = list(message.get("headers", []))
+            # Only add if not already present (avoid duplication with CORSMiddleware)
+            has_cors = any(h[0] == b"access-control-allow-origin" for h in headers)
+            if not has_cors:
+                headers.append((b"access-control-allow-origin", origin.encode() if origin else b"*"))
+                headers.append((b"access-control-allow-methods", b"GET, POST, PUT, DELETE, OPTIONS, PATCH"))
+                headers.append((b"access-control-allow-headers", b"*"))
+                message["headers"] = headers
+        await send(message)
+
+    await _fastapi_app(scope, receive, _send_with_cors)
 
 
 # Replace app with the ASGI-wrapped version
