@@ -96,6 +96,46 @@ async def get_reviews(product_group_id: str, db: Session = Depends(get_db)):
 
 
 # ─── CUSTOMER-AUTHENTICATED ENDPOINTS ───────────────────────────────
+# NOTE: Literal routes (/upload-image) MUST come before parameterized
+# routes (/{product_group_id}) so FastAPI matches the literal path
+# instead of capturing "upload-image" as a product_group_id.
+
+
+@router.post("/upload-image")
+async def upload_review_image(
+    file: UploadFile = File(...),
+    payload: dict = Depends(get_current_customer),
+):
+    """Upload a review photo to Cloudinary. Requires customer JWT.
+    Accepted formats: JPEG, PNG, WebP. Max size: 5MB."""
+
+    if file.content_type not in ALLOWED_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid file type '{file.content_type}'. Allowed: {', '.join(sorted(ALLOWED_TYPES))}",
+        )
+
+    file_bytes = await file.read()
+
+    if len(file_bytes) > MAX_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File too large ({len(file_bytes) / 1024 / 1024:.1f}MB). Maximum: 5MB.",
+        )
+
+    try:
+        url = upload_image(file_bytes, file.filename or "review.jpg")
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(e),
+        )
+
+    return {
+        "success": True,
+        "url": url,
+        "message": "Image uploaded successfully",
+    }
 
 
 @router.post("/{product_group_id}")
@@ -148,41 +188,4 @@ async def create_review(
         "success": True,
         "data": review.to_dict(),
         "message": "Review submitted for approval.",
-    }
-
-
-@router.post("/upload-image")
-async def upload_review_image(
-    file: UploadFile = File(...),
-    payload: dict = Depends(get_current_customer),
-):
-    """Upload a review photo to Cloudinary. Requires customer JWT.
-    Accepted formats: JPEG, PNG, WebP. Max size: 5MB."""
-
-    if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type '{file.content_type}'. Allowed: {', '.join(sorted(ALLOWED_TYPES))}",
-        )
-
-    file_bytes = await file.read()
-
-    if len(file_bytes) > MAX_SIZE:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"File too large ({len(file_bytes) / 1024 / 1024:.1f}MB). Maximum: 5MB.",
-        )
-
-    try:
-        url = upload_image(file_bytes, file.filename or "review.jpg")
-    except RuntimeError as e:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=str(e),
-        )
-
-    return {
-        "success": True,
-        "url": url,
-        "message": "Image uploaded successfully",
     }

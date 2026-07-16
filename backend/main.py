@@ -29,10 +29,27 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS Middleware - Allow all origins (auth via Authorization header, not cookies)
+# CORS Middleware - Allow configured origins + wildcard fallback
+# FRONTEND_URL and CORS_ORIGINS env vars allow explicit Vercel/production domains.
+# "*" is kept as fallback so the API works from any deployment preview.
+def _build_cors_origins():
+    origins = ["*"]
+    # Add explicit frontend URL if set
+    fe_url = os.getenv("FRONTEND_URL", "").strip()
+    if fe_url and fe_url not in origins:
+        origins.append(fe_url)
+    # Add any comma-separated CORS_ORIGINS (for Vercel previews, custom domains, etc.)
+    extra = os.getenv("CORS_ORIGINS", "").strip()
+    if extra:
+        for origin in extra.split(","):
+            origin = origin.strip()
+            if origin and origin not in origins:
+                origins.append(origin)
+    return origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_build_cors_origins(),
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )

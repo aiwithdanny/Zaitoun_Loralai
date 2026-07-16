@@ -1,20 +1,9 @@
-Phase A: Reviews System — backend + frontend
+Fix: review upload-image route ordering + CORS config
 
-Backend:
-- New Review model (FK -> customers, indexed by product_group_id)
-- New reviews API: public GET (approved only + aggregate stats),
-  customer POST (auto-sets verified_buyer via order history),
-  customer upload-image (Cloudinary, customer JWT)
-- Admin moderation endpoints: list reviews (?status=), approve, reject
-- Alembic migration for reviews table
-
-Frontend:
-- ReviewSummary component (average rating + distribution bar chart)
-- ReviewList component (review cards with stars, date, badge, photo)
-- ReviewForm component (star selector, textarea, photo upload, submit)
-- Integrated into ProductDetail page (loading, empty, and populated states)
-
-Verified buyer flag is set by checking Order -> OrderItem -> Product
-for a matching product_group_id on confirmed/delivered orders.
+- Moved @router.post("/upload-image") above @router.post("/{product_group_id}")
+  to fix 422 error — the parameterized route was swallowing literal paths
+- Added CORS_ORIGINS and FRONTEND_URL env var support for explicit origins
+  alongside the wildcard fallback, so Vercel production/preview URLs are
+  explicitly allowed
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
