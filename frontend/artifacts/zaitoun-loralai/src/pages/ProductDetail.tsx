@@ -384,7 +384,7 @@ export function ProductDetail() {
         <Separator className="my-12" />
 
         {/* Reviews Section */}
-        <section className="max-w-2xl mx-auto py-8">
+        <section className="max-w-5xl mx-auto py-8">
           <h2 className="font-serif text-xl text-foreground mb-6">Customer Reviews</h2>
 
           {reviewsLoading ? (
@@ -392,32 +392,39 @@ export function ProductDetail() {
               <Loader2 className="w-6 h-6 animate-spin text-muted-foreground/50" />
             </div>
           ) : (
-            <div className="space-y-6">
-              {/* Summary bar — only when there are reviews */}
-              {aggregate.total_count > 0 && <ReviewSummary aggregate={aggregate} />}
-
-              {/* Existing reviews */}
-              <ReviewList reviews={reviews} />
-
-              {/* Empty state — only when no reviews at all */}
-              {aggregate.total_count === 0 && (
-                <div className="text-center py-12">
-                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <MessageSquare className="w-6 h-6 text-muted-foreground/50" />
+            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8">
+              {/* Left column: summary */}
+              <aside>
+                {aggregate.total_count > 0 && (
+                  <div className="md:sticky md:top-24">
+                    <ReviewSummary aggregate={aggregate} />
                   </div>
-                  <h3 className="font-serif text-lg text-foreground mb-2">No reviews yet — be the first!</h3>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Share your experience with this product.
-                  </p>
-                </div>
-              )}
+                )}
+              </aside>
 
-              {/* Review form */}
-              <ReviewForm
-                productGroupId={group_id!}
-                existingReview={reviews.find((r) => customer && r.customer_id === customer.id)}
-                onSubmitted={fetchReviews}
-              />
+              {/* Right column: reviews + form */}
+              <div className="space-y-6">
+                <ReviewList reviews={reviews} />
+
+                {/* Empty state — only when no reviews at all */}
+                {aggregate.total_count === 0 && (
+                  <div className="text-center py-12">
+                    <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                      <MessageSquare className="w-6 h-6 text-muted-foreground/50" />
+                    </div>
+                    <h3 className="font-serif text-lg text-foreground mb-2">No reviews yet — be the first!</h3>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      Share your experience with this product.
+                    </p>
+                  </div>
+                )}
+
+                <ReviewForm
+                  productGroupId={group_id!}
+                  existingReview={reviews.find((r) => customer && r.customer_id === customer.id)}
+                  onSubmitted={fetchReviews}
+                />
+              </div>
             </div>
           )}
         </section>

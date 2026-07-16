@@ -1,4 +1,4 @@
-import { Star, BadgeCheck, Image as ImageIcon } from "lucide-react";
+import { Star, BadgeCheck } from "lucide-react";
 import type { ReviewData } from "@/lib/api";
 
 interface ReviewListProps {
@@ -23,32 +23,29 @@ export function ReviewList({ reviews }: ReviewListProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {reviews.map((review) => (
-        <div
-          key={review.id}
-          className="border border-border rounded-lg p-5 space-y-3"
-        >
-          {/* Header: name + date + badge */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
+        <div key={review.id} className="border-b border-border pb-5 last:border-b-0 last:pb-0">
+          {/* Row 1: Name + badge + date */}
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-foreground">
                 {review.customer_name || "Anonymous"}
               </span>
               {review.verified_buyer && (
-                <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
+                <span className="inline-flex items-center gap-0.5 text-[10px] uppercase tracking-wider text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-medium">
                   <BadgeCheck className="w-3 h-3" />
-                  Verified Buyer
+                  Verified
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-muted-foreground shrink-0">
+            <span className="text-[11px] text-muted-foreground shrink-0">
               {formatDate(review.created_at)}
             </span>
           </div>
 
-          {/* Stars */}
-          <div className="flex gap-0.5">
+          {/* Row 2: Stars */}
+          <div className="flex gap-0.5 mb-1.5">
             {[1, 2, 3, 4, 5].map((s) => (
               <Star
                 key={s}
@@ -61,7 +58,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
             ))}
           </div>
 
-          {/* Text */}
+          {/* Row 3: Review text */}
           <p className="text-sm text-muted-foreground leading-relaxed">
             {review.review_text}
           </p>
@@ -72,12 +69,12 @@ export function ReviewList({ reviews }: ReviewListProps) {
               href={review.photo_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block"
+              className="inline-block mt-2"
             >
               <img
                 src={review.photo_url}
                 alt="Review photo"
-                className="h-20 w-20 object-cover rounded-md border border-border hover:opacity-80 transition-opacity"
+                className="h-16 w-16 object-cover rounded-md border border-border hover:opacity-80 transition-opacity"
               />
             </a>
           )}

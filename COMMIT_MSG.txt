@@ -1,16 +1,13 @@
-Fix: approved reviews filter + add delete functionality
+UI: Redesign reviews section to match reference layout
 
-Bug fix: Renamed backend parameter from status_filter to status to match
-the frontend query string (?status=approved). The mismatch caused every
-request to default to "pending" regardless of the tab selected.
-
-Also improved the "pending" filter to exclude rejected reviews
-(is_approved=False AND review_text != "__rejected__") instead of just
-checking is_approved=False.
-
-New:
-- DELETE /api/v1/admin/reviews/{id} (hard delete, admin-only)
-- deleteReview() method in frontend adminApi
-- "Delete" button on every review card with AlertDialog confirmation
+Changes:
+- ReviewSummary: redesigned as vertical stacked left-column panel
+  (big rating star + count + distribution bars), replaces old
+  horizontal flex layout
+- ReviewList: redesigned cards with name + Verified badge + date on
+  same row, stars below, review text below that
+- ProductDetail: reviews section now uses two-column grid
+  (280px summary left, reviews+form right) on desktop, single
+  column stacked on mobile
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
