@@ -21,7 +21,7 @@ def generate_order_number():
     return f"ZL-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4).upper()}"
 
 
-@router.get("/")
+@router.get("")
 async def get_orders(
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     limit: int = Query(20, ge=1, le=100, description="Items per page"),
@@ -66,7 +66,7 @@ async def get_orders(
     }
 
 
-@router.post("/")
+@router.post("")
 async def create_order(
     order_data: OrderCreate,
     db: Session = Depends(get_db),

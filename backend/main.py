@@ -27,7 +27,8 @@ app = FastAPI(
     description="Premium Olive Oil E-commerce API with WhatsApp Payment Integration",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    redirect_slashes=False,
 )
 
 # Register exception handlers

@@ -128,10 +128,19 @@ class ExternalServiceError(ZaitounException):
 
 
 # Exception handlers
+def _cors_response(request, resp: JSONResponse) -> JSONResponse:
+    """Add CORS headers to an error response."""
+    origin = request.headers.get("origin", "")
+    resp.headers["Access-Control-Allow-Origin"] = origin if origin else "*"
+    resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    resp.headers["Access-Control-Allow-Headers"] = "*"
+    return resp
+
+
 async def zaitoun_exception_handler(request: Request, exc: ZaitounException):
     """Handle Zaitoun custom exceptions"""
     logger.error(f"ZaitounException: {exc.error_code} - {exc.detail_message}")
-    return JSONResponse(
+    return _cors_response(request, JSONResponse(
         status_code=exc.status_code,
         content={
             "success": False,
@@ -139,7 +148,7 @@ async def zaitoun_exception_handler(request: Request, exc: ZaitounException):
             "detail": exc.detail,
             "timestamp": __import__('datetime').datetime.utcnow().isoformat()
         }
-    )
+    ))
 
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -153,7 +162,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         })
 
     logger.warning(f"Validation error: {errors}")
-    return JSONResponse(
+    return _cors_response(request, JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "success": False,
@@ -162,13 +171,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "errors": errors,
             "timestamp": __import__('datetime').datetime.utcnow().isoformat()
         }
-    )
+    ))
 
 
 async def generic_exception_handler(request: Request, exc: Exception):
     """Handle generic exceptions"""
     logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
-    return JSONResponse(
+    return _cors_response(request, JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "success": False,
@@ -176,4 +185,4 @@ async def generic_exception_handler(request: Request, exc: Exception):
             "detail": "An internal error occurred. Please try again later.",
             "timestamp": __import__('datetime').datetime.utcnow().isoformat()
         }
-    )
+    ))

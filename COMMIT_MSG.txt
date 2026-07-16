@@ -1,10 +1,21 @@
-Fix: category query param not being read on product detail page
+Fix: CORS headers missing on order API error responses
 
-wouter's useLocation() returns pathname only — the query string was
-lost when parsing with location.split("?")[1]. Switched to using
-window.location.search directly (the standard browser API), which
-always returns the query string regardless of router implementation.
+Two issues found and fixed:
 
-This fixes the ?category=Bottles/Cans/Bulk default-variant behavior.
+1. Exception handlers missing CORS headers:
+   generic_exception_handler, zaitoun_exception_handler, and
+   validation_exception_handler all returned JSONResponse without
+   CORS headers. Browser blocks the error response because
+   Access-Control-Allow-Origin is missing.
+   Fix: Added _cors_response() helper that echoes the Origin header
+   on all three exception handler responses.
+
+2. Trailing slash redirect on orders endpoint:
+   Frontend calls POST /api/v1/orders (no trailing slash), but the
+   route was defined as @router.post("/") requiring a trailing slash.
+   FastAPI issued a 307 redirect, which browsers handle
+   inconsistently for CORS preflighted requests.
+   Fix: Changed route patterns to @router.post("") and @router.get("")
+   + set redirect_slashes=False on the FastAPI app.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
