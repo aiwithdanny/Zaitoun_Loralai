@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { LayoutDashboard, Package, ShoppingCart, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { toast } from "sonner";
 
@@ -64,6 +64,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <a href="/admin/products">
                     <Package className="h-4 w-4" />
                     <span>Products</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location === "/admin/reviews"}>
+                  <a href="/admin/reviews">
+                    <MessageSquare className="h-4 w-4" />
+                    <span>Reviews</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>

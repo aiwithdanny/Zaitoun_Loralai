@@ -426,6 +426,20 @@ export const adminApi = {
       return true; // Treat errors as expired
     }
   },
+
+  // Admin review moderation
+  getReviews: async (status?: string): Promise<ReviewListResponse> => {
+    const query = status ? `?status=${status}` : '';
+    return apiFetch<ReviewListResponse>(`/admin/reviews${query}`);
+  },
+
+  approveReview: async (reviewId: number): Promise<{ success: boolean; data: ReviewData; message: string }> => {
+    return apiFetch(`/admin/reviews/${reviewId}/approve`, { method: 'PUT' });
+  },
+
+  rejectReview: async (reviewId: number): Promise<{ success: boolean; data: ReviewData; message: string }> => {
+    return apiFetch(`/admin/reviews/${reviewId}/reject`, { method: 'PUT' });
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -554,6 +568,12 @@ export interface ReviewsResponse {
   success: boolean;
   data: ReviewData[];
   aggregate: ReviewAggregate;
+}
+
+export interface ReviewListResponse {
+  success: boolean;
+  data: ReviewData[];
+  count: number;
 }
 
 export const reviewsApi = {
