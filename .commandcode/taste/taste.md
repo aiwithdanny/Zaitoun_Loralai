@@ -24,3 +24,6 @@ See [workflow/taste.md](workflow/taste.md)
 # documentation
 - For documentation/config sync/audit tasks: only update genuinely outdated or missing content based on actual built state; do not restructure documents, add new sections beyond what's needed, delete accurate content, or add speculative/future features. Confidence: 0.70
 
+# content
+- Never fabricate health/quality claims, nutritional data, tasting notes, or specific product facts — use honest placeholder states ("Content coming soon", commented `// PLACEHOLDER - awaiting real content from client`) until real content is provided by the client. Confidence: 0.85
+

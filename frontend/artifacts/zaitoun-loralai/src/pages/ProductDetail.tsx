@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Zap } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Zap, Star, MessageSquare } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/store/cart";
 import { SizeSelector } from "@/components/SizeSelector";
@@ -10,6 +10,8 @@ import { productImages } from "@/lib/productImages";
 import { formatPrice } from "@/utils/currency";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Separator } from "@/components/ui/separator";
 import type { Product } from "@/lib/api";
 
 /** Strip a trailing " — size" or " - size" suffix from a product name. */
@@ -268,15 +270,105 @@ export function ProductDetail() {
               </div>
             </div>
 
-            {/* Separator */}
+            {/* Product Info Accordion */}
             <div className="border-t border-border pt-6">
-              <h3 className="font-serif text-lg text-foreground mb-3">Description</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {currentVariant?.description || "No description available."}
-              </p>
+              <Accordion type="multiple" defaultValue={["description"]}>
+                <AccordionItem value="description">
+                  <AccordionTrigger className="font-serif text-lg text-foreground">
+                    Description
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    {currentVariant?.description || "No description available."}
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="quality">
+                  <AccordionTrigger className="font-serif text-lg text-foreground">
+                    Quality &amp; Health Benefits
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="italic text-muted-foreground/60">
+                      {/* PLACEHOLDER - awaiting real content from client */}
+                      Content coming soon.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="usage">
+                  <AccordionTrigger className="font-serif text-lg text-foreground">
+                    How To Use / Best For
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="italic text-muted-foreground/60">
+                      {/* PLACEHOLDER - awaiting real content from client */}
+                      Content coming soon.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="flavour">
+                  <AccordionTrigger className="font-serif text-lg text-foreground">
+                    Flavour Profile
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="italic text-muted-foreground/60">
+                      {/* PLACEHOLDER - awaiting real content from client */}
+                      Content coming soon.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="ingredients">
+                  <AccordionTrigger className="font-serif text-lg text-foreground">
+                    Ingredients
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="italic text-muted-foreground/60">
+                      {/* PLACEHOLDER - awaiting real content from client */}
+                      Content coming soon.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="nutrition">
+                  <AccordionTrigger className="font-serif text-lg text-foreground">
+                    Nutritional Info
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="italic text-muted-foreground/60">
+                      {/* PLACEHOLDER - awaiting real content from client */}
+                      Content coming soon.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
         </div>
+
+        {/* Separator */}
+        <Separator className="my-12" />
+
+        {/* Reviews Section — Empty State */}
+        <section className="max-w-2xl mx-auto text-center py-8">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
+              <MessageSquare className="w-6 h-6 text-muted-foreground/50" />
+            </div>
+            <div>
+              <h2 className="font-serif text-xl text-foreground mb-2">No reviews yet — be the first!</h2>
+              <p className="text-sm text-muted-foreground">
+                Be the first to share your experience with Zaitoun Extra Virgin Olive Oil.
+              </p>
+            </div>
+            <Button variant="outline" size="sm" className="mt-2 gap-2" disabled>
+              <Star className="w-4 h-4" />
+              Write a Review
+            </Button>
+          </div>
+        </section>
+
+        <Separator className="mb-12" />
       </main>
 
       <Footer />
