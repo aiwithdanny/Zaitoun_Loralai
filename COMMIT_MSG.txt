@@ -1,14 +1,20 @@
-Replace unverified product claims with placeholders across all accordion sections
+Phase A: Reviews System — backend + frontend
 
-All content in Quality & Health Benefits, Flavour Profile, Nutritional Info,
-How To Use / Best For, and Ingredients was removed because:
-- Health claims and nutritional data were fabricated (regulatory risk)
-- Flavour notes, smoke point, and shelf life were estimated without lab/supplier data
-- Sourcing detail ("premium olives grown in Loralai, Pakistan") is unconfirmed
+Backend:
+- New Review model (FK -> customers, indexed by product_group_id)
+- New reviews API: public GET (approved only + aggregate stats),
+  customer POST (auto-sets verified_buyer via order history),
+  customer upload-image (Cloudinary, customer JWT)
+- Admin moderation endpoints: list reviews (?status=), approve, reject
+- Alembic migration for reviews table
 
-Only Description remains, as it pulls from the API's currentVariant?.description.
+Frontend:
+- ReviewSummary component (average rating + distribution bar chart)
+- ReviewList component (review cards with stars, date, badge, photo)
+- ReviewForm component (star selector, textarea, photo upload, submit)
+- Integrated into ProductDetail page (loading, empty, and populated states)
 
-Each placeholder is marked with:
-  // PLACEHOLDER - awaiting real content from client
+Verified buyer flag is set by checking Order -> OrderItem -> Product
+for a matching product_group_id on confirmed/delivered orders.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

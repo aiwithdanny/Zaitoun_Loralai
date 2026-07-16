@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Zap, Star, MessageSquare } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Zap, Star, MessageSquare, Loader2 } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/store/cart";
 import { SizeSelector } from "@/components/SizeSelector";
@@ -12,6 +13,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import { ReviewForm } from "@/components/ReviewForm";
+import { ReviewList } from "@/components/ReviewList";
+import { ReviewSummary } from "@/components/ReviewSummary";
+import { reviewsApi, type ReviewData, type ReviewAggregate } from "@/lib/api";
 import type { Product } from "@/lib/api";
 
 /** Strip a trailing " — size" or " - size" suffix from a product name. */
@@ -23,6 +28,7 @@ export function ProductDetail() {
   const { group_id } = useParams<{ group_id: string }>();
   const [, navigate] = useLocation();
   const addItem = useCart((state) => state.addItem);
+  const { customer } = useCustomerAuth();
 
   // Fetch all variants in this product group
   const { data: products, isPending, error } = useProducts(
@@ -48,6 +54,34 @@ export function ProductDetail() {
       setQuantity(1);
     }
   }, [sorted]);
+
+  // ==================== Reviews ====================
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const [aggregate, setAggregate] = useState<ReviewAggregate>({
+    average_rating: 0,
+    total_count: 0,
+    distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  });
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  const fetchReviews = useCallback(async () => {
+    if (!group_id) return;
+    setReviewsLoading(true);
+    try {
+      const res = await reviewsApi.getReviews(group_id);
+      setReviews(res.data);
+      setAggregate(res.aggregate);
+    } catch {
+      // Silently fail — reviews are non-critical
+      setReviews([]);
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, [group_id]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   const groupName = sorted.length > 0 ? stripSizeSuffix(sorted[0].name) : "";
   const category = sorted.length > 0 ? (sorted[0].category || "Loralai, Pakistan") : "";
@@ -349,23 +383,43 @@ export function ProductDetail() {
         {/* Separator */}
         <Separator className="my-12" />
 
-        {/* Reviews Section — Empty State */}
-        <section className="max-w-2xl mx-auto text-center py-8">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-muted-foreground/50" />
+        {/* Reviews Section */}
+        <section className="max-w-2xl mx-auto py-8">
+          <h2 className="font-serif text-xl text-foreground mb-6">Customer Reviews</h2>
+
+          {reviewsLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground/50" />
             </div>
-            <div>
-              <h2 className="font-serif text-xl text-foreground mb-2">No reviews yet — be the first!</h2>
-              <p className="text-sm text-muted-foreground">
-                Be the first to share your experience with Zaitoun Extra Virgin Olive Oil.
-              </p>
+          ) : (
+            <div className="space-y-6">
+              {/* Summary bar — only when there are reviews */}
+              {aggregate.total_count > 0 && <ReviewSummary aggregate={aggregate} />}
+
+              {/* Existing reviews */}
+              <ReviewList reviews={reviews} />
+
+              {/* Empty state — only when no reviews at all */}
+              {aggregate.total_count === 0 && (
+                <div className="text-center py-12">
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-6 h-6 text-muted-foreground/50" />
+                  </div>
+                  <h3 className="font-serif text-lg text-foreground mb-2">No reviews yet — be the first!</h3>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Share your experience with this product.
+                  </p>
+                </div>
+              )}
+
+              {/* Review form */}
+              <ReviewForm
+                productGroupId={group_id!}
+                existingReview={reviews.find((r) => customer && r.customer_id === customer.id)}
+                onSubmitted={fetchReviews}
+              />
             </div>
-            <Button variant="outline" size="sm" className="mt-2 gap-2" disabled>
-              <Star className="w-4 h-4" />
-              Write a Review
-            </Button>
-          </div>
+          )}
         </section>
 
         <Separator className="mb-12" />

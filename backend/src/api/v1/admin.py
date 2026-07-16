@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -249,3 +249,67 @@ async def get_admin_profile(
             "last_login": user.last_login.isoformat() if user.last_login else None
         }
     }
+
+
+# ─── REVIEW MODERATION ─────────────────────────────────────────────
+
+
+@router.get("/reviews")
+async def list_reviews(
+    status_filter: str = "pending",
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """List all reviews with optional status filter: pending / approved / rejected. Admin only."""
+    query = db.query(Review)
+
+    if status_filter == "pending":
+        query = query.filter(Review.is_approved == False)
+    elif status_filter == "approved":
+        query = query.filter(Review.is_approved == True)
+    elif status_filter == "rejected":
+        query = query.filter(Review.is_approved == False, Review.review_text == "__rejected__")
+    # "all" — no filter
+
+    reviews = query.order_by(Review.created_at.desc()).all()
+    return {"success": True, "data": [r.to_dict() for r in reviews], "count": len(reviews)}
+
+
+@router.put("/reviews/{review_id}/approve")
+async def approve_review(
+    review_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Approve a review (sets is_approved=True). Admin only."""
+    review = db.query(Review).filter(Review.id == review_id).first()
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    review.is_approved = True
+    review.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(review)
+
+    return {"success": True, "data": review.to_dict(), "message": "Review approved."}
+
+
+@router.put("/reviews/{review_id}/reject")
+async def reject_review(
+    review_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Reject a review (clears review_text, sets is_approved=False). Admin only."""
+    review = db.query(Review).filter(Review.id == review_id).first()
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    review.is_approved = False
+    review.review_text = "__rejected__"
+    review.verified_buyer = False
+    review.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(review)
+
+    return {"success": True, "data": review.to_dict(), "message": "Review rejected."}

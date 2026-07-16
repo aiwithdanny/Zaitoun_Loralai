@@ -65,7 +65,7 @@ async def root():
 
 
 # Import and include routers
-from src.api.v1 import products, orders, whatsapp, admin, newsletter, customers, upload
+from src.api.v1 import products, orders, whatsapp, admin, newsletter, customers, upload, reviews
 
 app.include_router(products.router, prefix="/api/v1/products", tags=["Products"])
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
@@ -74,3 +74,4 @@ app.include_router(whatsapp.router, prefix="/api/v1/whatsapp", tags=["WhatsApp"]
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(customers.router, prefix="/api/v1/customers", tags=["Customers"])
 app.include_router(upload.router, prefix="/api/v1/products", tags=["Products"])
+app.include_router(reviews.router, prefix="/api/v1/reviews", tags=["Reviews"])

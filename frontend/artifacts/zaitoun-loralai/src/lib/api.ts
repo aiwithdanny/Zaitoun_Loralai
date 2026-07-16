@@ -527,3 +527,72 @@ export const whatsappApi = {
     return response;
   },
 };
+
+// ==================== REVIEWS API ====================
+
+export interface ReviewData {
+  id: number;
+  customer_id: number;
+  customer_name: string | null;
+  product_group_id: string;
+  rating: number;
+  review_text: string;
+  photo_url: string | null;
+  verified_buyer: boolean;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewAggregate {
+  average_rating: number;
+  total_count: number;
+  distribution: Record<number, number>;
+}
+
+export interface ReviewsResponse {
+  success: boolean;
+  data: ReviewData[];
+  aggregate: ReviewAggregate;
+}
+
+export const reviewsApi = {
+  // Get approved reviews + aggregate for a product group (public)
+  getReviews: async (productGroupId: string): Promise<ReviewsResponse> => {
+    return apiFetch<ReviewsResponse>(`/reviews/${productGroupId}`);
+  },
+
+  // Submit a review (customer auth)
+  createReview: async (
+    productGroupId: string,
+    data: { rating: number; review_text: string; photo_url?: string },
+  ): Promise<{ success: boolean; data: ReviewData; message: string }> => {
+    return apiFetch(`/reviews/${productGroupId}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, 'customer');
+  },
+
+  // Upload review photo to Cloudinary (customer auth)
+  uploadImage: async (file: File): Promise<string> => {
+    const token = localStorage.getItem('customer_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/reviews/upload-image`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(errorData.detail || 'Image upload failed');
+    }
+
+    const result = await response.json();
+    return result.url;
+  },
+};
