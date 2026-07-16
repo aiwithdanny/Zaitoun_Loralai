@@ -1,16 +1,13 @@
-Admin: Add product_group_id and size_label fields to ProductForm
+Content: Replace placeholders with real product content in accordion sections
 
-New fields in the admin add/edit product modal:
-- Group ID: slug-like identifier (e.g., "extra-virgin-olive-oil")
-- Size Label: display text (e.g., "250ml", "3L", "5L")
-
-Both optional. Grouped together in a "Product Group" section after
-Category, with helper text explaining that products sharing a Group ID
-appear as size variants on the product detail page.
-
-If one field is set without the other, a subtle amber hint warns the
-admin to consider setting both.
-
-No backend changes needed — the schema and API already support these fields.
+All five accordion sections now contain the client-provided content:
+- Quality & Health Benefits: polyphenol content (557 mg/kg), key benefits
+  listed as bullet points
+- How To Use / Best For: smoke point (210°C), use cases including
+  Pakistani dishes, storage instructions
+- Flavour Profile: tasting notes with 5 specific descriptors
+- Ingredients: full breakdown with sourcing detail
+- Nutritional Info: full table rendered via .map() over label/value
+  tuples, with sub-fat indentation
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
