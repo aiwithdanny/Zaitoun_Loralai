@@ -1,4 +1,10 @@
-import { Star, BadgeCheck } from "lucide-react";
+import { Star, BadgeCheck, X } from "lucide-react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogClose,
+} from "@/components/ui/dialog";
 import type { ReviewData } from "@/lib/api";
 
 interface ReviewListProps {
@@ -65,18 +71,31 @@ export function ReviewList({ reviews }: ReviewListProps) {
 
           {/* Photo */}
           {review.photo_url && (
-            <a
-              href={review.photo_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-2"
-            >
-              <img
-                src={review.photo_url}
-                alt="Review photo"
-                className="h-16 w-16 object-cover rounded-md border border-border hover:opacity-80 transition-opacity"
-              />
-            </a>
+            <div className="mt-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button type="button" className="block cursor-pointer">
+                    <img
+                      src={review.photo_url}
+                      alt="Review photo"
+                      className="h-24 w-24 object-cover rounded-md border border-border hover:opacity-80 transition-opacity"
+                    />
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-0 shadow-none">
+                  <div className="relative flex items-center justify-center">
+                    <img
+                      src={review.photo_url}
+                      alt="Review photo"
+                      className="max-w-full max-h-[85vh] object-contain rounded-md"
+                    />
+                    <DialogClose className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70 transition-colors">
+                      <X className="w-4 h-4" />
+                    </DialogClose>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           )}
         </div>
       ))}

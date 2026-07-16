@@ -1,13 +1,10 @@
-UI: Redesign reviews section to match reference layout
+UI: Larger review photo thumbnails + lightbox overlay
 
-Changes:
-- ReviewSummary: redesigned as vertical stacked left-column panel
-  (big rating star + count + distribution bars), replaces old
-  horizontal flex layout
-- ReviewList: redesigned cards with name + Verified badge + date on
-  same row, stars below, review text below that
-- ProductDetail: reviews section now uses two-column grid
-  (280px summary left, reviews+form right) on desktop, single
-  column stacked on mobile
+Changed review photo display from a simple 64x64 linked image to:
+- 96x96 (h-24 w-24) thumbnail — almost 50% larger
+- Click opens a Dialog lightbox overlay (dark backdrop, centered)
+- Full-size image displayed with max-w/max-h constraints
+- X button to close, click outside closes automatically
+- Shadcn Dialog component (already in project)
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
