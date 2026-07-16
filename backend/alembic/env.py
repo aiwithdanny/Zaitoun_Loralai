@@ -17,6 +17,11 @@ from alembic import context
 # Add backend root to sys.path so models can be imported
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+# Load .env so DATABASE_URL is available without manually setting it
+from dotenv import load_dotenv
+dotenv_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+load_dotenv(dotenv_path)
+
 # Alembic Config object
 config = context.config
 

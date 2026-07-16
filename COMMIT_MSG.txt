@@ -1,29 +1,10 @@
-Fix: CORS headers now injected on every response including error handlers
+Fix: alembic env.py now loads DATABASE_URL from .env file
 
-Problem: After deploying, the browser reported CORS errors despite the
-CORSMiddleware being configured correctly. Two issues:
+Alembic was failing with "DATABASE_URL environment variable is required"
+because env.py read from os.getenv() only — it never loaded the .env file
+that already exists in the backend/ directory.
 
-1. FastAPI's built-in CORSMiddleware does NOT add CORS headers to
-   responses that come from exception handlers (500, 422, etc.) —
-   only normal route handlers get the headers. So when the reviews
-   endpoint threw a 500 (reviews table doesn't exist yet), the
-   response was missing Access-Control-Allow-Origin and the browser
-   rejected it.
-
-2. The outer ASGI wrapper was only handling OPTIONS preflight at that
-   layer — non-OPTIONS requests were passed through to FastAPI
-   without the CORS injection fallback.
-
-Fix:
-- The ASGI wrapper now also injects CORS headers on non-OPTIONS
-  responses, but only when the CORSMiddleware hasn't already added
-  them (deduplication check via has_cors)
-- This ensures that error responses (5xx, 4xx) and successful
-  responses all have consistent CORS headers
-
-Verified locally with httpx:
-- All response types (200, 204, 404) now have ACAO headers
-- OPTIONS preflight handled at ASGI layer with proper headers
-- No header duplication with CORSMiddleware
+Added load_dotenv() pointing to backend/.env so DATABASE_URL is available
+to Alembic without manually setting the env var in the shell.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
