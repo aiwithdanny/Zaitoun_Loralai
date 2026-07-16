@@ -27,3 +27,6 @@ See [workflow/taste.md](workflow/taste.md)
 # content
 - Never fabricate health/quality claims, nutritional data, tasting notes, or specific product facts — use honest placeholder states ("Content coming soon", commented `// PLACEHOLDER - awaiting real content from client`) until real content is provided by the client. Confidence: 0.85
 
+# wouter
+- Use wouter's `<Link>` component (with a `to` prop) instead of plain `<a>` tags for internal SPA navigation to prevent full page reloads. Confidence: 0.75
+

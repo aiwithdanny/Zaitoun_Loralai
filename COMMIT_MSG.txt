@@ -1,13 +1,6 @@
-Content: Replace placeholders with real product content in accordion sections
+Header: Use wouter <Link> for logo navigation instead of <a>
 
-All five accordion sections now contain the client-provided content:
-- Quality & Health Benefits: polyphenol content (557 mg/kg), key benefits
-  listed as bullet points
-- How To Use / Best For: smoke point (210°C), use cases including
-  Pakistani dishes, storage instructions
-- Flavour Profile: tasting notes with 5 specific descriptors
-- Ingredients: full breakdown with sourcing detail
-- Nutritional Info: full table rendered via .map() over label/value
-  tuples, with sub-fat indentation
+Replaced <a href="/"> with wouter's <Link to="/"> for the logo,
+enabling client-side SPA navigation without a full page reload.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

@@ -44,7 +44,7 @@ export function Header() {
       }`}
     >
       <div className="container mx-auto px-4 md:px-8 flex items-center justify-between">
-        <a href="/" className="flex items-center">
+        <Link to="/" className="flex items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.6, rotate: -15 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
@@ -61,7 +61,7 @@ export function Header() {
             />
             <img src={logoUrl} alt={BRAND.name} className="h-full w-full object-cover" />
           </motion.div>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
