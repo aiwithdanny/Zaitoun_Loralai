@@ -1,9 +1,23 @@
-Fix: review upload-image route ordering + CORS config
+Fix: CORS headers not reaching browser on fastapicloud.dev
 
-- Moved @router.post("/upload-image") above @router.post("/{product_group_id}")
-  to fix 422 error — the parameterized route was swallowing literal paths
-- Added CORS_ORIGINS and FRONTEND_URL env var support for explicit origins
-  alongside the wildcard fallback, so Vercel production/preview URLs are
-  explicitly allowed
+Problem: Browser reported "No 'Access-Control-Allow-Origin' header present"
+on all requests. The FastAPI CORSMiddleware was configured correctly with
+allow_origins=["*"], but the fastapicloud.dev platform's proxy layer was
+either stripping headers or intercepting OPTIONS preflight requests before
+they reached the middleware stack.
+
+Fix:
+- Added an outer ASGI wrapper that handles OPTIONS preflight requests at
+  the raw ASGI layer, before FastAPI's middleware stack processes them
+- The wrapper responds directly to OPTIONS with proper CORS headers,
+  bypassing any proxy-level interception
+- Non-OPTIONS requests pass through to FastAPI where the existing
+  CORSMiddleware handles CORS header injection on responses
+
+Also verified:
+- Route ordering: POST /upload-image registered before POST /{product_group_id}
+- CORS headers present on all response types (200, 404, error, OPTIONS)
+- Origin echo works for both known and unknown origins
+- All headers/access-control-allow-headers=max-age present on preflight
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
