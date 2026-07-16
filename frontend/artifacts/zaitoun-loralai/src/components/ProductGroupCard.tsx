@@ -5,6 +5,7 @@ import { formatPrice } from "@/utils/currency";
 
 interface ProductGroupCardProps {
   variants: Product[];
+  category?: string;
   productImages: Record<string, string>;
 }
 
@@ -13,7 +14,7 @@ function stripSizeSuffix(name: string): string {
   return name.replace(/\s*[—–-]\s*[^—–-]+$/, "");
 }
 
-export function ProductGroupCard({ variants, productImages }: ProductGroupCardProps) {
+export function ProductGroupCard({ variants, category: categoryProp, productImages }: ProductGroupCardProps) {
   const [, navigate] = useLocation();
 
   const sorted = useMemo(
@@ -40,7 +41,12 @@ export function ProductGroupCard({ variants, productImages }: ProductGroupCardPr
   const imgSrc = first.image_url || productImages[first.slug];
 
   const handleNavigate = () => {
-    if (groupId) navigate(`/product/${groupId}`);
+    if (groupId) {
+      const params = new URLSearchParams();
+      if (categoryProp) params.set("category", categoryProp);
+      const qs = params.toString();
+      navigate(`/product/${groupId}${qs ? `?${qs}` : ""}`);
+    }
   };
 
   return (

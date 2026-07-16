@@ -80,8 +80,8 @@ export function ProductGrid() {
     toast.success(`${product.name} added to cart`);
   };
 
-  // Group products by product_group_id so each product line shows as one card
-  // with a SizeSelector. Products without a group_id render as individual cards.
+  // Group products by product_group_id, then split each group by category
+  // so Bottles, Cans, and Bulk each get their own card.
   const grouped = useMemo(() => {
     if (!products) return null;
     const map = new Map<string, typeof products>();
@@ -95,10 +95,21 @@ export function ProductGrid() {
         ungrouped.push(p);
       }
     }
-    return {
-      groups: Array.from(map.entries()).map(([groupId, variants]) => ({ groupId, variants })),
-      ungrouped,
-    };
+    const groups: Array<{ groupId: string; category: string; variants: typeof products }> = [];
+    for (const [groupId, variants] of map.entries()) {
+      // Split variants by category (e.g. Bottles, Cans, Bulk)
+      const byCategory = new Map<string, typeof products>();
+      for (const v of variants) {
+        const cat = v.category || "Other";
+        const existing = byCategory.get(cat) || [];
+        existing.push(v);
+        byCategory.set(cat, existing);
+      }
+      for (const [cat, catVariants] of byCategory.entries()) {
+        groups.push({ groupId, category: cat, variants: catVariants });
+      }
+    }
+    return { groups, ungrouped };
   }, [products]);
 
   return (
@@ -191,11 +202,12 @@ export function ProductGrid() {
               animate="show"
               className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
             >
-            {/* Grouped product lines — one card per unique product_group_id */}
+            {/* Grouped product lines — one card per category per group */}
             {grouped?.groups.map((g) => (
-              <motion.div key={g.groupId} variants={card}>
+              <motion.div key={`${g.groupId}-${g.category}`} variants={card}>
                 <ProductGroupCard
                   variants={g.variants}
+                  category={g.category}
                   productImages={productImages}
                 />
               </motion.div>

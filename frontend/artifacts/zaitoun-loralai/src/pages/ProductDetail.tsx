@@ -26,7 +26,7 @@ function stripSizeSuffix(name: string): string {
 
 export function ProductDetail() {
   const { group_id } = useParams<{ group_id: string }>();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const addItem = useCart((state) => state.addItem);
   const { customer } = useCustomerAuth();
 
@@ -48,12 +48,18 @@ export function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
 
   // Reset to first variant when grouped data loads or changes
+  // Prefer a variant matching ?category= query param if present
   useEffect(() => {
     if (sorted.length > 0) {
-      setSelectedVariant(sorted[0]);
+      const params = new URLSearchParams(location.split("?")[1] || "");
+      const targetCategory = params.get("category");
+      const defaultVariant = targetCategory
+        ? sorted.find((v) => v.category === targetCategory) ?? sorted[0]
+        : sorted[0];
+      setSelectedVariant(defaultVariant);
       setQuantity(1);
     }
-  }, [sorted]);
+  }, [sorted, location]);
 
   // ==================== Reviews ====================
   const [reviews, setReviews] = useState<ReviewData[]>([]);
