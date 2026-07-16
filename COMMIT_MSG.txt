@@ -1,14 +1,12 @@
-Debug: expose real backend error when DEBUG=true for order 500 issue
+Revert: restore original orders routes (redirect_slashes, trailing slash)
 
-The orders endpoint returns a generic 500 with no detail. Added
-DEBUG-aware exception handling: when DEBUG=true, the actual Python
-exception message is returned in the response body so it's visible
-in the browser console. In production (DEBUG not set), it continues
-to return the generic message.
+The 307 redirect was never the problem — it already had CORS headers
+from the ASGI wrapper. The only real CORS fix needed was the
+_cors_response() on exception handlers, which is already deployed.
 
-Instructions: Set DEBUG=true on the production env, redeploy, attempt
-an order, and the browser console will show the actual error (e.g.
-missing table, column, FK constraint, etc.). Then fix and revert
-DEBUG to false.
+Reverted:
+- redirect_slashes=False → default True (removed from FastAPI constructor)
+- @router.post("") → @router.post("/")
+- @router.get("") → @router.get("/")
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
