@@ -1,21 +1,10 @@
-Homepage: Show 3 category cards instead of 1 combined group card
+Fix: category query param not being read on product detail page
 
-The single "Extra Virgin Olive Oil" group card is now split into 3
-cards by category: Bottles (250ml, 500ml, 1L Glass), Cans (300ml,
-500ml), Bulk (3L, 5L).
+wouter's useLocation() returns pathname only — the query string was
+lost when parsing with location.split("?")[1]. Switched to using
+window.location.search directly (the standard browser API), which
+always returns the query string regardless of router implementation.
 
-Changes:
-- ProductGrid: grouping logic now splits variants by category within
-  each product_group_id, producing subgroups that each get their own
-  ProductGroupCard
-- ProductGroupCard: accepts an optional category prop, passed as
-  ?category= query param when navigating to the product detail page
-- ProductDetail: reads ?category= param from URL and selects the
-  first variant in that category by default. Falls back to sorted[0]
-  (current behavior) if no param is present
-
-All 6 variants remain available on the detail page — the category
-param only affects which variant is initially selected. SizeSelector
-still shows all variants.
+This fixes the ?category=Bottles/Cans/Bulk default-variant behavior.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

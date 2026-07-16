@@ -51,7 +51,7 @@ export function ProductDetail() {
   // Prefer a variant matching ?category= query param if present
   useEffect(() => {
     if (sorted.length > 0) {
-      const params = new URLSearchParams(location.split("?")[1] || "");
+      const params = new URLSearchParams(window.location.search);
       const targetCategory = params.get("category");
       const defaultVariant = targetCategory
         ? sorted.find((v) => v.category === targetCategory) ?? sorted[0]
