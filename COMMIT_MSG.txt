@@ -1,12 +1,13 @@
-Revert: restore original orders routes (redirect_slashes, trailing slash)
+Fix: add trailing slash to frontend orders API calls
 
-The 307 redirect was never the problem — it already had CORS headers
-from the ASGI wrapper. The only real CORS fix needed was the
-_cors_response() on exception handlers, which is already deployed.
+Frontend was calling /api/v1/orders (no trailing slash), but the route
+is @router.post("/") which requires a trailing slash. FastAPI's default
+redirect_slashes=True sends a 307 redirect, which browsers handle
+inconsistently for CORS-preflighted POST requests — the redirect URL
+may lose the Origin header, causing CORS to fail silently.
 
-Reverted:
-- redirect_slashes=False → default True (removed from FastAPI constructor)
-- @router.post("") → @router.post("/")
-- @router.get("") → @router.get("/")
+Fix: Added trailing slash to both /orders/ (create) and /orders/?
+(list) endpoints in the frontend API client, so requests hit the
+correct route directly with no redirect.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

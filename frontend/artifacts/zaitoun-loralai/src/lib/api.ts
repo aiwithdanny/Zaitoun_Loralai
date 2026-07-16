@@ -258,7 +258,7 @@ export const ordersApi = {
     if (status) queryParams.append('status', status);
 
     const queryString = queryParams.toString();
-    const endpoint = `/orders?${queryString}`;
+    const endpoint = `/orders/?${queryString}`;
 
     const response = await apiFetch<OrdersListResponse>(endpoint, {}, 'admin');
     return response;
@@ -266,7 +266,7 @@ export const ordersApi = {
 
   // Create new order
   createOrder: async (orderData: CreateOrderData): Promise<Order> => {
-    const response = await apiFetch<{ success: boolean; data: Order }>('/orders', {
+    const response = await apiFetch<{ success: boolean; data: Order }>('/orders/', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
