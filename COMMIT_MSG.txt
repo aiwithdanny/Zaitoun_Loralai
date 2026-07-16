@@ -1,10 +1,16 @@
-UI: Larger review photo thumbnails + lightbox overlay
+Admin: Add product_group_id and size_label fields to ProductForm
 
-Changed review photo display from a simple 64x64 linked image to:
-- 96x96 (h-24 w-24) thumbnail — almost 50% larger
-- Click opens a Dialog lightbox overlay (dark backdrop, centered)
-- Full-size image displayed with max-w/max-h constraints
-- X button to close, click outside closes automatically
-- Shadcn Dialog component (already in project)
+New fields in the admin add/edit product modal:
+- Group ID: slug-like identifier (e.g., "extra-virgin-olive-oil")
+- Size Label: display text (e.g., "250ml", "3L", "5L")
+
+Both optional. Grouped together in a "Product Group" section after
+Category, with helper text explaining that products sharing a Group ID
+appear as size variants on the product detail page.
+
+If one field is set without the other, a subtle amber hint warns the
+admin to consider setting both.
+
+No backend changes needed — the schema and API already support these fields.
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

@@ -30,6 +30,8 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
     discount_price: '',
     stock: '',
     category: '',
+    product_group_id: '',
+    size_label: '',
     image_url: '',
     is_featured: false,
   });
@@ -50,6 +52,8 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
         discount_price: product.discount_price ? String(product.discount_price) : '',
         stock: String(product.stock || ''),
         category: product.category || '',
+        product_group_id: product.product_group_id || '',
+        size_label: product.size_label || '',
         image_url: product.image_url || '',
         is_featured: product.is_featured || false,
       });
@@ -173,6 +177,8 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
       discount_price: formData.discount_price ? parseFloat(formData.discount_price) : null,
       stock: parseInt(formData.stock, 10),
       category: formData.category || null,
+      product_group_id: formData.product_group_id || undefined,
+      size_label: formData.size_label || undefined,
       image_url: imageUrl,
       is_featured: formData.is_featured,
     };
@@ -301,6 +307,51 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
           placeholder="e.g., Oils, Spices"
           disabled={isLoading || isUploading}
         />
+      </div>
+
+      {/* ===== Product Group Section ===== */}
+      <div className="border-t border-gray-200 pt-4 mt-2">
+        <p className="text-sm font-medium text-gray-700 mb-3">Product Group <span className="text-gray-400 font-normal">(optional)</span></p>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Group ID</label>
+            <input
+              type="text"
+              name="product_group_id"
+              value={formData.product_group_id}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g., extra-virgin-olive-oil"
+              disabled={isLoading || isUploading}
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Products with the same Group ID appear as size variants on the product detail page.
+            </p>
+            {formData.size_label && !formData.product_group_id && (
+              <p className="text-xs text-amber-600 mt-1">Set Group ID to enable size variant grouping.</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Size Label</label>
+            <input
+              type="text"
+              name="size_label"
+              value={formData.size_label}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g., 250ml, 500ml, 3L"
+              disabled={isLoading || isUploading}
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Displayed as a size option on the product page (appears when Group ID is shared).
+            </p>
+            {formData.product_group_id && !formData.size_label && (
+              <p className="text-xs text-amber-600 mt-1">Add a Size Label so customers can distinguish variants.</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ===== Image Section ===== */}
