@@ -211,3 +211,28 @@ async def update_payment_status(
         "data": order.to_dict(),
         "message": f"Payment status updated to {payment_update.payment_status}"
     }
+
+
+@router.delete("/{order_id}")
+async def delete_order(
+    order_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Soft delete an order by setting status to 'cancelled' - Admin only"""
+    order = db.query(Order).filter(Order.id == order_id).first()
+
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.status == "cancelled":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order is already cancelled"
+        )
+
+    order.status = "cancelled"
+    order.updated_at = datetime.utcnow()
+    db.commit()
+
+    return {"success": True, "message": "Order cancelled successfully"}

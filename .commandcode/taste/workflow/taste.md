@@ -1,6 +1,6 @@
 # workflow
 - Use `npm run dev` from the project root (not standalone `npx vite`) to start the full stack; the dev server runs on port 3000, not 5173. Confidence: 0.75
-- Present a plan and get user approval before writing any code or final content. Confidence: 0.82
+- Present a plan and get user approval before writing any code or final content. Confidence: 0.85
 - Implement in this order: database migration first (with verification), then backend files, then frontend files — with build/import checks after each major step. Keep backend and frontend phases strictly sequential: verify backend endpoints work via API testing before moving to frontend implementation. Confidence: 0.82
 - Show real proof at each checkpoint (e.g., before/after data snapshots, live request/response output) rather than just confirmation statements. Confidence: 0.77
 - Investigate and report findings with file/line references before proposing or implementing any fix. Confidence: 0.73

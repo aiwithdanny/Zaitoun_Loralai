@@ -308,6 +308,11 @@ export const ordersApi = {
     );
     return response.data;
   },
+
+  // Delete order (admin only - soft delete)
+  deleteOrder: async (orderId: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/orders/${orderId}`, { method: 'DELETE' }, 'admin');
+  },
 };
 
 // ==================== ADMIN API ====================

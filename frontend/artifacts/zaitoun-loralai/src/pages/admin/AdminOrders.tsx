@@ -8,6 +8,17 @@ import { Order, ordersApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { OrderDetailModal } from '@/components/admin/OrderDetailModal';
 import { formatPrice } from '@/utils/currency';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
 const DEFAULT_LIMIT = 20;
 const STATUS_FILTERS = ['', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
@@ -45,6 +56,7 @@ export default function AdminOrders() {
   const [error, setError] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
   const [shouldRefetch, setShouldRefetch] = useState(false);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'asc' });
 
@@ -98,6 +110,20 @@ export default function AdminOrders() {
 
   const handleOrderClick = (orderNumber: string) => {
     setSelectedOrder(orderNumber);
+  };
+
+  const handleDeleteOrder = async () => {
+    if (deleteOrderId === null) return;
+
+    try {
+      await ordersApi.deleteOrder(deleteOrderId);
+      toast.success('Order cancelled successfully');
+      setDeleteOrderId(null);
+      fetchOrders();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to cancel order');
+      setDeleteOrderId(null);
+    }
   };
 
   const handleSort = (key: SortConfig['key']) => {
@@ -282,12 +308,43 @@ export default function AdminOrders() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={() => handleOrderClick(order.order_number)}
-                          className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-                        >
-                          View Details
-                        </button>
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleOrderClick(order.order_number)}
+                            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                          >
+                            View Details
+                          </button>
+                          {order.status !== 'cancelled' && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button
+                                  onClick={() => setDeleteOrderId(order.id)}
+                                  className="text-red-600 hover:text-red-700 font-medium text-sm"
+                                >
+                                  Delete
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Cancel Order?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will cancel order <span className="font-mono font-medium">{order.order_number}</span> for <span className="font-medium">{order.customer_name}</span>. This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => setDeleteOrderId(null)}>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={handleDeleteOrder}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                  >
+                                    Yes, Cancel Order
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
