@@ -269,7 +269,7 @@ export const ordersApi = {
     const response = await apiFetch<{ success: boolean; data: Order }>('/orders/', {
       method: 'POST',
       body: JSON.stringify(orderData),
-    });
+    }, 'customer');
     return response.data;
   },
 
