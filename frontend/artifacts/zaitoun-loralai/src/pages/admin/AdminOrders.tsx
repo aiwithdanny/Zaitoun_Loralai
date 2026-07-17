@@ -117,11 +117,11 @@ export default function AdminOrders() {
 
     try {
       await ordersApi.deleteOrder(deleteOrderId);
-      toast.success('Order cancelled successfully');
+      toast.success('Order deleted successfully');
       setDeleteOrderId(null);
       fetchOrders();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to cancel order');
+      toast.error(err.message || 'Failed to delete order');
       setDeleteOrderId(null);
     }
   };
@@ -315,8 +315,7 @@ export default function AdminOrders() {
                           >
                             View Details
                           </button>
-                          {order.status !== 'cancelled' && (
-                            <AlertDialog>
+                          <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <button
                                   onClick={() => setDeleteOrderId(order.id)}
@@ -327,9 +326,9 @@ export default function AdminOrders() {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Cancel Order?</AlertDialogTitle>
+                                  <AlertDialogTitle>Delete Order?</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    This will cancel order <span className="font-mono font-medium">{order.order_number}</span> for <span className="font-medium">{order.customer_name}</span>. This action cannot be undone.
+                                    This will permanently delete order <span className="font-mono font-medium">{order.order_number}</span> for <span className="font-medium">{order.customer_name}</span>. This action cannot be undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -338,12 +337,11 @@ export default function AdminOrders() {
                                     onClick={handleDeleteOrder}
                                     className="bg-red-600 hover:bg-red-700 text-white"
                                   >
-                                    Yes, Cancel Order
+                                    Yes, Delete Order
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
-                          )}
                         </div>
                       </td>
                     </tr>

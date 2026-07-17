@@ -219,20 +219,15 @@ async def delete_order(
     current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Soft delete an order by setting status to 'cancelled' - Admin only"""
+    """Permanently delete an order and its items from the database - Admin only"""
     order = db.query(Order).filter(Order.id == order_id).first()
 
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    if order.status == "cancelled":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Order is already cancelled"
-        )
-
-    order.status = "cancelled"
-    order.updated_at = datetime.utcnow()
+    # Delete order items first, then the order itself
+    db.query(OrderItem).filter(OrderItem.order_id == order_id).delete()
+    db.delete(order)
     db.commit()
 
-    return {"success": True, "message": "Order cancelled successfully"}
+    return {"success": True, "message": "Order deleted successfully"}
