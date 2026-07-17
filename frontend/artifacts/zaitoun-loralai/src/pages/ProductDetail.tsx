@@ -481,6 +481,81 @@ export function ProductDetail() {
           )}
         </section>
 
+        {/* Find Your Perfect Match — Comparison Section */}
+        {(() => {
+          const matchCategory = currentVariant?.category;
+          const matchVariants = sorted.filter((v) => v.category === matchCategory);
+          if (!matchCategory || matchVariants.length < 2) return null;
+
+          const COMPARISON_DATA: Record<string, { bestFor: string; perfectFor: string; idealServing: string }> = {
+            "250ml": { bestFor: "Drizzling, dressings, finishing dishes", perfectFor: "Individuals, gifts, first-time buyers", idealServing: "1–2 people" },
+            "500ml": { bestFor: "Everyday cooking, sautéing, dressings", perfectFor: "Small families, regular everyday use", idealServing: "2–4 people" },
+            "300ml Can": { bestFor: "Gifting, travel, portion control", perfectFor: "Gifts, occasional use, picnics", idealServing: "1–2 people" },
+            "500ml Can": { bestFor: "Daily cooking, marinades, baking", perfectFor: "Families, value-for-money shoppers", idealServing: "2–4 people" },
+            "3L": { bestFor: "Heavy cooking, frying, meal prep", perfectFor: "Large families, serious home cooks", idealServing: "4–6 people" },
+            "5L": { bestFor: "Restaurants, catering, bulk use", perfectFor: "Commercial, best price per litre", idealServing: "6+ people" },
+          };
+
+          const avgRating = aggregate.average_rating;
+          const rounded = Math.round(avgRating);
+
+          return (
+            <section className="max-w-5xl mx-auto py-8">
+              <h2 className="font-serif text-xl text-foreground mb-6">Find Your Perfect Match</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {matchVariants.map((variant) => {
+                  const info = COMPARISON_DATA[variant.size_label ?? ""];
+                  return (
+                    <div key={variant.id} className="bg-card border border-border rounded-lg p-6 flex flex-col">
+                      <p className="font-serif text-lg text-foreground mb-1">{variant.size_label}</p>
+
+                      {/* Star rating */}
+                      <div className="flex items-center gap-1 text-amber-400 mb-4">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <svg key={star} className={`w-3.5 h-3.5 ${star <= rounded ? "fill-amber-400" : "fill-amber-400/20"}`} viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                        <span className="text-xs text-muted-foreground ml-1">
+                          {avgRating > 0 ? avgRating.toFixed(1) : "—"}
+                        </span>
+                      </div>
+
+                      {/* Specs */}
+                      {info && (
+                        <div className="space-y-3 mb-6 flex-1">
+                          <div>
+                            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Best For</p>
+                            <p className="text-sm text-foreground">{info.bestFor}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Perfect For</p>
+                            <p className="text-sm text-foreground">{info.perfectFor}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Ideal Serving</p>
+                            <p className="text-sm text-foreground">{info.idealServing}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <Button
+                        onClick={() => {
+                          handleVariantChange(variant);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="w-full"
+                      >
+                        Shop Now
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })()}
+
         <Separator className="mb-12" />
       </main>
 
