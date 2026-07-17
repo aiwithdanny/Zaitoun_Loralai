@@ -513,7 +513,7 @@ export function ProductDetail() {
                           <img
                             src={variant.image_url || productImages[variant.slug]}
                             alt={variant.size_label || variant.name}
-                            className="h-36 w-auto object-contain"
+                            className="h-48 w-auto object-contain"
                           />
                         ) : (
                           <div className="h-36 w-36 border border-dashed border-border rounded-sm flex items-center justify-center text-muted-foreground/30 text-[10px] uppercase tracking-widest">
