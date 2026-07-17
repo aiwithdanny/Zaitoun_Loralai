@@ -485,9 +485,21 @@ export function ProductDetail() {
 
         {/* Find Your Perfect Match — Comparison Section */}
         {(() => {
-          const matchCategory = currentVariant?.category;
-          const matchVariants = sorted.filter((v) => v.category === matchCategory);
-          if (!matchCategory || matchVariants.length < 2) return null;
+          const SIZE_MATCH: Record<string, string> = {
+            "250ml": "300ml Can",
+            "500ml": "3L",
+            "300ml Can": "250ml",
+            "500ml Can": "500ml",
+            "3L": "500ml",
+            "5L": "3L",
+          };
+
+          const currentSize = currentVariant?.size_label;
+          if (!currentSize) return null;
+          const matchTarget = SIZE_MATCH[currentSize];
+          if (!matchTarget) return null;
+          const matchedVariant = sorted.find((v) => v.size_label === matchTarget);
+          if (!matchedVariant) return null;
 
           const COMPARISON_DATA: Record<string, { bestFor: string; perfectFor: string; idealServing: string }> = {
             "250ml": { bestFor: "Drizzling, dressings, finishing dishes", perfectFor: "Individuals, gifts, first-time buyers", idealServing: "1–2 people" },
@@ -505,7 +517,7 @@ export function ProductDetail() {
             <section className="max-w-5xl mx-auto py-8">
               <h2 className="font-serif text-xl text-foreground mb-6">Find Your Perfect Match</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {matchVariants.map((variant) => {
+                {[currentVariant, matchedVariant].map((variant) => {
                   const info = COMPARISON_DATA[variant.size_label ?? ""];
                   return (
                     <div key={variant.id} className="bg-card border border-border rounded-lg p-6 flex flex-col">
