@@ -3,10 +3,10 @@ import { Hero } from "@/components/Hero";
 
 import { ProductGrid } from "@/components/ProductGrid";
 import { QualityFeatures } from "@/components/QualityFeatures";
+import { TestimonialSection } from "@/components/TestimonialSection";
 import { Story } from "@/components/Story";
 import { About } from "@/components/About";
 import { TastingNotes } from "@/components/TastingNotes";
-import { Recipes } from "@/components/Recipes";
 import { Footer } from "@/components/Footer";
 
 function Home() {
@@ -17,10 +17,10 @@ function Home() {
         <Hero />
         <ProductGrid />
         <QualityFeatures />
+        <TestimonialSection />
         <Story />
         <About />
         <TastingNotes />
-        <Recipes />
       </main>
       <Footer />
     </div>

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { TestimonialSection } from "@/components/TestimonialSection";
+import { Recipes } from "@/components/Recipes";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewList } from "@/components/ReviewList";
 import { ReviewSummary } from "@/components/ReviewSummary";
@@ -593,7 +593,7 @@ export function ProductDetail() {
 
         <Separator className="mb-12" />
 
-        <TestimonialSection />
+        <Recipes />
       </main>
 
       <Footer />
