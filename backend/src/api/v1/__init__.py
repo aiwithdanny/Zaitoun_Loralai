@@ -4,7 +4,7 @@ API v1 module for Zaitoun Loralai
 
 from fastapi import APIRouter
 
-from src.api.v1 import products, orders, whatsapp, admin, wishlist
+from src.api.v1 import products, orders, whatsapp, admin, wishlist, coupons
 
 router = APIRouter()
 
@@ -14,5 +14,6 @@ router.include_router(orders.router, prefix="/orders", tags=["Orders"])
 router.include_router(whatsapp.router, prefix="/whatsapp", tags=["WhatsApp"])
 router.include_router(admin.router, prefix="/admin", tags=["Admin"])
 router.include_router(wishlist.router, prefix="/wishlist", tags=["Wishlist"])
+router.include_router(coupons.router, prefix="/coupons", tags=["Coupons"])
 
-__all__ = ["router", "products", "orders", "whatsapp", "admin", "wishlist"]
+__all__ = ["router", "products", "orders", "whatsapp", "admin", "wishlist", "coupons"]
