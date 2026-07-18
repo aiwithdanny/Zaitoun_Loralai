@@ -2,8 +2,9 @@ import { Helmet } from "react-helmet-async";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Zap, Star, MessageSquare, Loader2 } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Zap, Star, MessageSquare, Loader2, Heart } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
+import { useWishlistList, useWishlistAdd, useWishlistRemove } from "@/hooks/useWishlist";
 import { useCart } from "@/store/cart";
 import { SizeSelector } from "@/components/SizeSelector";
 import { Header } from "@/components/Header";
@@ -110,6 +111,32 @@ export function ProductDetail() {
 
   const groupName = sorted.length > 0 ? stripSizeSuffix(sorted[0].name) : "";
   const category = sorted.length > 0 ? (sorted[0].category || "Loralai, Pakistan") : "";
+
+  // Wishlist state
+  const { isLoggedIn } = useCustomerAuth();
+  const { data: wishlist } = useWishlistList();
+  const addMutation = useWishlistAdd();
+  const removeMutation = useWishlistRemove();
+
+  const isWishlisted = useMemo(() => {
+    if (!wishlist || !group_id) return false;
+    return wishlist.some((group) => group[0]?.product_group_id === group_id);
+  }, [wishlist, group_id]);
+
+  const handleWishlistToggle = () => {
+    if (!group_id) return;
+
+    if (!isLoggedIn) {
+      toast.error("Sign in to save items to your wishlist");
+      return;
+    }
+
+    if (isWishlisted) {
+      removeMutation.mutate(group_id);
+    } else {
+      addMutation.mutate(group_id);
+    }
+  };
 
   const currentVariant = selectedVariant ?? sorted[0];
   const currentPrice = currentVariant?.discount_price ?? currentVariant?.price ?? 0;
@@ -230,13 +257,29 @@ export function ProductDetail() {
 
           {/* Right — Info */}
           <div className="flex flex-col justify-center">
-            <p className="text-accent uppercase tracking-[0.2em] text-xs mb-3">
-              {category}
-            </p>
-
-            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight mb-4">
-              {groupName}
-            </h1>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-accent uppercase tracking-[0.2em] text-xs mb-3">
+                  {category}
+                </p>
+                <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground leading-tight">
+                  {groupName}
+                </h1>
+              </div>
+              <button
+                onClick={handleWishlistToggle}
+                className="mt-2 p-1.5 rounded-full hover:bg-muted transition-colors flex-shrink-0"
+                title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              >
+                <Heart
+                  className={`h-6 w-6 ${
+                    isWishlisted
+                      ? "fill-red-500 text-red-500"
+                      : "text-gray-400"
+                  }`}
+                />
+              </button>
+            </div>
 
             {/* Star rating — dynamic from reviews */}
             <div className="flex items-center gap-2 mb-6">
