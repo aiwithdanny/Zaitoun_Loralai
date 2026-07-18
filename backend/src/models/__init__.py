@@ -226,7 +226,24 @@ class Review(Base):
         }
 
 
+class Wishlist(Base):
+    __tablename__ = "wishlists"
+
+    id = Column(Integer, primary_key=True, index=True)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
+    product_group_id = Column(String(100), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "customer_id": self.customer_id,
+            "product_group_id": self.product_group_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
+
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist"]
 
 
