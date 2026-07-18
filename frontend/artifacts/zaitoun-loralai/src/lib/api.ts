@@ -537,6 +537,31 @@ export const customerApi = {
   },
 };
 
+// ==================== WISHLIST API ====================
+
+export interface WishlistResponse {
+  success: boolean;
+  data: Product[][];
+}
+
+export const wishlistApi = {
+  list: async (): Promise<Product[][]> => {
+    const response = await apiFetch<WishlistResponse>('/wishlist/', { method: 'GET' }, 'customer');
+    return response.data;
+  },
+
+  add: async (product_group_id: string): Promise<{ success: boolean; message: string }> => {
+    return apiFetch('/wishlist/', {
+      method: 'POST',
+      body: JSON.stringify({ product_group_id }),
+    }, 'customer');
+  },
+
+  remove: async (product_group_id: string): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/wishlist/${product_group_id}`, { method: 'DELETE' }, 'customer');
+  },
+};
+
 // ==================== WHATSAPP API ====================
 
 export const whatsappApi = {
