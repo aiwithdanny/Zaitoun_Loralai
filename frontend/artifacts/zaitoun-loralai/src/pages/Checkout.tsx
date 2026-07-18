@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 import { useCart } from "@/store/cart";
@@ -123,9 +123,15 @@ export function Checkout() {
             <p className="text-sm text-muted-foreground mb-6">
               Order #: <span className="font-mono text-foreground">{orderNumber}</span>
             </p>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground mb-4">
               We'll send you a confirmation email shortly with tracking information.
             </p>
+            <Link
+              href="/track-order"
+              className="block text-sm text-accent hover:underline mb-4 text-center"
+            >
+              Track your order
+            </Link>
             <Button onClick={() => navigate("/")} className="w-full">
               Back to Home
             </Button>

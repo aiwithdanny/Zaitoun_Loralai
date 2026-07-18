@@ -20,6 +20,7 @@ import CustomerLogin from "@/pages/CustomerLogin";
 import CustomerRegister from "@/pages/CustomerRegister";
 import { ProductDetail } from "@/pages/ProductDetail";
 import AccountOrders from "@/pages/AccountOrders";
+import TrackOrder from "@/pages/TrackOrder";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { CustomerProtectedRoute } from "@/components/CustomerProtectedRoute";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/terms-of-service" component={TermsOfService} />
       <Route path="/refund-policy" component={RefundPolicy} />
       <Route path="/faqs" component={FAQs} />
+      <Route path="/track-order" component={TrackOrder} />
       <Route path="/login" component={CustomerLogin} />
       <Route path="/register" component={CustomerRegister} />
       <Route path="/account/orders" component={CustomerProtectedRoute(AccountOrders)} />
