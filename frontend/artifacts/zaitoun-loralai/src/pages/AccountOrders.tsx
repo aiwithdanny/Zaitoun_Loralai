@@ -32,7 +32,15 @@ export default function AccountOrders() {
       </Helmet>
       <Header />
       <main className="min-h-screen pt-28 pb-16 px-4 md:px-8 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-foreground mb-2">My Orders</h1>
+        <div className="flex items-center gap-6 mb-2">
+          <h1 className="text-2xl font-bold text-foreground">My Orders</h1>
+          <Link
+            href="/account/wishlist"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Wishlist
+          </Link>
+        </div>
         <p className="text-muted-foreground text-sm mb-8">View your order history</p>
 
         {loading && (
