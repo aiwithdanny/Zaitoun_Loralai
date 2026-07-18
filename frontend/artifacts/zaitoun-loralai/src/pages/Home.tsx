@@ -7,6 +7,7 @@ import { TestimonialSection } from "@/components/TestimonialSection";
 import { Story } from "@/components/Story";
 import { About } from "@/components/About";
 import { TastingNotes } from "@/components/TastingNotes";
+import { Recipes } from "@/components/Recipes";
 import { Footer } from "@/components/Footer";
 
 function Home() {
@@ -21,6 +22,7 @@ function Home() {
         <Story />
         <About />
         <TastingNotes />
+        <Recipes />
       </main>
       <Footer />
     </div>
