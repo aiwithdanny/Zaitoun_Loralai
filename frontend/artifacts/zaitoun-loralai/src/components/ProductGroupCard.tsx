@@ -1,7 +1,11 @@
 import { useMemo } from "react";
 import { useLocation } from "wouter";
+import { Heart } from "lucide-react";
 import type { Product } from "@/lib/api";
 import { formatPrice } from "@/utils/currency";
+import { useCustomerAuth } from "@/hooks/useCustomerAuth";
+import { useWishlistList, useWishlistAdd, useWishlistRemove } from "@/hooks/useWishlist";
+import { toast } from "sonner";
 
 interface ProductGroupCardProps {
   variants: Product[];
@@ -16,6 +20,10 @@ function stripSizeSuffix(name: string): string {
 
 export function ProductGroupCard({ variants, category: categoryProp, productImages }: ProductGroupCardProps) {
   const [, navigate] = useLocation();
+  const { isLoggedIn } = useCustomerAuth();
+  const { data: wishlist } = useWishlistList();
+  const addMutation = useWishlistAdd();
+  const removeMutation = useWishlistRemove();
 
   const sorted = useMemo(
     () => [...variants].sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99)),
@@ -27,6 +35,27 @@ export function ProductGroupCard({ variants, category: categoryProp, productImag
   const category = first.category || "Loralai, Pakistan";
   const isFeatured = sorted.some((v) => v.is_featured);
   const groupId = first.product_group_id;
+
+  const isWishlisted = useMemo(() => {
+    if (!wishlist || !groupId) return false;
+    return wishlist.some((group) => group[0]?.product_group_id === groupId);
+  }, [wishlist, groupId]);
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!groupId) return;
+
+    if (!isLoggedIn) {
+      toast.error("Sign in to save items to your wishlist");
+      return;
+    }
+
+    if (isWishlisted) {
+      removeMutation.mutate(groupId);
+    } else {
+      addMutation.mutate(groupId);
+    }
+  };
 
   // Lowest effective price among all variants
   const lowestPrice = useMemo(() => {
@@ -61,6 +90,20 @@ export function ProductGroupCard({ variants, category: categoryProp, productImag
             Featured
           </span>
         )}
+
+        <button
+          onClick={handleWishlistToggle}
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
+          title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className={`h-5 w-5 ${
+              isWishlisted
+                ? "fill-red-500 text-red-500"
+                : "text-gray-400"
+            }`}
+          />
+        </button>
 
         {imgSrc ? (
           <img
