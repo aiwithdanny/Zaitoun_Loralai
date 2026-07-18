@@ -109,6 +109,7 @@ class OrderCreate(BaseModel):
     customer_address: str = Field(..., min_length=10, description="Customer address")
     items: List[OrderItemData] = Field(..., min_items=1, description="Order items (minimum 1)")
     payment_method: str = Field(default="whatsapp", description="Payment method")
+    coupon_code: Optional[str] = Field(None, max_length=50, description="Coupon code to apply")
 
     @validator("payment_method")
     def validate_payment_method(cls, v):

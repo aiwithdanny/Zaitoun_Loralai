@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, Query
 from sqlalchemy.orm import Session
 
 from src.models.database import get_db
-from src.models import Order, OrderItem, Product
+from src.models import Order, OrderItem, Product, Coupon
 from src.config.auth import get_current_user, get_optional_customer
 from src.schemas import OrderCreate, OrderStatusUpdate, OrderPaymentUpdate
 
@@ -105,8 +105,38 @@ async def create_order(
         # Update stock
         product.stock -= item.quantity
 
+    # ── Coupon validation ──
+    discount_amount = 0.0
+    if order_data.coupon_code:
+        coupon = db.query(Coupon).filter(Coupon.code == order_data.coupon_code.upper().strip()).first()
+        if not coupon:
+            raise HTTPException(status_code=400, detail="Coupon not found")
+        if not coupon.is_active:
+            raise HTTPException(status_code=400, detail="Coupon is no longer active")
+        if coupon.expiry_date and coupon.expiry_date < datetime.utcnow():
+            raise HTTPException(status_code=400, detail="Coupon has expired")
+        if coupon.usage_limit is not None and coupon.times_used >= coupon.usage_limit:
+            raise HTTPException(status_code=400, detail="Coupon usage limit has been reached")
+        if coupon.min_order_amount is not None and total_amount < coupon.min_order_amount:
+            raise HTTPException(status_code=400, detail=f"Minimum order amount of Rs. {coupon.min_order_amount:,.0f} required")
+
+        if coupon.discount_type == "percentage":
+            discount_amount = total_amount * (coupon.discount_value / 100)
+            if coupon.max_discount_amount is not None:
+                discount_amount = min(discount_amount, coupon.max_discount_amount)
+        else:
+            discount_amount = min(coupon.discount_value, total_amount)
+
+        discount_amount = round(discount_amount, 2)
+
+        # Increment usage
+        coupon.times_used += 1
+
     # Extract customer_id from optional JWT (None for guest orders)
     customer_id = customer_payload.get("customer_id") if customer_payload else None
+
+    # Compute final total after discount
+    final_total = round(total_amount - discount_amount, 2)
 
     # Create order
     order = Order(
@@ -115,7 +145,9 @@ async def create_order(
         customer_email=order_data.customer_email,
         customer_phone=order_data.customer_phone,
         customer_address=order_data.customer_address,
-        total_amount=total_amount,
+        total_amount=final_total,
+        coupon_code=order_data.coupon_code.upper().strip() if order_data.coupon_code else None,
+        discount_amount=discount_amount,
         payment_method=order_data.payment_method,
         status="pending",
         payment_status="unpaid",
