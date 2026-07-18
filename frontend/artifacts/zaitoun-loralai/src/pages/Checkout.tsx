@@ -2,12 +2,12 @@ import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle, Tag, X } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { ordersApi, CreateOrderData } from "@/lib/api";
+import { ordersApi, couponsApi, CreateOrderData } from "@/lib/api";
 import { toast } from "sonner";
 import { formatPrice } from "@/utils/currency";
 
@@ -25,11 +25,45 @@ export function Checkout() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string>("");
+  const [couponCode, setCouponCode] = useState("");
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountType: string;
+    discountAmount: number;
+  } | null>(null);
   const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormData>({
     defaultValues: {
       payment_method: "cash",
     },
   });
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsValidatingCoupon(true);
+    try {
+      const result = await couponsApi.validate(couponCode.trim(), getTotalPrice());
+      if (result.valid) {
+        setAppliedCoupon({
+          code: couponCode.trim().toUpperCase(),
+          discountType: result.discount_type!,
+          discountAmount: result.discount_amount!,
+        });
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error("Failed to validate coupon");
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+  };
 
   if (items.length === 0 && !isSuccess) {
     return (
@@ -71,6 +105,7 @@ export function Checkout() {
           product_id: item.id,
           quantity: item.quantity,
         })),
+        coupon_code: appliedCoupon?.code,
       };
 
       // Try to place order via API, fallback to local storage if API fails
@@ -320,12 +355,73 @@ export function Checkout() {
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="text-foreground">TBD</span>
                 </div>
+
+                {/* Coupon input */}
+                {!appliedCoupon ? (
+                  <div className="pt-3 border-t border-border">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          placeholder="Coupon code"
+                          className="pl-8 text-sm h-9"
+                          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleApplyCoupon())}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleApplyCoupon}
+                        disabled={isValidatingCoupon || !couponCode.trim()}
+                        className="h-9 whitespace-nowrap"
+                      >
+                        {isValidatingCoupon ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          "Apply"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="pt-3 border-t border-border">
+                    <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-700">{appliedCoupon.code}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-green-700">
+                          -{formatPrice(appliedCoupon.discountAmount)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleRemoveCoupon}
+                          className="p-0.5 rounded hover:bg-green-200 transition-colors"
+                        >
+                          <X className="h-3.5 w-3.5 text-green-600" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Discount line */}
+                {appliedCoupon && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Discount</span>
+                    <span className="text-green-600">-{formatPrice(appliedCoupon.discountAmount)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-between">
                 <span className="font-serif text-foreground">Total</span>
                 <span className="font-serif text-lg text-foreground">
-                  {formatPrice(getTotalPrice())}
+                  {formatPrice(getTotalPrice() - (appliedCoupon?.discountAmount ?? 0))}
                 </span>
               </div>
             </div>

@@ -233,6 +233,7 @@ export interface CreateOrderData {
   customer_address: string;
   items: OrderItem[];
   payment_method?: string;
+  coupon_code?: string;
 }
 
 export interface OrdersListResponse {
@@ -559,6 +560,25 @@ export const wishlistApi = {
 
   remove: async (product_group_id: string): Promise<{ success: boolean; message: string }> => {
     return apiFetch(`/wishlist/${product_group_id}`, { method: 'DELETE' }, 'customer');
+  },
+};
+
+// ==================== COUPONS API ====================
+
+export interface CouponValidateResponse {
+  valid: boolean;
+  discount_type?: string;
+  discount_value?: number;
+  discount_amount?: number;
+  message: string;
+}
+
+export const couponsApi = {
+  validate: async (code: string, cartTotal: number): Promise<CouponValidateResponse> => {
+    return apiFetch<CouponValidateResponse>('/coupons/validate', {
+      method: 'POST',
+      body: JSON.stringify({ code, cart_total: cartTotal }),
+    });
   },
 };
 
