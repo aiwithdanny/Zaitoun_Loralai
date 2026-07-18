@@ -516,7 +516,7 @@ export function ProductDetail() {
 
           return (
             <section className="max-w-5xl mx-auto py-8">
-              <h2 className="font-serif text-xl text-foreground mb-6">Find Your Perfect Match</h2>
+              <h2 className="font-serif text-2xl text-foreground mb-6 text-center">Find Your Perfect Match</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[currentVariant, matchedVariant].map((variant) => {
                   const info = COMPARISON_DATA[variant.size_label ?? ""];
@@ -528,7 +528,7 @@ export function ProductDetail() {
                           <img
                             src={variant.image_url || productImages[variant.slug]}
                             alt={variant.size_label || variant.name}
-                            className="h-48 w-auto object-contain"
+                            className="h-56 w-full max-w-[200px] object-contain"
                           />
                         ) : (
                           <div className="h-36 w-36 border border-dashed border-border rounded-sm flex items-center justify-center text-muted-foreground/30 text-[10px] uppercase tracking-widest">
