@@ -450,6 +450,32 @@ export const adminApi = {
   deleteReview: async (reviewId: number): Promise<{ success: boolean; message: string }> => {
     return apiFetch(`/admin/reviews/${reviewId}`, { method: 'DELETE' });
   },
+
+  // Coupon management
+  getCoupons: async (): Promise<Coupon[]> => {
+    const response = await apiFetch<{ success: boolean; data: Coupon[] }>('/admin/coupons');
+    return response.data;
+  },
+
+  createCoupon: async (data: Partial<Coupon>): Promise<Coupon> => {
+    const response = await apiFetch<{ success: boolean; data: Coupon }>('/admin/coupons', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateCoupon: async (id: number, data: Partial<Coupon>): Promise<Coupon> => {
+    const response = await apiFetch<{ success: boolean; data: Coupon }>(`/admin/coupons/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteCoupon: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/coupons/${id}`, { method: 'DELETE' });
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -564,6 +590,20 @@ export const wishlistApi = {
 };
 
 // ==================== COUPONS API ====================
+
+export interface Coupon {
+  id: number;
+  code: string;
+  discount_type: string;
+  discount_value: number;
+  min_order_amount: number | null;
+  max_discount_amount: number | null;
+  expiry_date: string | null;
+  usage_limit: number | null;
+  times_used: number;
+  is_active: boolean;
+  created_at: string;
+}
 
 export interface CouponValidateResponse {
   valid: boolean;
