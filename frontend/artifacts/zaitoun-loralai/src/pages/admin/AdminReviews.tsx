@@ -3,6 +3,7 @@
  * View, approve, and reject customer reviews
  */
 
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from 'react';
 import { adminApi, type ReviewData } from '@/lib/api';
 import { toast } from 'sonner';
@@ -140,6 +141,10 @@ export default function AdminReviews() {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Admin Reviews — Zaitoun Loralai</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Reviews</h1>

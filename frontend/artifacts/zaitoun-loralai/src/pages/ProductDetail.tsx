@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { useParams, useLocation } from "wouter";
@@ -128,6 +129,9 @@ export function ProductDetail() {
   if (isPending) {
     return (
       <div className="min-h-screen bg-background">
+        <Helmet>
+          <title>Loading Product — Zaitoun Loralai</title>
+        </Helmet>
         <Header />
         <div className="flex justify-center items-center py-40">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -142,6 +146,10 @@ export function ProductDetail() {
   if (error || sorted.length === 0) {
     return (
       <div className="min-h-screen bg-background">
+        <Helmet>
+          <title>Product Not Found — Zaitoun Loralai</title>
+          <meta name="description" content="The requested product could not be found." />
+        </Helmet>
         <Header />
         <div className="container mx-auto px-4 md:px-8 py-24 text-center">
           <h1 className="font-serif text-2xl text-foreground mb-4">Product not found</h1>
@@ -160,6 +168,12 @@ export function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{groupName} — Zaitoun Loralai</title>
+        <meta name="description" content={`Shop ${groupName} — premium cold-pressed extra virgin olive oil from Zaitoun Loralai, sourced from Loralai, Pakistan.`} />
+        <meta property="og:title" content={`${groupName} — Zaitoun Loralai`} />
+        <meta property="og:description" content={`Shop ${groupName} — premium cold-pressed extra virgin olive oil from Zaitoun Loralai.`} />
+      </Helmet>
       <Header />
 
       <main className="container mx-auto px-4 md:px-8 py-8">

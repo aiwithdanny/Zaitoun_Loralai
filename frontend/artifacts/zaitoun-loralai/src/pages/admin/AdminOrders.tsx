@@ -3,6 +3,7 @@
  * View and manage customer orders with pagination, filtering, and detail modal
  */
 
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from 'react';
 import { Order, ordersApi } from '@/lib/api';
 import { toast } from 'sonner';
@@ -197,6 +198,10 @@ export default function AdminOrders() {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Admin Orders — Zaitoun Loralai</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

@@ -3,6 +3,7 @@
  * Displays admin statistics and controls
  */
 
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from 'react';
 import { adminApi, ordersApi } from '@/lib/api';
 import { toast } from 'sonner';
@@ -93,6 +94,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Admin Dashboard — Zaitoun Loralai</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       {/* Page title */}
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 

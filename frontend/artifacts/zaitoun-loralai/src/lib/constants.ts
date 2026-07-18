@@ -1,3 +1,6 @@
+export const SITE_URL = "https://zaitoun-loralai-1mtz.vercel.app";
+export const OG_IMAGE = `${SITE_URL}/opengraph.jpg`;
+
 export const BRAND = {
   name: "Zaitoun Loralai",
   tagline: "Crafted from the heart of Pakistan",

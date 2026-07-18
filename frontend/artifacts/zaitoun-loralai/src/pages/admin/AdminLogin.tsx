@@ -4,6 +4,7 @@
  * Uses our existing brand theme tokens (olive green primary, gold accent, serif font).
  */
 
+import { Helmet } from "react-helmet-async";
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
@@ -48,6 +49,10 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
+      <Helmet>
+        <title>Admin Login — Zaitoun Loralai</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       {/* Left — Login Form (40%) */}
       <div className="w-full md:w-[40%] flex items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-sm">

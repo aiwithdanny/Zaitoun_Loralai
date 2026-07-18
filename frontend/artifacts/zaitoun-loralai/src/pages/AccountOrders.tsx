@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { customerApi, type Order } from '@/lib/api';
@@ -25,6 +26,10 @@ export default function AccountOrders() {
 
   return (
     <>
+      <Helmet>
+        <title>My Orders — Zaitoun Loralai</title>
+        <meta name="description" content="View your Zaitoun Loralai order history." />
+      </Helmet>
       <Header />
       <main className="min-h-screen pt-28 pb-16 px-4 md:px-8 max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground mb-2">My Orders</h1>

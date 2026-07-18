@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState } from 'react';
 import { useLocation, Link } from 'wouter';
 import { customerApi } from '@/lib/api';
@@ -43,6 +44,10 @@ export default function CustomerRegister() {
 
   return (
     <>
+      <Helmet>
+        <title>Create Account — Zaitoun Loralai</title>
+        <meta name="description" content="Create your Zaitoun Loralai account to shop premium olive oil." />
+      </Helmet>
       <Header />
       <main className="min-h-screen pt-28 pb-16 flex items-center justify-center px-4">
         <div className="w-full max-w-md">

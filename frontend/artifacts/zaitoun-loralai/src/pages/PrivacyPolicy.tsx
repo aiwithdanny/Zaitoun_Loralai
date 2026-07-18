@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useEffect } from "react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { BRAND } from "@/lib/constants";
@@ -9,6 +10,10 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Privacy Policy — Zaitoun Loralai</title>
+        <meta name="description" content="Zaitoun Loralai's privacy policy." />
+      </Helmet>
       {/* Hero Section */}
       <div className="py-12 md:py-16 bg-card border-b border-border">
         <div className="container mx-auto px-4 md:px-8">

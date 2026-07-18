@@ -3,6 +3,7 @@
  * Full CRUD for products with table view, add/edit modal, and delete confirmation
  */
 
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from 'react';
 import { productsApi, Product } from '@/lib/api';
 import { toast } from 'sonner';
@@ -160,6 +161,10 @@ export default function AdminProducts() {
 
   return (
     <div className="p-6">
+      <Helmet>
+        <title>Admin Products — Zaitoun Loralai</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useEffect } from "react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
@@ -8,6 +9,10 @@ export default function FAQs() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>FAQs — Zaitoun Loralai</title>
+        <meta name="description" content="Frequently asked questions about Zaitoun Loralai's premium olive oil." />
+      </Helmet>
       {/* Hero Section */}
       <div className="py-12 md:py-16 bg-card border-b border-border">
         <div className="container mx-auto px-4 md:px-8">

@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState } from 'react';
 import { useLocation, Link } from 'wouter';
 import { customerApi } from '@/lib/api';
@@ -37,6 +38,10 @@ export default function CustomerLogin() {
 
   return (
     <>
+      <Helmet>
+        <title>Sign In — Zaitoun Loralai</title>
+        <meta name="description" content="Sign in to your Zaitoun Loralai account." />
+      </Helmet>
       <Header />
       <main className="min-h-screen pt-28 pb-16 flex items-center justify-center px-4">
         <div className="w-full max-w-md">

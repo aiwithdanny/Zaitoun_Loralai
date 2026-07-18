@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
@@ -25,6 +26,10 @@ export function Cart() {
   if (items.length === 0 && !isCheckingOut) {
     return (
       <div className="min-h-screen bg-background">
+        <Helmet>
+          <title>Your Cart — Zaitoun Loralai</title>
+          <meta name="description" content="Review your Zaitoun Loralai olive oil selections before checkout." />
+        </Helmet>
         <div className="container mx-auto px-4 md:px-8 py-24">
           <button
             onClick={() => navigate("/")}
@@ -54,6 +59,10 @@ export function Cart() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Your Cart — Zaitoun Loralai</title>
+        <meta name="description" content="Review your Zaitoun Loralai olive oil selections before checkout." />
+      </Helmet>
       <div className="container mx-auto px-4 md:px-8 py-24">
         <button
           onClick={() => navigate("/")}
