@@ -15,9 +15,11 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { adminApi } from "@/lib/api";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -26,6 +28,16 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location, setLocation] = useLocation();
   const { user, logout } = useAdminAuth();
+
+  const [lowStockCount, setLowStockCount] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    adminApi.getStats().then((data) => {
+      setLowStockCount(data.low_stock_products?.length ?? 0);
+    }).catch(() => {});
+    return () => controller.abort();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -106,6 +118,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <SidebarTrigger />
           <Separator orientation="vertical" className="h-6" />
           <div className="flex-1" />
+          <button
+            onClick={() => setLocation("/admin/dashboard")}
+            className="relative mr-2"
+            title="Low stock alerts"
+          >
+            <Bell className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+            {lowStockCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[10px] font-bold leading-none">
+                {lowStockCount}
+              </span>
+            )}
+          </button>
           {user && (
             <span className="text-sm text-muted-foreground">
               {user.username}
