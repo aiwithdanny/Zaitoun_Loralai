@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewList } from "@/components/ReviewList";
 import { ReviewSummary } from "@/components/ReviewSummary";
+import { ProductGroupCard } from "@/components/ProductGroupCard";
 import { reviewsApi, type ReviewData, type ReviewAggregate } from "@/lib/api";
 import type { Product } from "@/lib/api";
 
@@ -45,6 +46,22 @@ export function ProductDetail() {
         : [],
     [products],
   );
+
+  // Fetch all active products for the "You May Also Like" section
+  const { data: allProducts } = useProducts();
+
+  // Group related products by product_group_id, excluding current group
+  const relatedGroups = useMemo(() => {
+    if (!allProducts || !group_id) return [];
+    const groups = new Map<string, Product[]>();
+    for (const p of allProducts) {
+      if (!p.product_group_id || p.product_group_id === group_id) continue;
+      const existing = groups.get(p.product_group_id);
+      if (existing) existing.push(p);
+      else groups.set(p.product_group_id, [p]);
+    }
+    return Array.from(groups.values());
+  }, [allProducts, group_id]);
 
   const [selectedVariant, setSelectedVariant] = useState<Product | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
@@ -497,6 +514,23 @@ export function ProductDetail() {
             </div>
           )}
         </section>
+
+        {/* You May Also Like — Related Products */}
+        {relatedGroups.length > 0 && (
+          <section className="max-w-5xl mx-auto py-8">
+            <h2 className="font-serif text-xl text-foreground mb-6">You May Also Like</h2>
+            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin">
+              {relatedGroups.map((group) => (
+                <div key={group[0].product_group_id} className="min-w-[260px] max-w-[260px] snap-start flex-shrink-0">
+                  <ProductGroupCard
+                    variants={group}
+                    productImages={productImages}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Find Your Perfect Match — Comparison Section */}
         {(() => {
