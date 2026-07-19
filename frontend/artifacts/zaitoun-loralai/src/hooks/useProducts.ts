@@ -16,6 +16,7 @@ export interface ProductFilters {
   min_price?: number;
   max_price?: number;
   product_group_id?: string;
+  exclude_group?: string;
 }
 
 // Query keys

@@ -27,7 +27,16 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { CustomerProtectedRoute } from "@/components/CustomerProtectedRoute";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes — data considered fresh for 5 min
+      gcTime: 1000 * 60 * 30,   // 30 minutes — keep unused data in cache
+      refetchOnWindowFocus: false,
+      retry: 1,                 // single retry instead of default 3
+    },
+  },
+});
 
 function Router() {
   return (

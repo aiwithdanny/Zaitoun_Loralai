@@ -3,7 +3,7 @@ Admin API endpoints with JWT authentication
 """
 
 from fastapi import APIRouter, HTTPException, Depends, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
 from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon
@@ -261,7 +261,7 @@ async def list_reviews(
     db: Session = Depends(get_db),
 ):
     """List all reviews with optional status filter: pending / approved / rejected. Admin only."""
-    query = db.query(Review)
+    query = db.query(Review).options(selectinload(Review.customer))
 
     if status == "pending":
         query = query.filter(Review.is_approved == False, Review.review_text != "__rejected__")

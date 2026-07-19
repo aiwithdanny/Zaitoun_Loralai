@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { useParams, useLocation } from "wouter";
 import { ArrowLeft, Minus, Plus, ShoppingBag, Zap, Star, MessageSquare, Loader2, Heart } from "lucide-react";
@@ -20,7 +20,7 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewList } from "@/components/ReviewList";
 import { ReviewSummary } from "@/components/ReviewSummary";
 import { ProductGroupCard } from "@/components/ProductGroupCard";
-import { reviewsApi, type ReviewData, type ReviewAggregate } from "@/lib/api";
+import { useReviews, useRefreshReviews } from "@/hooks/useReviews";
 import type { Product } from "@/lib/api";
 
 /** Strip a trailing " — size" or " - size" suffix from a product name. */
@@ -48,8 +48,10 @@ export function ProductDetail() {
     [products],
   );
 
-  // Fetch all active products for the "You May Also Like" section
-  const { data: allProducts } = useProducts();
+  // Fetch related products excluding the current group
+  const { data: allProducts } = useProducts(
+    group_id ? { exclude_group: group_id } : undefined,
+  );
 
   // Group related products by product_group_id, excluding current group
   const relatedGroups = useMemo(() => {
@@ -82,32 +84,15 @@ export function ProductDetail() {
   }, [sorted, location]);
 
   // ==================== Reviews ====================
-  const [reviews, setReviews] = useState<ReviewData[]>([]);
-  const [aggregate, setAggregate] = useState<ReviewAggregate>({
+  const { data: reviewsData, isPending: reviewsLoading } = useReviews(group_id ?? "");
+  const refreshReviews = useRefreshReviews();
+
+  const reviews = reviewsData?.data ?? [];
+  const aggregate = reviewsData?.aggregate ?? {
     average_rating: 0,
     total_count: 0,
     distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-  });
-  const [reviewsLoading, setReviewsLoading] = useState(true);
-
-  const fetchReviews = useCallback(async () => {
-    if (!group_id) return;
-    setReviewsLoading(true);
-    try {
-      const res = await reviewsApi.getReviews(group_id);
-      setReviews(res.data);
-      setAggregate(res.aggregate);
-    } catch {
-      // Silently fail — reviews are non-critical
-      setReviews([]);
-    } finally {
-      setReviewsLoading(false);
-    }
-  }, [group_id]);
-
-  useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+  };
 
   const groupName = sorted.length > 0 ? stripSizeSuffix(sorted[0].name) : "";
   const category = sorted.length > 0 ? (sorted[0].category || "Loralai, Pakistan") : "";
@@ -551,7 +536,7 @@ export function ProductDetail() {
                 <ReviewForm
                   productGroupId={group_id!}
                   existingReview={reviews.find((r) => customer && r.customer_id === customer.id)}
-                  onSubmitted={fetchReviews}
+                  onSubmitted={() => refreshReviews(group_id!)}
                 />
               </div>
             </div>
@@ -619,6 +604,7 @@ export function ProductDetail() {
                           <img
                             src={variant.image_url || productImages[variant.slug]}
                             alt={variant.size_label || variant.name}
+                            loading="lazy"
                             className="h-56 w-full max-w-[200px] object-contain"
                           />
                         ) : (

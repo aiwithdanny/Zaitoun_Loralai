@@ -34,6 +34,7 @@ async def get_products(
     min_price: Optional[float] = Query(None, description="Minimum price filter"),
     max_price: Optional[float] = Query(None, description="Maximum price filter"),
     product_group_id: Optional[str] = Query(None, description="Filter by product group (size variants)"),
+    exclude_group: Optional[str] = Query(None, description="Exclude a specific product group (for related products)"),
     db: Session = Depends(get_db)
 ):
     """Get all products with optional filters - Public endpoint"""
@@ -54,6 +55,8 @@ async def get_products(
         query = query.filter(Product.price >= min_price)
     if max_price is not None:
         query = query.filter(Product.price <= max_price)
+    if exclude_group:
+        query = query.filter(Product.product_group_id != exclude_group)
 
     # Apply sorting
     if sort_by and sort_by in SORT_COLUMNS:

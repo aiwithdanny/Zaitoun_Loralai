@@ -78,6 +78,7 @@ async def get_reviews(product_group_id: str, db: Session = Depends(get_db)):
     """Get approved reviews + aggregate stats for a product group. Public."""
     reviews = (
         db.query(Review)
+        .options(selectinload(Review.customer))
         .filter(
             Review.product_group_id == product_group_id,
             Review.is_approved == True,

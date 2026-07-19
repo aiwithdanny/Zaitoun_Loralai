@@ -4,6 +4,7 @@
  */
 
 import { MOCK_PRODUCTS } from './mockData';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 // API Base URL - Use env var for production, fallback to localhost for dev
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
@@ -119,6 +120,7 @@ export const productsApi = {
     min_price?: number;
     max_price?: number;
     product_group_id?: string;
+    exclude_group?: string;
   }): Promise<Product[]> => {
     try {
       const queryParams = new URLSearchParams();
@@ -130,16 +132,23 @@ export const productsApi = {
       if (params?.min_price !== undefined) queryParams.append('min_price', String(params.min_price));
       if (params?.max_price !== undefined) queryParams.append('max_price', String(params.max_price));
       if (params?.product_group_id) queryParams.append('product_group_id', params.product_group_id);
+      if (params?.exclude_group) queryParams.append('exclude_group', params.exclude_group);
 
       const queryString = queryParams.toString();
       const endpoint = `/products${queryString ? `?${queryString}` : ''}`;
 
       const response = await apiFetch<ProductsResponse>(endpoint);
-      return response.data;
+      return response.data.map((p) => ({
+        ...p,
+        image_url: optimizeCloudinaryUrl(p.image_url) ?? null,
+      }));
     } catch (error) {
       // Fallback to mock data
       console.warn('API unavailable, using mock data:', error);
-      return MOCK_PRODUCTS;
+      return MOCK_PRODUCTS.map((p) => ({
+        ...p,
+        image_url: optimizeCloudinaryUrl(p.image_url) ?? null,
+      }));
     }
   },
 
@@ -147,7 +156,10 @@ export const productsApi = {
   getProduct: async (slug: string): Promise<Product> => {
     try {
       const response = await apiFetch<{ success: boolean; data: Product }>(`/products/${slug}`);
-      return response.data;
+      return {
+        ...response.data,
+        image_url: optimizeCloudinaryUrl(response.data.image_url) ?? null,
+      };
     } catch (error) {
       // Fallback to mock data
       const product = MOCK_PRODUCTS.find((p) => p.slug === slug);
