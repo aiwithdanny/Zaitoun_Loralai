@@ -1,34 +1,33 @@
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
 import { Truck, Leaf, ShieldCheck } from "lucide-react";
-import heroVisual from "@/assets/home-page.png";
+import productImg from "@/assets/500_ml_Bottle_1782790552258.png";
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Full-width background image */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={heroVisual}
-          alt=""
-          className="w-full h-full object-cover object-center"
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-background/20" />
-      </div>
+    <section className="min-h-screen flex items-center pt-20 overflow-hidden">
+      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
+        {/* Left Column - Product Image */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex items-center justify-center"
+        >
+          <img
+            src={productImg}
+            alt="Zaitoun Loralai Extra Virgin Olive Oil 500ml"
+            className="w-full max-w-[260px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px] h-auto object-contain drop-shadow-2xl"
+          />
+        </motion.div>
 
-      {/* Overlay content — kept for accessibility, SEO, and interactivity */}
-      <div className="container relative z-10 mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-        {/* Left: intentionally empty — the image fills the visual */}
-        <div className="hidden lg:block" aria-hidden="true" />
-
-        {/* Right: Content */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+        {/* Right Column - Content */}
+        <div className="flex flex-col justify-center space-y-5">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-accent uppercase tracking-[0.25em] text-sm md:text-base font-medium mb-4"
+            className="text-accent uppercase tracking-[0.25em] text-sm md:text-base font-medium"
           >
             {BRAND.name}
           </motion.span>
@@ -37,7 +36,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-serif text-primary mb-3 leading-tight"
+            className="text-3xl md:text-4xl lg:text-5xl font-serif text-foreground leading-tight"
           >
             {BRAND.tagline}
           </motion.h1>
@@ -46,25 +45,27 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-base md:text-lg text-muted-foreground mb-2"
+            className="text-lg md:text-xl text-muted-foreground"
           >
             {BRAND.product.name}
           </motion.p>
 
-          <motion.span
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
-            className="inline-block px-3 py-1 bg-secondary text-secondary-foreground text-sm font-medium rounded mb-4"
+            className="inline-flex"
           >
-            {BRAND.product.size}
-          </motion.span>
+            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+              {BRAND.product.size}
+            </span>
+          </motion.div>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-sm md:text-base text-muted-foreground/80 max-w-lg mb-8 leading-relaxed"
+            className="text-muted-foreground max-w-lg leading-relaxed"
           >
             {BRAND.product.description}
           </motion.p>
@@ -73,17 +74,17 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center gap-4 mb-10"
+            className="flex flex-col sm:flex-row items-start gap-4 pt-2"
           >
             <a
               href="#products"
-              className="px-8 py-4 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
+              className="px-8 py-3 bg-primary text-primary-foreground rounded-full font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
             >
               {BRAND.hero.primaryCta}
             </a>
             <a
               href="#story"
-              className="px-8 py-4 bg-transparent text-primary border border-primary/30 rounded-none font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
+              className="px-8 py-3 border border-primary text-primary rounded-full font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
             >
               {BRAND.hero.secondaryCta}
             </a>
@@ -94,7 +95,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center lg:justify-start gap-6"
+            className="flex flex-wrap items-center gap-6 pt-2"
           >
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Truck className="w-4 h-4 text-accent" />
