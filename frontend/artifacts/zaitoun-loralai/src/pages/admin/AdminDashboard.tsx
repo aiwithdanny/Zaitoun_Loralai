@@ -8,9 +8,11 @@ import { useEffect, useState } from 'react';
 import { adminApi, ordersApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
+import { Package, ShoppingCart, CircleDollarSign, TrendingUp, Clock, Calendar, UserPlus, AlertTriangle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatPrice } from '@/utils/currency';
 import { OrderDetailModal } from '@/components/admin/OrderDetailModal';
+import { StatCard } from '@/components/admin/StatCard';
 
 interface DashboardStats {
   total_products: number;
@@ -128,97 +130,16 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       {!loading && stats && (
         <>
-          {/* KPI Cards - 2 rows of 4 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {/* Total Products Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">Total Products</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{stats.total_products}</p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Total Revenue Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{formatPrice(stats.total_revenue)}</p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Revenue This Month Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">Revenue This Month</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{formatPrice(stats.revenue_this_month)}</p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Total Orders Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">Total Orders</p>
-              <p className="text-3xl font-bold text-foreground mt-2">
-                {Object.values(stats.order_status_breakdown).reduce((a, b) => a + b, 0)}
-              </p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Pending Orders Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">Pending Orders</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{stats.pending_orders}</p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Orders Today Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">Orders Today</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{stats.orders_today}</p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              </div>
-            </div>
-
-            {/* New Customers Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">New Customers</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{stats.new_customers_this_month}</p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Low Stock Alert Card */}
-            <div className="bg-card rounded-lg shadow-sm border border-border p-6 border-l-4 border-primary">
-              <p className="text-muted-foreground text-sm font-medium">Low Stock Items</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{stats.low_stock_products.length}</p>
-              <div className="mt-3 flex items-center justify-center bg-primary/10 rounded-full p-3 w-12 h-12">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0 5v2M6.228 6.228a9 9 0 1012.544 0M4.5 12a7.5 7.5 0 1115 0 7.5 7.5 0 01-15 0z" />
-                </svg>
-              </div>
-            </div>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+            <StatCard icon={Package} label="Total Products" value={stats.total_products} />
+            <StatCard icon={CircleDollarSign} label="Total Revenue" value={formatPrice(stats.total_revenue)} />
+            <StatCard icon={TrendingUp} label="Revenue This Month" value={formatPrice(stats.revenue_this_month)} />
+            <StatCard icon={ShoppingCart} label="Total Orders" value={Object.values(stats.order_status_breakdown).reduce((a, b) => a + b, 0)} />
+            <StatCard icon={Clock} label="Pending Orders" value={stats.pending_orders} />
+            <StatCard icon={Calendar} label="Orders Today" value={stats.orders_today} />
+            <StatCard icon={UserPlus} label="New Customers" value={stats.new_customers_this_month} />
+            <StatCard icon={AlertTriangle} label="Low Stock Items" value={stats.low_stock_products.length} />
           </div>
 
           {/* Order Status Chart — all statuses shown */}
