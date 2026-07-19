@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell, Tag } from "lucide-react";
+import logoSrc from "@assets/logo-2.png";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { adminApi } from "@/lib/api";
 import { toast } from "sonner";
@@ -50,9 +51,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2 px-2 py-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-accent text-accent-foreground text-sm font-bold">
-              ZL
-            </div>
+            <img src={logoSrc} alt="Zaitoun Loralai" className="h-8 w-auto" />
             <span className="text-sm font-semibold truncate group-data-[collapsible=icon]:hidden">
               Zaitoun Loralai
             </span>
