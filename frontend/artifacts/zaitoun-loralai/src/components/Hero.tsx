@@ -1,32 +1,29 @@
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
 import { Truck, Leaf, ShieldCheck } from "lucide-react";
-import productImg from "@/assets/500_ml_Bottle_1782790552258.png";
+import heroVisual from "@/assets/home-page.png";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-      <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-        {/* Left: Product Image */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex justify-center lg:justify-end order-1"
-        >
-          <div className="relative">
-            {/* Subtle glow behind bottle */}
-            <div className="absolute inset-0 bg-gradient-radial from-accent/10 to-transparent rounded-full blur-3xl scale-150" />
-            <img
-              src={productImg}
-              alt="Zaitoun Loralai Extra Virgin Olive Oil 500ml"
-              className="relative w-full max-w-[260px] sm:max-w-[300px] md:max-w-[360px] lg:max-w-[420px] h-auto object-contain drop-shadow-2xl"
-            />
-          </div>
-        </motion.div>
+    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+      {/* Full-width background image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={heroVisual}
+          alt=""
+          className="w-full h-full object-cover object-center"
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-background/20" />
+      </div>
+
+      {/* Overlay content — kept for accessibility, SEO, and interactivity */}
+      <div className="container relative z-10 mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        {/* Left: intentionally empty — the image fills the visual */}
+        <div className="hidden lg:block" aria-hidden="true" />
 
         {/* Right: Content */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-2">
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -49,7 +46,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl text-muted-foreground mb-2"
+            className="text-base md:text-lg text-muted-foreground mb-2"
           >
             {BRAND.product.name}
           </motion.p>
@@ -67,7 +64,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-base md:text-lg text-muted-foreground/80 max-w-lg mb-8 leading-relaxed"
+            className="text-sm md:text-base text-muted-foreground/80 max-w-lg mb-8 leading-relaxed"
           >
             {BRAND.product.description}
           </motion.p>
