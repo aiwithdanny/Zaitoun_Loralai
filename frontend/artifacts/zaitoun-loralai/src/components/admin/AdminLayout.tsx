@@ -50,7 +50,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2 px-2 py-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-primary text-primary-foreground text-sm font-bold">
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-accent text-accent-foreground text-sm font-bold">
               ZL
             </div>
             <span className="text-sm font-semibold truncate group-data-[collapsible=icon]:hidden">
@@ -144,7 +144,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </span>
           )}
         </header>
-        <div className="flex-1 bg-muted/30">{children}</div>
+        <div className="flex-1 bg-background">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
