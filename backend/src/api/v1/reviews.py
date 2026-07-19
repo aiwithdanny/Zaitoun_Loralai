@@ -3,7 +3,7 @@ Review API endpoints — public read, customer submit + upload, admin moderation
 """
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import func
 from datetime import datetime
 from typing import Optional
