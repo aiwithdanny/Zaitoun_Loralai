@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell, Tag, Crown } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell, Tag, Crown, Home } from "lucide-react";
 import logoSrc from "@assets/logo-2.png";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { adminApi } from "@/lib/api";
@@ -107,6 +107,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <a href="/admin/founder">
                     <Crown className="h-4 w-4" />
                     <span>Founder</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location === "/admin/homepage"}>
+                  <a href="/admin/homepage">
+                    <Home className="h-4 w-4" />
+                    <span>Homepage</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>

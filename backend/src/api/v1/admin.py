@@ -2,11 +2,11 @@
 Admin API endpoints with JWT authentication
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate
 
 router = APIRouter()
 
@@ -491,3 +491,77 @@ async def delete_founder(
     db.delete(founder)
     db.commit()
     return {"success": True, "message": "Founder deleted successfully"}
+
+
+# ─── HOMEPAGE CONTENT MANAGEMENT ────────────────────────────────────
+
+
+@router.get("/homepage")
+async def get_homepage(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get current homepage content. Admin only."""
+    content = db.query(HomepageContent).first()
+    if not content:
+        return {"success": True, "data": None}
+    return {"success": True, "data": content.to_dict()}
+
+
+@router.put("/homepage")
+async def update_homepage(
+    data: HomepageContentUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create or update homepage content. Admin only."""
+    content = db.query(HomepageContent).first()
+    update_data = data.model_dump(exclude_unset=True)
+
+    if content:
+        for field, value in update_data.items():
+            setattr(content, field, value)
+    else:
+        content = HomepageContent(**update_data)
+        db.add(content)
+
+    db.commit()
+    db.refresh(content)
+    return {"success": True, "data": content.to_dict(), "message": "Homepage content saved successfully"}
+
+
+@router.post("/homepage/upload-image")
+async def upload_homepage_image(
+    file: UploadFile = File(...),
+    current_user: str = Depends(get_current_user),
+):
+    """Upload a homepage hero image. Admin only.
+    Uses same Cloudinary upload pattern as product/review uploads."""
+    from src.config.cloudinary import upload_image
+    import secrets
+
+    # Validate file type
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed: {', '.join(allowed_types)}"
+        )
+
+    # Validate file size (5MB)
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=400,
+            detail="File too large. Maximum size is 5MB"
+        )
+
+    # Upload to Cloudinary
+    url = upload_image(contents, f"homepage/{secrets.token_hex(8)}")
+    if not url:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to upload image to Cloudinary"
+        )
+
+    return {"success": True, "url": url, "message": "Image uploaded successfully"}

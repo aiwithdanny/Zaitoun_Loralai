@@ -398,6 +398,35 @@ class FounderResponse(BaseModel):
         from_attributes = True
 
 
+# ==================== HOMEPAGE CONTENT SCHEMAS ====================
+
+class HomepageContentUpdate(BaseModel):
+    """Schema for updating homepage content (all fields optional)"""
+    hero_image_url: Optional[str] = Field(None, max_length=500)
+    hero_brand_name: Optional[str] = Field(None, max_length=255)
+    hero_headline: Optional[str] = Field(None, max_length=255)
+    hero_description: Optional[str] = None
+    hero_primary_cta_text: Optional[str] = Field(None, max_length=255)
+    hero_secondary_cta_text: Optional[str] = Field(None, max_length=255)
+    is_active: Optional[bool] = None
+
+
+class HomepageContentResponse(BaseModel):
+    """Schema for homepage content response"""
+    id: int
+    hero_image_url: Optional[str]
+    hero_brand_name: Optional[str]
+    hero_headline: Optional[str]
+    hero_description: Optional[str]
+    hero_primary_cta_text: Optional[str]
+    hero_secondary_cta_text: Optional[str]
+    is_active: bool
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== GENERIC RESPONSE SCHEMAS ====================
 
 class SuccessResponse(BaseModel):

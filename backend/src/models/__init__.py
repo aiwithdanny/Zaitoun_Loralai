@@ -305,7 +305,34 @@ class Founder(Base):
         }
 
 
+class HomepageContent(Base):
+    __tablename__ = "homepage_content"
+
+    id = Column(Integer, primary_key=True)
+    hero_image_url = Column(String(500))
+    hero_brand_name = Column(String(255))
+    hero_headline = Column(String(255))
+    hero_description = Column(Text)
+    hero_primary_cta_text = Column(String(255))
+    hero_secondary_cta_text = Column(String(255))
+    is_active = Column(Boolean, default=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "hero_image_url": self.hero_image_url,
+            "hero_brand_name": self.hero_brand_name,
+            "hero_headline": self.hero_headline,
+            "hero_description": self.hero_description,
+            "hero_primary_cta_text": self.hero_primary_cta_text,
+            "hero_secondary_cta_text": self.hero_secondary_cta_text,
+            "is_active": self.is_active,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent"]
 
 

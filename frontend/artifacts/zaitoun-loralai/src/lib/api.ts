@@ -514,6 +514,42 @@ export const adminApi = {
   deleteFounder: async (id: number): Promise<{ success: boolean; message: string }> => {
     return apiFetch(`/admin/founder/${id}`, { method: 'DELETE' });
   },
+
+  // Homepage content management
+  getHomepage: async (): Promise<HomepageData | null> => {
+    const response = await apiFetch<{ success: boolean; data: HomepageData | null }>('/admin/homepage');
+    return response.data;
+  },
+
+  updateHomepage: async (data: Partial<HomepageData>): Promise<HomepageData> => {
+    const response = await apiFetch<{ success: boolean; data: HomepageData }>('/admin/homepage', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  uploadHomepageImage: async (file: File): Promise<string> => {
+    const token = localStorage.getItem('admin_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/admin/homepage/upload-image`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Image upload failed' }));
+      throw new Error(errorData.detail || 'Image upload failed');
+    }
+
+    const result = await response.json();
+    return result.url;
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -726,6 +762,28 @@ export const founderApi = {
   // Get active founder (public)
   getActive: async (): Promise<FounderData> => {
     const response = await apiFetch<FounderData>('/founder/');
+    return response;
+  },
+};
+
+// ==================== HOMEPAGE API ====================
+
+export interface HomepageData {
+  id: number;
+  hero_image_url: string | null;
+  hero_brand_name: string | null;
+  hero_headline: string | null;
+  hero_description: string | null;
+  hero_primary_cta_text: string | null;
+  hero_secondary_cta_text: string | null;
+  is_active: boolean;
+  updated_at: string;
+}
+
+export const homepageApi = {
+  // Get active homepage content (public)
+  getActive: async (): Promise<HomepageData> => {
+    const response = await apiFetch<HomepageData>('/homepage/');
     return response;
   },
 };
