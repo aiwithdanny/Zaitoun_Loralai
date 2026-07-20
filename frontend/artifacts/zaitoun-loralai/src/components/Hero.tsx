@@ -13,8 +13,8 @@ export function Hero() {
         />
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 lg:ml-[8%] max-w-2xl lg:max-w-xl mt-16">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 md:p-10 lg:p-12 text-center lg:text-left">
+      <div className="container relative z-10 mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -28,7 +28,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-2xl md:text-4xl lg:text-5xl font-serif text-foreground mb-5 leading-tight"
+            className="text-xl md:text-3xl lg:text-4xl font-serif text-foreground mb-4 leading-tight"
           >
             {BRAND.hero.headline}
           </motion.h1>
@@ -37,7 +37,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-base md:text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed"
+            className="text-sm md:text-base text-muted-foreground mb-6 leading-relaxed"
           >
             {BRAND.hero.subheadline}
           </motion.p>
@@ -50,13 +50,13 @@ export function Hero() {
           >
             <a 
               href="#products" 
-              className="px-8 py-4 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
             >
               {BRAND.hero.primaryCta}
             </a>
             <a 
               href="#story" 
-              className="px-8 py-4 bg-transparent text-primary border border-primary/30 rounded-none font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
+              className="px-6 py-3 bg-transparent text-primary border border-primary/30 rounded-none font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
             >
               {BRAND.hero.secondaryCta}
             </a>
