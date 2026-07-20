@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate
 
 router = APIRouter()
 
@@ -421,3 +421,73 @@ async def delete_coupon(
     db.commit()
 
     return {"success": True, "message": "Coupon deleted successfully"}
+
+
+# ─── FOUNDER MANAGEMENT ──────────────────────────────────────────────
+
+
+@router.get("/founder")
+async def get_all_founders(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get all founder entries. Admin only."""
+    founders = db.query(Founder).order_by(Founder.created_at.desc()).all()
+    return {"success": True, "data": [f.to_dict() for f in founders]}
+
+
+@router.post("/founder")
+async def create_founder(
+    data: FounderCreate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a new founder entry. Admin only."""
+    founder = Founder(
+        image_url=data.image_url,
+        name=data.name,
+        designation=data.designation,
+        heading=data.heading,
+        description=data.description,
+        is_active=data.is_active,
+    )
+    db.add(founder)
+    db.commit()
+    db.refresh(founder)
+    return {"success": True, "data": founder.to_dict(), "message": "Founder created successfully"}
+
+
+@router.put("/founder/{founder_id}")
+async def update_founder(
+    founder_id: int,
+    data: FounderUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update a founder entry. Admin only."""
+    founder = db.query(Founder).filter(Founder.id == founder_id).first()
+    if not founder:
+        raise HTTPException(status_code=404, detail="Founder not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(founder, field, value)
+
+    db.commit()
+    db.refresh(founder)
+    return {"success": True, "data": founder.to_dict(), "message": "Founder updated successfully"}
+
+
+@router.delete("/founder/{founder_id}")
+async def delete_founder(
+    founder_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a founder entry. Admin only."""
+    founder = db.query(Founder).filter(Founder.id == founder_id).first()
+    if not founder:
+        raise HTTPException(status_code=404, detail="Founder not found")
+    db.delete(founder)
+    db.commit()
+    return {"success": True, "message": "Founder deleted successfully"}

@@ -278,7 +278,34 @@ class Coupon(Base):
         }
 
 
+class Founder(Base):
+    __tablename__ = "founders"
+
+    id = Column(Integer, primary_key=True, index=True)
+    image_url = Column(String(500))
+    name = Column(String(255), nullable=False)
+    designation = Column(String(255))
+    heading = Column(String(255))
+    description = Column(Text)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "image_url": self.image_url,
+            "name": self.name,
+            "designation": self.designation,
+            "heading": self.heading,
+            "description": self.description,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder"]
 
 

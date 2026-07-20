@@ -349,6 +349,55 @@ class ReviewAggregate(BaseModel):
     distribution: dict
 
 
+# ==================== FOUNDER SCHEMAS ====================
+
+class FounderCreate(BaseModel):
+    """Schema for creating a founder entry"""
+    image_url: Optional[str] = Field(None, max_length=500, description="Cloudinary image URL")
+    name: str = Field(..., min_length=1, max_length=255, description="Founder name")
+    designation: Optional[str] = Field(None, max_length=255, description="Designation/title")
+    heading: Optional[str] = Field(None, max_length=255, description="Section heading")
+    description: Optional[str] = Field(None, description="Full bio/description")
+    is_active: bool = Field(default=True, description="Whether this entry is active")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Abdul Naqeeb",
+                "designation": "FOUNDER & CEO",
+                "heading": "Meet Our Founder",
+                "description": "Abdul Naqeeb leads Zaitoun Loralai...",
+                "is_active": True
+            }
+        }
+
+
+class FounderUpdate(BaseModel):
+    """Schema for updating a founder entry (all fields optional)"""
+    image_url: Optional[str] = Field(None, max_length=500)
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    designation: Optional[str] = Field(None, max_length=255)
+    heading: Optional[str] = Field(None, max_length=255)
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class FounderResponse(BaseModel):
+    """Schema for founder response"""
+    id: int
+    image_url: Optional[str]
+    name: str
+    designation: Optional[str]
+    heading: Optional[str]
+    description: Optional[str]
+    is_active: bool
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== GENERIC RESPONSE SCHEMAS ====================
 
 class SuccessResponse(BaseModel):
