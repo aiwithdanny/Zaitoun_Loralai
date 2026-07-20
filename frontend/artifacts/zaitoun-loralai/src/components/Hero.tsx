@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
-import heroImg from "@/assets/home-page.png";
+import heroImg from "@/assets/zl-home-page.png.png";
 
 export function Hero() {
   const [displayedChars, setDisplayedChars] = useState(0);
