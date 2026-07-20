@@ -9,20 +9,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function Header() {
   const [_, navigate] = useLocation();
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
   const cartTotal = useCart((state: any) => state.getTotalItems());
   const { isLoggedIn, customer, logout } = useCustomerAuth();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Close account dropdown on outside click
   useEffect(() => {
@@ -36,13 +27,7 @@ export function Header() {
   }, []);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/90 backdrop-blur-md border-b border-border shadow-sm py-3"
-          : "bg-transparent py-6"
-      }`}
-    >
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-border py-3">
       <div className="container mx-auto px-4 md:px-8 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <motion.div
@@ -69,9 +54,7 @@ export function Header() {
             <a
               key={link.label}
               href={link.href}
-              className={`text-sm tracking-wide transition-colors hover:text-primary ${
-                isScrolled ? "text-foreground" : "text-white/90"
-              }`}
+              className="text-sm tracking-wide font-semibold text-foreground hover:text-primary transition-colors"
             >
               {link.label}
             </a>
@@ -119,15 +102,15 @@ export function Header() {
               </div>
             ) : (
               <>
-                <a href="/login" className={`text-sm tracking-wide hover:text-primary transition-colors ${isScrolled ? "text-foreground" : "text-white/90"}`}>Login</a>
-                <a href="/register" className="text-sm px-4 py-1.5 bg-accent text-accent-foreground rounded-lg font-medium hover:opacity-90 transition">Register</a>
+                <a href="/login" className="px-4 py-1.5 bg-accent text-accent-foreground rounded-lg font-semibold text-sm hover:opacity-90 transition">Login</a>
+                <a href="/register" className="px-4 py-1.5 bg-accent text-accent-foreground rounded-lg font-semibold text-sm hover:opacity-90 transition">Register</a>
               </>
             )}
           </div>
 
           <button
             onClick={() => navigate("/cart")}
-            className="p-2 hover:bg-muted rounded-full transition-colors relative"
+            className="p-2 bg-accent/10 rounded-full hover:bg-accent/20 transition-colors relative"
             title="Shopping cart"
           >
             <ShoppingBag className="w-5 h-5" />

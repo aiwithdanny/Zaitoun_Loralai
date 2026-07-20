@@ -4,23 +4,21 @@ import heroImg from "@/assets/zl-home-page.png.png";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center pt-20">
+    <section className="relative min-h-[90vh] flex items-center justify-start pt-20">
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImg} 
           alt="Zaitoun Loralai olive oil" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent"></div>
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 text-center max-w-4xl mt-16">
+      <div className="container relative z-10 mx-auto px-4 text-center lg:text-left lg:ml-[8%] max-w-2xl lg:max-w-xl mt-16">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-accent uppercase tracking-[0.2em] text-sm md:text-base mb-6"
+          className="text-accent uppercase tracking-[0.25em] text-sm md:text-base mb-4"
         >
           {BRAND.name}
         </motion.p>
@@ -29,7 +27,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-3xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight"
+          className="text-2xl md:text-4xl lg:text-5xl font-serif text-white mb-5 leading-tight"
         >
           {BRAND.hero.headline}
         </motion.h1>
@@ -38,7 +36,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-10 font-light"
+          className="text-base md:text-lg text-white/90 max-w-lg mb-8 font-light"
         >
           {BRAND.hero.subheadline}
         </motion.p>
@@ -47,7 +45,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row items-center lg:items-start gap-4"
         >
           <a 
             href="#products" 
