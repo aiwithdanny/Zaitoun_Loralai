@@ -13,53 +13,55 @@ export function Hero() {
         />
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 text-center lg:text-left lg:ml-[8%] max-w-2xl lg:max-w-xl mt-16">
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-accent uppercase tracking-[0.25em] text-sm md:text-base mb-4"
-        >
-          {BRAND.name}
-        </motion.p>
-        
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-2xl md:text-4xl lg:text-5xl font-serif text-white mb-5 leading-tight"
-        >
-          {BRAND.hero.headline}
-        </motion.h1>
-        
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-base md:text-lg text-white/90 max-w-lg mb-8 font-light"
-        >
-          {BRAND.hero.subheadline}
-        </motion.p>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center lg:items-start gap-4"
-        >
-          <a 
-            href="#products" 
-            className="px-8 py-4 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
+      <div className="container relative z-10 mx-auto px-4 lg:ml-[8%] max-w-2xl lg:max-w-xl mt-16">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 md:p-10 lg:p-12 text-center lg:text-left">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-accent uppercase tracking-[0.25em] text-sm md:text-base mb-4"
           >
-            {BRAND.hero.primaryCta}
-          </a>
-          <a 
-            href="#story" 
-            className="px-8 py-4 bg-transparent text-white border border-white/30 rounded-none font-medium tracking-wide hover:bg-white/10 transition-colors w-full sm:w-auto text-center"
+            {BRAND.name}
+          </motion.p>
+          
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-2xl md:text-4xl lg:text-5xl font-serif text-foreground mb-5 leading-tight"
           >
-            {BRAND.hero.secondaryCta}
-          </a>
-        </motion.div>
+            {BRAND.hero.headline}
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-base md:text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed"
+          >
+            {BRAND.hero.subheadline}
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-col sm:flex-row items-center lg:items-start gap-4"
+          >
+            <a 
+              href="#products" 
+              className="px-8 py-4 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
+            >
+              {BRAND.hero.primaryCta}
+            </a>
+            <a 
+              href="#story" 
+              className="px-8 py-4 bg-transparent text-primary border border-primary/30 rounded-none font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
+            >
+              {BRAND.hero.secondaryCta}
+            </a>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
