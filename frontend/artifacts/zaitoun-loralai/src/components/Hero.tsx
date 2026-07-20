@@ -36,7 +36,7 @@ export function Hero() {
           <div className="w-full h-72 md:h-full bg-muted animate-pulse" />
         </div>
         <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 w-full">
+          <div className="bg-[#FAF3E6] rounded-2xl shadow-2xl p-6 md:p-8 w-full">
             <div className="h-4 w-32 bg-muted-foreground/20 rounded animate-pulse mb-4" />
             <div className="h-8 w-64 bg-muted-foreground/20 rounded animate-pulse mb-4" />
             <div className="h-4 w-full bg-muted-foreground/20 rounded animate-pulse mb-2" />
@@ -62,7 +62,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
+        <div className="bg-[#FAF3E6] rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
