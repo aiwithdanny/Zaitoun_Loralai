@@ -32,6 +32,9 @@ export function Hero() {
   if (loading) {
     return (
       <section className="relative pt-16 pb-8 md:pt-20 md:pb-0 md:min-h-[90vh] md:flex md:items-center md:justify-start">
+        <div className="w-full md:absolute md:inset-0 md:z-0">
+          <div className="w-full h-72 md:h-full bg-muted animate-pulse" />
+        </div>
         <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
           <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 w-full">
             <div className="h-4 w-32 bg-muted-foreground/20 rounded animate-pulse mb-4" />
@@ -44,15 +47,20 @@ export function Hero() {
             </div>
           </div>
         </div>
-        <div className="w-full md:absolute md:inset-0 md:z-0">
-          <div className="w-full h-72 md:h-full bg-muted animate-pulse" />
-        </div>
       </section>
     );
   }
 
   return (
     <section className="relative pt-16 pb-8 md:pt-20 md:pb-0 md:min-h-[90vh] md:flex md:items-center md:justify-start">
+      <div className="w-full md:absolute md:inset-0 md:z-0">
+        <img 
+          src={backgroundImage} 
+          alt="Zaitoun Loralai olive oil" 
+          className="w-full h-72 md:h-full object-cover"
+        />
+      </div>
+
       <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
           <motion.p
@@ -102,14 +110,6 @@ export function Hero() {
             </a>
           </motion.div>
         </div>
-      </div>
-
-      <div className="w-full md:absolute md:inset-0 md:z-0">
-        <img 
-          src={backgroundImage} 
-          alt="Zaitoun Loralai olive oil" 
-          className="w-full h-72 md:h-full object-cover"
-        />
       </div>
     </section>
   );

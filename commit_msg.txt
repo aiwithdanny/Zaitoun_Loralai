@@ -1,6 +1,3 @@
-Fix mobile hero: text on top, image below
-
-Mobile: text card first, background image below (h-72)
-Desktop: unchanged — image as full background with text overlay
+Swap hero order: image on top, text below on mobile
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
