@@ -9,7 +9,7 @@ export function Hero() {
         <img 
           src={heroImg} 
           alt="Zaitoun Loralai olive oil" 
-          className="w-full h-full object-cover scale-[0.85]"
+          className="w-full h-full object-cover"
         />
       </div>
 
