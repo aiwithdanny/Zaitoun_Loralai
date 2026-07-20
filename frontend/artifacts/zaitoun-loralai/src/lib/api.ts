@@ -488,6 +488,32 @@ export const adminApi = {
   deleteCoupon: async (id: number): Promise<{ success: boolean; message: string }> => {
     return apiFetch(`/admin/coupons/${id}`, { method: 'DELETE' });
   },
+
+  // Founder management
+  getFounders: async (): Promise<FounderData[]> => {
+    const response = await apiFetch<{ success: boolean; data: FounderData[] }>('/admin/founder');
+    return response.data;
+  },
+
+  createFounder: async (data: Partial<FounderData>): Promise<FounderData> => {
+    const response = await apiFetch<{ success: boolean; data: FounderData }>('/admin/founder', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateFounder: async (id: number, data: Partial<FounderData>): Promise<FounderData> => {
+    const response = await apiFetch<{ success: boolean; data: FounderData }>(`/admin/founder/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteFounder: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/founder/${id}`, { method: 'DELETE' });
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -681,6 +707,30 @@ export interface ReviewListResponse {
   data: ReviewData[];
   count: number;
 }
+
+// ==================== FOUNDER API ====================
+
+export interface FounderData {
+  id: number;
+  image_url: string | null;
+  name: string;
+  designation: string | null;
+  heading: string | null;
+  description: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export const founderApi = {
+  // Get active founder (public)
+  getActive: async (): Promise<FounderData> => {
+    const response = await apiFetch<FounderData>('/founder/');
+    return response;
+  },
+};
+
+// ==================== REVIEWS API ====================
 
 export const reviewsApi = {
   // Get approved reviews + aggregate for a product group (public)
