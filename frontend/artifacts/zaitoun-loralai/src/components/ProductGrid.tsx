@@ -200,7 +200,7 @@ export function ProductGrid() {
               variants={container}
               initial="hidden"
               animate="show"
-              className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
+              className={`grid grid-cols-2 max-sm:grid-cols-1 lg:grid-cols-4 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}
             >
             {/* Grouped product lines — one card per category per group */}
             {grouped?.groups.map((g) => (
@@ -236,7 +236,7 @@ export function ProductGrid() {
                       src={product.image_url || productImages[product.slug]}
                       alt={product.name}
                       loading="lazy"
-                      className="w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
+                      className="w-[80%] sm:w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
                         if (product.image_url && productImages[product.slug]) {
                           e.currentTarget.src = productImages[product.slug];
@@ -286,7 +286,7 @@ export function ProductGrid() {
                     </div>
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 min-h-[44px] hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={product.stock === 0}
                     >
                       <ShoppingBag className="w-3.5 h-3.5" />

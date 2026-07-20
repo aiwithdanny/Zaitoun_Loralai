@@ -110,7 +110,7 @@ export function ProductGroupCard({ variants, category: categoryProp, productImag
             src={imgSrc}
             alt={groupName}
             loading="lazy"
-            className="w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
+            className="w-[80%] sm:w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
           />
         ) : (
           <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground/40">
@@ -142,7 +142,7 @@ export function ProductGroupCard({ variants, category: categoryProp, productImag
               e.stopPropagation();
               handleNavigate();
             }}
-            className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 hover:bg-primary/90 transition-colors duration-300"
+            className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 min-h-[44px] hover:bg-primary/90 transition-colors duration-300"
           >
             Shop Now
           </span>

@@ -96,13 +96,13 @@ export function Hero() {
           >
             <a 
               href="#products" 
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
+              className="px-6 py-4 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
             >
               {primaryCta}
             </a>
             <a 
               href="#story" 
-              className="px-6 py-3 bg-transparent text-primary border border-primary/30 rounded-none font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
+              className="px-6 py-4 bg-transparent text-primary border border-primary/30 rounded-none font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
             >
               {secondaryCta}
             </a>

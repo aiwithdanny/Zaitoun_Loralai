@@ -67,6 +67,8 @@ export function TestimonialSection() {
           className="max-w-3xl mx-auto"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
         >
           <div className="relative min-h-[280px] md:min-h-[240px]">
             <AnimatePresence mode="wait">
@@ -111,18 +113,20 @@ export function TestimonialSection() {
           </div>
 
           {/* Dot indicators */}
-          <div className="flex items-center justify-center gap-3 mt-8">
+          <div className="flex items-center justify-center gap-1 mt-8">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label={`Go to testimonial ${i + 1}`}
+              >
+                <span className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                   i === current
                     ? "bg-accent w-6"
                     : "bg-border hover:bg-muted-foreground/50"
-                }`}
-                aria-label={`Go to testimonial ${i + 1}`}
-              />
+                }`} />
+              </button>
             ))}
           </div>
         </div>

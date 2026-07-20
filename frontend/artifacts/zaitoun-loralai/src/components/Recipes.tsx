@@ -25,7 +25,7 @@ export function Recipes() {
               transition={{ duration: 0.6, delay: i * 0.2 }}
               className="group cursor-pointer"
             >
-              <div className="aspect-square overflow-hidden rounded-sm mb-6 relative">
+              <div className="aspect-[4/3] md:aspect-square overflow-hidden rounded-sm mb-6 relative">
                 <img 
                   src={images[i]} 
                   alt={recipe.title} 

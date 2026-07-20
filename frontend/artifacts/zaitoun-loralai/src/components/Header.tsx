@@ -110,7 +110,7 @@ export function Header() {
 
           <button
             onClick={() => navigate("/cart")}
-            className="p-2 bg-accent/10 rounded-full hover:bg-accent/20 transition-colors relative"
+            className="p-3 bg-accent/10 rounded-full hover:bg-accent/20 transition-colors relative"
             title="Shopping cart"
           >
             <ShoppingBag className="w-5 h-5" />
@@ -126,7 +126,7 @@ export function Header() {
           </button>
 
           <button
-            className="md:hidden p-2 hover:bg-muted rounded-full transition-colors"
+            className="md:hidden p-3 hover:bg-muted rounded-full transition-colors"
             onClick={() => setMobileMenuOpen(true)}
           >
             <Menu className="w-5 h-5" />
@@ -154,7 +154,7 @@ export function Header() {
                 <img src={logoUrl} alt={BRAND.name} className="h-full w-full object-cover" />
               </motion.div>
               <button
-                className="p-2 hover:bg-muted rounded-full"
+                className="p-3 hover:bg-muted rounded-full"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <X className="w-6 h-6" />
