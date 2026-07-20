@@ -122,12 +122,12 @@ export function ProductGrid() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <p className="text-accent uppercase tracking-[0.2em] text-xs mb-4">Our Collection</p>
+          <p className="text-accent uppercase tracking-[0.2em] text-xs mb-4">Our Family Of Olive Oils</p>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground">
-            Every Size, One Standard
+            Choose Your Bottle
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto text-sm leading-relaxed">
-            Whether for the everyday kitchen or a thoughtful gift, Zaitoun Loralai is available in multiple sizes — all sharing the same uncompromising quality.
+            From everyday kitchen essentials to premium gifts — find the perfect size for every need, all sharing the same uncompromising quality.
           </p>
         </motion.div>
 

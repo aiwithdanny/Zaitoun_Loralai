@@ -1,24 +1,14 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
 import heroImg from "@/assets/zl-home-page.png.png";
 
 export function Hero() {
-  const [displayedChars, setDisplayedChars] = useState(0);
-  const headline = BRAND.hero.headline;
-
-  useEffect(() => {
-    if (displayedChars >= headline.length) return;
-    const timer = setTimeout(() => setDisplayedChars((c) => c + 1), 50);
-    return () => clearTimeout(timer);
-  }, [displayedChars, headline.length]);
-
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center pt-20">
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImg} 
-          alt="Olive grove at golden hour" 
+          alt="Zaitoun Loralai olive oil" 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40"></div>
@@ -32,16 +22,16 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-accent uppercase tracking-[0.2em] text-sm md:text-base mb-6"
         >
-          {BRAND.tagline}
+          {BRAND.name}
         </motion.p>
         
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-2xl md:text-5xl lg:text-5xl font-['Cinzel'] uppercase text-white mb-6 leading-tight"
+          className="text-3xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight"
         >
-          {headline.slice(0, displayedChars)}
+          {BRAND.hero.headline}
         </motion.h1>
         
         <motion.p

@@ -12,8 +12,8 @@ export const BRAND = {
     { label: "Contact", href: "#contact" },
   ],
   hero: {
-    headline: "The true taste of nature",
-    subheadline: "Hand-harvested in the mountains of Loralai, our extra virgin olive oil brings the purity of ancestral groves to your table.",
+    headline: "The Real Taste Of Pakistan",
+    subheadline: "Cold-pressed and award-winning. Hand-harvested from the mountains of Loralai — 100% pure, extra virgin olive oil with a legacy of quality.",
     primaryCta: "Shop Now",
     secondaryCta: "Learn More",
   },
