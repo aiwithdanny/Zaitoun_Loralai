@@ -1,14 +1,6 @@
-Fix homepage mobile responsiveness issues
+Fix mobile hero: text on top, image below
 
-- Hero CTAs: py-3 → py-4 for 44px touch targets
-- ProductGrid: single column on sub-sm screens, larger product images on mobile
-- Header icon buttons: p-2 → p-3 (hamburger, cart, close)
-- Add to Cart / Shop Now buttons: min-h-[44px] touch targets
-- ProductGroupCard images: w-[80%] on mobile
-- Testimonial dots: wrapped in min-w-[44px] containers, added touch pause
-- Footer social icons: p-2 containers for 44px touch targets
-- Footer newsletter: p-2 → p-3, input py-2 → py-3
-- Footer policy links: flex-wrap to prevent overflow
-- Recipes aspect-square → aspect-[4/3] on mobile
+Mobile: text card first, background image below (h-72)
+Desktop: unchanged — image as full background with text overlay
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
