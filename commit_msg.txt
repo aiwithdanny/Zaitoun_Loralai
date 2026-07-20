@@ -1,3 +1,3 @@
-Update hero card color to warm cream (#FAF3E6)
+Add brand logo favicon
 
 Co-authored-by: CommandCodeBot <noreply@commandcode.ai>
