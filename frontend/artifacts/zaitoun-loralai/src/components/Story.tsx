@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { BRAND } from "@/lib/constants";
-import storyImg from "@/assets/story-landscape.webp";
+import storyImg from "@/assets/story.png";
 
 export function Story() {
   return (
