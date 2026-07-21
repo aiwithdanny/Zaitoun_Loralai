@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate
 
 router = APIRouter()
 
@@ -558,6 +558,140 @@ async def upload_homepage_image(
 
     # Upload to Cloudinary
     url = upload_image(contents, f"homepage/{secrets.token_hex(8)}")
+    if not url:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to upload image to Cloudinary"
+        )
+
+    return {"success": True, "url": url, "message": "Image uploaded successfully"}
+
+
+# ─── RECIPE CONTENT MANAGEMENT ──────────────────────────────────────
+
+
+@router.get("/recipe-content")
+async def get_recipe_content(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get current recipe section content. Admin only."""
+    content = db.query(RecipeContent).first()
+    if not content:
+        return {"success": True, "data": None}
+    return {"success": True, "data": content.to_dict()}
+
+
+@router.put("/recipe-content")
+async def update_recipe_content(
+    data: RecipeContentUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create or update recipe section content. Admin only."""
+    content = db.query(RecipeContent).first()
+    update_data = data.model_dump(exclude_unset=True)
+
+    if content:
+        for field, value in update_data.items():
+            setattr(content, field, value)
+    else:
+        content = RecipeContent(**update_data)
+        db.add(content)
+
+    db.commit()
+    db.refresh(content)
+    return {"success": True, "data": content.to_dict(), "message": "Recipe section saved successfully"}
+
+
+# ─── RECIPE CRUD ────────────────────────────────────────────────────
+
+
+@router.get("/recipes")
+async def get_recipes(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get all recipes. Admin only."""
+    recipes = db.query(Recipe).order_by(Recipe.sort_order).all()
+    return {"success": True, "data": [r.to_dict() for r in recipes]}
+
+
+@router.post("/recipes")
+async def create_recipe(
+    data: RecipeCreate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a new recipe. Admin only."""
+    recipe = Recipe(**data.model_dump())
+    db.add(recipe)
+    db.commit()
+    db.refresh(recipe)
+    return {"success": True, "data": recipe.to_dict(), "message": "Recipe created successfully"}
+
+
+@router.put("/recipes/{recipe_id}")
+async def update_recipe(
+    recipe_id: int,
+    data: RecipeUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update a recipe. Admin only."""
+    recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(recipe, field, value)
+
+    db.commit()
+    db.refresh(recipe)
+    return {"success": True, "data": recipe.to_dict(), "message": "Recipe updated successfully"}
+
+
+@router.delete("/recipes/{recipe_id}")
+async def delete_recipe(
+    recipe_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a recipe. Admin only."""
+    recipe = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+
+    db.delete(recipe)
+    db.commit()
+    return {"success": True, "message": "Recipe deleted successfully"}
+
+
+@router.post("/recipes/upload-image")
+async def upload_recipe_image(
+    file: UploadFile = File(...),
+    current_user: str = Depends(get_current_user),
+):
+    """Upload a recipe image. Admin only."""
+    from src.config.cloudinary import upload_image
+    import secrets
+
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed: {', '.join(allowed_types)}"
+        )
+
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=400,
+            detail="File too large. Maximum size is 5MB"
+        )
+
+    url = upload_image(contents, f"recipes/{secrets.token_hex(8)}")
     if not url:
         raise HTTPException(
             status_code=500,
