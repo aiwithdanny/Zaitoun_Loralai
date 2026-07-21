@@ -454,6 +454,62 @@ class StoryContentResponse(BaseModel):
         from_attributes = True
 
 
+# ==================== RECIPE CONTENT SCHEMAS ====================
+
+class RecipeContentUpdate(BaseModel):
+    """Schema for updating recipe section content (all fields optional)"""
+    section_tag: Optional[str] = Field(None, max_length=255)
+    headline: Optional[str] = Field(None, max_length=255)
+    is_active: Optional[bool] = None
+
+
+class RecipeContentResponse(BaseModel):
+    """Schema for recipe section content response"""
+    id: int
+    section_tag: Optional[str]
+    headline: Optional[str]
+    is_active: bool
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+# ==================== RECIPE SCHEMAS ====================
+
+class RecipeCreate(BaseModel):
+    """Schema for creating a recipe entry"""
+    title: str = Field(..., min_length=1, max_length=255)
+    description: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=500)
+    sort_order: Optional[int] = Field(default=0)
+    is_active: bool = Field(default=True)
+
+
+class RecipeUpdate(BaseModel):
+    """Schema for updating a recipe entry (all fields optional)"""
+    title: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=500)
+    sort_order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class RecipeResponse(BaseModel):
+    """Schema for recipe response"""
+    id: int
+    title: str
+    description: Optional[str]
+    image_url: Optional[str]
+    sort_order: int
+    is_active: bool
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== GENERIC RESPONSE SCHEMAS ====================
 
 class SuccessResponse(BaseModel):
