@@ -52,12 +52,12 @@ export function Hero() {
   }
 
   return (
-    <section className="relative pt-16 pb-8 md:pt-20 md:pb-0 md:min-h-[90vh] md:flex md:items-center md:justify-start">
+    <section className="relative pt-16 pb-8 md:pt-20 md:pb-0 md:min-h-[120vh] md:flex md:items-center md:justify-start">
       <div className="w-full md:absolute md:inset-0 md:z-0">
         <img 
           src={backgroundImage} 
           alt="Zaitoun Loralai olive oil" 
-          className="w-full h-72 md:h-full object-cover"
+          className="w-full h-72 md:absolute md:inset-0 object-cover"
         />
       </div>
 
