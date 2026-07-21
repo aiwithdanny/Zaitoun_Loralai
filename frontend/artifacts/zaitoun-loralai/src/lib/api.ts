@@ -587,6 +587,70 @@ export const adminApi = {
     const result = await response.json();
     return result.url;
   },
+
+  // ── Recipe section content ──
+
+  getRecipeContent: async (): Promise<RecipeContentData | null> => {
+    const response = await apiFetch<{ success: boolean; data: RecipeContentData | null }>('/admin/recipe-content');
+    return response.data;
+  },
+
+  updateRecipeContent: async (data: Partial<RecipeContentData>): Promise<RecipeContentData> => {
+    const response = await apiFetch<{ success: boolean; data: RecipeContentData }>('/admin/recipe-content', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  // ── Recipe CRUD ──
+
+  getRecipes: async (): Promise<RecipeData[]> => {
+    const response = await apiFetch<{ success: boolean; data: RecipeData[] }>('/admin/recipes');
+    return response.data;
+  },
+
+  createRecipe: async (data: Partial<RecipeData>): Promise<RecipeData> => {
+    const response = await apiFetch<{ success: boolean; data: RecipeData }>('/admin/recipes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateRecipe: async (id: number, data: Partial<RecipeData>): Promise<RecipeData> => {
+    const response = await apiFetch<{ success: boolean; data: RecipeData }>(`/admin/recipes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteRecipe: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/recipes/${id}`, { method: 'DELETE' });
+  },
+
+  uploadRecipeImage: async (file: File): Promise<string> => {
+    const token = localStorage.getItem('admin_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/admin/recipes/upload-image`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Image upload failed' }));
+      throw new Error(errorData.detail || 'Image upload failed');
+    }
+
+    const result = await response.json();
+    return result.url;
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -842,6 +906,40 @@ export const storyApi = {
   // Get active story content (public)
   getActive: async (): Promise<StoryData> => {
     const response = await apiFetch<StoryData>('/story/');
+    return response;
+  },
+};
+
+// ==================== RECIPES API ====================
+
+export interface RecipeContentData {
+  id: number;
+  section_tag: string | null;
+  headline: string | null;
+  is_active: boolean;
+  updated_at: string;
+}
+
+export interface RecipeData {
+  id: number;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecipesResponse {
+  content: RecipeContentData | null;
+  recipes: RecipeData[];
+}
+
+export const recipesApi = {
+  // Get active recipe section + recipes (public)
+  getActive: async (): Promise<RecipesResponse> => {
+    const response = await apiFetch<RecipesResponse>('/recipes/');
     return response;
   },
 };
