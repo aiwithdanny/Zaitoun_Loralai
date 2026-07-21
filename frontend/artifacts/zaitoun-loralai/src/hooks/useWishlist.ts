@@ -16,11 +16,12 @@ export const wishlistKeys = {
 /**
  * Fetch the customer's wishlist — returns grouped product data.
  */
-export function useWishlistList() {
+export function useWishlistList(enabled?: boolean) {
   return useQuery({
     queryKey: wishlistKeys.all,
     queryFn: () => wishlistApi.list(),
     staleTime: 1000 * 60, // 1 minute — wishlist changes should reflect reasonably fast
+    enabled,
   });
 }
 

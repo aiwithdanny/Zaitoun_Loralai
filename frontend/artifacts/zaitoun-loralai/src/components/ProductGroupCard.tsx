@@ -21,7 +21,7 @@ function stripSizeSuffix(name: string): string {
 export function ProductGroupCard({ variants, category: categoryProp, productImages }: ProductGroupCardProps) {
   const [, navigate] = useLocation();
   const { isLoggedIn } = useCustomerAuth();
-  const { data: wishlist } = useWishlistList();
+  const { data: wishlist } = useWishlistList(isLoggedIn);
   const addMutation = useWishlistAdd();
   const removeMutation = useWishlistRemove();
 

@@ -99,7 +99,7 @@ export function ProductDetail() {
 
   // Wishlist state
   const { isLoggedIn } = useCustomerAuth();
-  const { data: wishlist } = useWishlistList();
+  const { data: wishlist } = useWishlistList(isLoggedIn);
   const addMutation = useWishlistAdd();
   const removeMutation = useWishlistRemove();
 
