@@ -332,7 +332,32 @@ class HomepageContent(Base):
         }
 
 
+class StoryContent(Base):
+    __tablename__ = "story_content"
+
+    id = Column(Integer, primary_key=True)
+    section_tag = Column(String(255))
+    headline = Column(String(255))
+    body = Column(Text)
+    pull_quote = Column(Text)
+    image_url = Column(String(500))
+    is_active = Column(Boolean, default=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "section_tag": self.section_tag,
+            "headline": self.headline,
+            "body": self.body,
+            "pull_quote": self.pull_quote,
+            "image_url": self.image_url,
+            "is_active": self.is_active,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent", "StoryContent"]
 
 
