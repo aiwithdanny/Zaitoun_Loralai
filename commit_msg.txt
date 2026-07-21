@@ -1,3 +1,0 @@
-Add brand logo favicon
-
-Co-authored-by: CommandCodeBot <noreply@commandcode.ai>

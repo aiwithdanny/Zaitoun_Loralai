@@ -57,7 +57,7 @@ export function Hero() {
         <img 
           src={backgroundImage} 
           alt="Zaitoun Loralai olive oil" 
-          className="w-full h-72 md:h-full object-cover"
+          className="w-full h-96 md:h-full object-cover"
         />
       </div>
 
