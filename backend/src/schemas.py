@@ -427,6 +427,33 @@ class HomepageContentResponse(BaseModel):
         from_attributes = True
 
 
+# ==================== STORY CONTENT SCHEMAS ====================
+
+class StoryContentUpdate(BaseModel):
+    """Schema for updating story content (all fields optional)"""
+    section_tag: Optional[str] = Field(None, max_length=255)
+    headline: Optional[str] = Field(None, max_length=255)
+    body: Optional[str] = None
+    pull_quote: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=500)
+    is_active: Optional[bool] = None
+
+
+class StoryContentResponse(BaseModel):
+    """Schema for story content response"""
+    id: int
+    section_tag: Optional[str]
+    headline: Optional[str]
+    body: Optional[str]
+    pull_quote: Optional[str]
+    image_url: Optional[str]
+    is_active: bool
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== GENERIC RESPONSE SCHEMAS ====================
 
 class SuccessResponse(BaseModel):
