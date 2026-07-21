@@ -1,8 +1,26 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/constants";
+import { storyApi, type StoryData } from "@/lib/api";
+import { optimizeCloudinaryUrl } from "@/utils/cloudinary";
 import storyImg from "@/assets/story.png";
 
 export function Story() {
+  const [content, setContent] = useState<StoryData | null>(null);
+
+  useEffect(() => {
+    storyApi.getActive().then(setContent).catch(() => {});
+  }, []);
+
+  const sectionTag = content?.section_tag || "Our Heritage";
+  const headline = content?.headline || BRAND.story.headline;
+  const body = content?.body || BRAND.story.body;
+  const pullQuote = content?.pull_quote || BRAND.story.pullQuote;
+
+  const backgroundImage = content?.image_url
+    ? (optimizeCloudinaryUrl(content.image_url, { width: 1200, quality: "auto", format: "auto" }) ?? storyImg)
+    : storyImg;
+
   return (
     <section id="story" className="py-24 md:py-32 bg-background overflow-hidden">
       <div className="container mx-auto px-4 md:px-8">
@@ -15,17 +33,17 @@ export function Story() {
             transition={{ duration: 0.8 }}
             className="lg:col-span-5 lg:pr-12 relative z-10 order-2 lg:order-1"
           >
-            <p className="text-accent uppercase tracking-widest text-xs mb-4">Our Heritage</p>
+            <p className="text-accent uppercase tracking-widest text-xs mb-4">{sectionTag}</p>
             <h2 className="text-4xl md:text-5xl font-serif text-foreground mb-8 leading-tight">
-              {BRAND.story.headline}
+              {headline}
             </h2>
             <p className="text-lg text-foreground/80 leading-relaxed mb-8">
-              {BRAND.story.body}
+              {body}
             </p>
             
             <blockquote className="border-l-2 border-primary pl-6 py-2 my-8">
               <p className="font-serif text-xl md:text-2xl text-foreground italic leading-snug">
-                "{BRAND.story.pullQuote}"
+                "{pullQuote}"
               </p>
             </blockquote>
           </motion.div>
@@ -39,7 +57,7 @@ export function Story() {
           >
             <div className="aspect-[4/3] md:aspect-[16/10] overflow-hidden rounded-sm">
               <img 
-                src={storyImg} 
+                src={backgroundImage} 
                 alt="Loralai mountains and olive grove" 
                 loading="lazy"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
