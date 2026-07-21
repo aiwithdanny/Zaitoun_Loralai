@@ -15,6 +15,7 @@ import AdminCoupons from "@/pages/admin/AdminCoupons";
 import AdminFounder from "@/pages/admin/AdminFounder";
 import AdminHomepage from "@/pages/admin/AdminHomepage";
 import AdminStory from "@/pages/admin/AdminStory";
+import AdminRecipes from "@/pages/admin/AdminRecipes";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
