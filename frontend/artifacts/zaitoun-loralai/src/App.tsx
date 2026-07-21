@@ -68,6 +68,7 @@ function Router() {
       <Route path="/admin/founder" component={ProtectedRoute(AdminFounder, AdminLayout)} />
       <Route path="/admin/homepage" component={ProtectedRoute(AdminHomepage, AdminLayout)} />
       <Route path="/admin/story" component={ProtectedRoute(AdminStory, AdminLayout)} />
+      <Route path="/admin/recipes" component={ProtectedRoute(AdminRecipes, AdminLayout)} />
       <Route component={NotFound} />
     </Switch>
   );

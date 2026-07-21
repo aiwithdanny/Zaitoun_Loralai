@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell, Tag, Crown, Home, BookOpen } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell, Tag, Crown, Home, BookOpen, UtensilsCrossed } from "lucide-react";
 import logoSrc from "@assets/logo-2.png";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { adminApi } from "@/lib/api";
