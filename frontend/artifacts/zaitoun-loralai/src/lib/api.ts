@@ -550,6 +550,43 @@ export const adminApi = {
     const result = await response.json();
     return result.url;
   },
+
+  // ── Story management ──
+
+  getStory: async (): Promise<StoryData | null> => {
+    const response = await apiFetch<{ success: boolean; data: StoryData | null }>('/admin/story');
+    return response.data;
+  },
+
+  updateStory: async (data: Partial<StoryData>): Promise<StoryData> => {
+    const response = await apiFetch<{ success: boolean; data: StoryData }>('/admin/story', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  uploadStoryImage: async (file: File): Promise<string> => {
+    const token = localStorage.getItem('admin_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/admin/story/upload-image`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Image upload failed' }));
+      throw new Error(errorData.detail || 'Image upload failed');
+    }
+
+    const result = await response.json();
+    return result.url;
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -784,6 +821,27 @@ export const homepageApi = {
   // Get active homepage content (public)
   getActive: async (): Promise<HomepageData> => {
     const response = await apiFetch<HomepageData>('/homepage/');
+    return response;
+  },
+};
+
+// ==================== STORY API ====================
+
+export interface StoryData {
+  id: number;
+  section_tag: string | null;
+  headline: string | null;
+  body: string | null;
+  pull_quote: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  updated_at: string;
+}
+
+export const storyApi = {
+  // Get active story content (public)
+  getActive: async (): Promise<StoryData> => {
+    const response = await apiFetch<StoryData>('/story/');
     return response;
   },
 };
