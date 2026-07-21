@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate
 
 router = APIRouter()
 
@@ -558,6 +558,80 @@ async def upload_homepage_image(
 
     # Upload to Cloudinary
     url = upload_image(contents, f"homepage/{secrets.token_hex(8)}")
+    if not url:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to upload image to Cloudinary"
+        )
+
+    return {"success": True, "url": url, "message": "Image uploaded successfully"}
+
+
+# ─── STORY CONTENT MANAGEMENT ───────────────────────────────────────
+
+
+@router.get("/story")
+async def get_story(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get current story content. Admin only."""
+    content = db.query(StoryContent).first()
+    if not content:
+        return {"success": True, "data": None}
+    return {"success": True, "data": content.to_dict()}
+
+
+@router.put("/story")
+async def update_story(
+    data: StoryContentUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create or update story content. Admin only."""
+    content = db.query(StoryContent).first()
+    update_data = data.model_dump(exclude_unset=True)
+
+    if content:
+        for field, value in update_data.items():
+            setattr(content, field, value)
+    else:
+        content = StoryContent(**update_data)
+        db.add(content)
+
+    db.commit()
+    db.refresh(content)
+    return {"success": True, "data": content.to_dict(), "message": "Story content saved successfully"}
+
+
+@router.post("/story/upload-image")
+async def upload_story_image(
+    file: UploadFile = File(...),
+    current_user: str = Depends(get_current_user),
+):
+    """Upload a story image. Admin only.
+    Uses same Cloudinary upload pattern as homepage uploads."""
+    from src.config.cloudinary import upload_image
+    import secrets
+
+    # Validate file type
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed: {', '.join(allowed_types)}"
+        )
+
+    # Validate file size (5MB)
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=400,
+            detail="File too large. Maximum size is 5MB"
+        )
+
+    # Upload to Cloudinary
+    url = upload_image(contents, f"story/{secrets.token_hex(8)}")
     if not url:
         raise HTTPException(
             status_code=500,
