@@ -50,7 +50,7 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {BRAND.navLinks.map((link) => (
+          {BRAND.navLinks.slice(0, 1).map((link) => (
             <a
               key={link.label}
               href={link.href}
@@ -61,10 +61,19 @@ export function Header() {
           ))}
           <Link
             to="/wholesale"
-            className="text-sm tracking-wide font-semibold text-accent hover:text-accent/80 transition-colors"
+            className="text-sm tracking-wide font-semibold text-foreground hover:text-primary transition-colors"
           >
             Wholesale
           </Link>
+          {BRAND.navLinks.slice(1).map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className="text-sm tracking-wide font-semibold text-foreground hover:text-primary transition-colors"
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
