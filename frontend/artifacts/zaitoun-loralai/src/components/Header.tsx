@@ -59,6 +59,12 @@ export function Header() {
               {link.label}
             </a>
           ))}
+          <Link
+            to="/wholesale"
+            className="text-sm tracking-wide font-semibold text-accent hover:text-accent/80 transition-colors"
+          >
+            Wholesale
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -172,6 +178,15 @@ export function Header() {
                   {link.label}
                 </a>
               ))}
+              <button
+                onClick={() => {
+                  navigate("/wholesale");
+                  setMobileMenuOpen(false);
+                }}
+                className="text-2xl font-serif text-accent hover:text-accent/80 transition-colors"
+              >
+                Wholesale
+              </button>
               <button
                 onClick={() => {
                   navigate("/cart");

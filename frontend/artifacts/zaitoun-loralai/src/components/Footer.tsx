@@ -99,6 +99,7 @@ export function Footer() {
         <div className="pt-8 border-t border-[#FAF7F2]/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#FAF7F2]/40">
           <p>&copy; {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
           <div className="flex flex-wrap gap-4 md:gap-6">
+            <Link href="/wholesale" className="hover:text-white transition-colors">Wholesale</Link>
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
             <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
