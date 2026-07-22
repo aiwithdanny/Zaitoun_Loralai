@@ -32,6 +32,7 @@ function Home() {
       <main>
         <Hero />
         <ProductGrid />
+        <WholesaleSection />
         <QualityFeatures />
         <TestimonialSection />
         <Story />

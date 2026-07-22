@@ -187,15 +187,13 @@ export function Header() {
                   {link.label}
                 </a>
               ))}
-              <button
-                onClick={() => {
-                  navigate("/wholesale");
-                  setMobileMenuOpen(false);
-                }}
+              <a
+                href="#wholesale"
+                onClick={() => setMobileMenuOpen(false)}
                 className="text-2xl font-serif text-accent hover:text-accent/80 transition-colors"
               >
                 Wholesale
-              </button>
+              </a>
               <button
                 onClick={() => {
                   navigate("/cart");
@@ -242,6 +240,11 @@ export function Header() {
             </nav>
           </motion.div>
         )}
+      </AnimatePresence>
+    </header>
+  );
+}
+    )}
       </AnimatePresence>
     </header>
   );

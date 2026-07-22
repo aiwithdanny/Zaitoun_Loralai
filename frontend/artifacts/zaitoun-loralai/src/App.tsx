@@ -28,7 +28,6 @@ import AccountOrders from "@/pages/AccountOrders";
 import AccountWishlist from "@/pages/AccountWishlist";
 import TrackOrder from "@/pages/TrackOrder";
 import Founder from "@/pages/Founder";
-import Wholesale from "@/pages/Wholesale";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { CustomerProtectedRoute } from "@/components/CustomerProtectedRoute";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -56,7 +55,6 @@ function Router() {
       <Route path="/refund-policy" component={RefundPolicy} />
       <Route path="/faqs" component={FAQs} />
       <Route path="/founder" component={Founder} />
-      <Route path="/wholesale" component={Wholesale} />
       <Route path="/track-order" component={TrackOrder} />
       <Route path="/login" component={CustomerLogin} />
       <Route path="/register" component={CustomerRegister} />
