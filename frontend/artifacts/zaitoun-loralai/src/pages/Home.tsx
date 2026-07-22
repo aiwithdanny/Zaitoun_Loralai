@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 
 import { ProductGrid } from "@/components/ProductGrid";
+import { WholesaleSection } from "@/components/WholesaleSection";
 import { QualityFeatures } from "@/components/QualityFeatures";
 import { TestimonialSection } from "@/components/TestimonialSection";
 import { Story } from "@/components/Story";

@@ -59,12 +59,12 @@ export function Header() {
               {link.label}
             </a>
           ))}
-          <Link
-            to="/wholesale"
+          <a
+            href="#wholesale"
             className="text-sm tracking-wide font-semibold text-foreground hover:text-primary transition-colors"
           >
             Wholesale
-          </Link>
+          </a>
           {BRAND.navLinks.slice(1).map((link) => (
             <a
               key={link.label}
@@ -240,11 +240,6 @@ export function Header() {
             </nav>
           </motion.div>
         )}
-      </AnimatePresence>
-    </header>
-  );
-}
-    )}
       </AnimatePresence>
     </header>
   );
