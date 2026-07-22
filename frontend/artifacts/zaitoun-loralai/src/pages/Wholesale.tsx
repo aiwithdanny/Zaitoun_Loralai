@@ -21,7 +21,7 @@ export default function Wholesale() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background">
       <Helmet>
         <title>Wholesale & Bulk Orders — Zaitoun Loralai</title>
         <meta
@@ -37,8 +37,9 @@ export default function Wholesale() {
 
       <Header />
 
-      {/* Hero */}
-      <section className="pt-32 pb-16 md:pt-40 md:pb-20 bg-gradient-to-b from-[#F5F0E8] to-background">
+      <main className="pt-20">
+        {/* Hero */}
+        <section className="pb-16 md:pb-20 bg-gradient-to-b from-[#F5F0E8] to-background">
         <div className="container mx-auto px-4 md:px-8 text-center">
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
             Wholesale & Bulk Orders
@@ -105,6 +106,8 @@ export default function Wholesale() {
           </a>
         </div>
       </section>
+
+      </main>
 
       <Footer />
     </div>

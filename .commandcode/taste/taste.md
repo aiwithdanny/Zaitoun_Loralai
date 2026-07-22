@@ -4,6 +4,9 @@
 
 # workflow
 See [workflow/taste.md](workflow/taste.md)
+# architecture
+- Follow existing project patterns when adding similar features — reuse the same architectural approach (e.g., single-row config + multi-row CRUD pattern from Founder/Story) rather than inventing new patterns for each new feature. Confidence: 0.70
+
 # currency
 - Use PKR (Pakistani Rupees) for all pricing, displayed as "Rs. X,XXX" format with comma-separated thousands and no decimals. Confidence: 0.75
 
@@ -19,7 +22,7 @@ See [workflow/taste.md](workflow/taste.md)
 - Use distinct, honest messaging in fallback/success paths — don't show the same generic success message when data was saved only locally (e.g. localStorage) vs. when it reached the real backend. Confidence: 0.70
 
 # assets
-- Use the project's existing `@assets/` alias for importing image/static files instead of introducing separate conventions like `public/` — keep consistent with the established import pattern. Confidence: 0.70
+- Use the project's existing `@assets/` alias for importing image/static files instead of introducing separate conventions like `public/` — keep consistent with the established import pattern. Confidence: 0.75
 
 # documentation
 - For documentation/config sync/audit tasks: only update genuinely outdated or missing content based on actual built state; do not restructure documents, add new sections beyond what's needed, delete accurate content, or add speculative/future features. Confidence: 0.70
