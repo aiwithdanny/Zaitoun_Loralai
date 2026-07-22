@@ -36,7 +36,7 @@ export function Hero() {
           <div className="w-full h-72 md:h-full bg-muted animate-pulse" />
         </div>
         <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
-          <div className="bg-[#FAF3E6] rounded-2xl shadow-2xl p-6 md:p-8 w-full">
+          <div className="bg-primary rounded-2xl shadow-2xl p-6 md:p-8 w-full">
             <div className="h-4 w-32 bg-muted-foreground/20 rounded animate-pulse mb-4" />
             <div className="h-8 w-64 bg-muted-foreground/20 rounded animate-pulse mb-4" />
             <div className="h-4 w-full bg-muted-foreground/20 rounded animate-pulse mb-2" />
@@ -62,7 +62,7 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
-        <div className="bg-[#FAF3E6] rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
+        <div className="bg-primary rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -76,7 +76,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-3xl lg:text-4xl font-serif text-foreground mb-4 leading-tight"
+            className="text-xl md:text-3xl lg:text-4xl font-serif text-primary-foreground mb-4 leading-tight"
           >
             {headline}
           </motion.h1>
@@ -85,7 +85,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-sm md:text-base text-muted-foreground mb-6 leading-relaxed"
+            className="text-sm md:text-base text-primary-foreground/80 mb-6 leading-relaxed"
           >
             {description}
           </motion.p>
@@ -98,13 +98,13 @@ export function Hero() {
           >
             <a 
               href="#products" 
-              className="px-6 py-4 bg-primary text-primary-foreground rounded-none font-medium tracking-wide hover:bg-primary/90 transition-colors w-full sm:w-auto text-center"
+              className="px-6 py-4 bg-white text-primary rounded-none font-medium tracking-wide hover:bg-white/90 transition-colors w-full sm:w-auto text-center"
             >
               {primaryCta}
             </a>
             <a 
               href="#story" 
-              className="px-6 py-4 bg-transparent text-primary border border-primary/30 rounded-none font-medium tracking-wide hover:bg-primary/5 transition-colors w-full sm:w-auto text-center"
+              className="px-6 py-4 bg-transparent text-white border border-white/30 rounded-none font-medium tracking-wide hover:bg-white/5 transition-colors w-full sm:w-auto text-center"
             >
               {secondaryCta}
             </a>
