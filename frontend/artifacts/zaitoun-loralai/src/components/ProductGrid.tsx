@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Loader2, Search, X } from "lucide-react";
+import { ShoppingCart, Check, Loader2, Search, X } from "lucide-react";
 import { useProducts, type ProductFilters } from "@/hooks/useProducts";
 import { useCart } from "@/store/cart";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ const sortOptions = [
 
 export function ProductGrid() {
   const addItem = useCart((state) => state.addItem);
+  const [justAdded, setJustAdded] = useState<Set<number>>(new Set());
 
   // Filter state
   const [searchInput, setSearchInput] = useState('');
@@ -77,7 +78,15 @@ export function ProductGrid() {
       price: product.discount_price || product.price,
       image_url: product.image_url || productImages[product.slug],
     });
+    setJustAdded((prev) => new Set(prev).add(product.id));
     toast.success(`${product.name} added to cart`);
+    setTimeout(() => {
+      setJustAdded((prev) => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+    }, 1500);
   };
 
   // Group products by product_group_id, then split each group by category
@@ -289,8 +298,11 @@ export function ProductGrid() {
                       className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 min-h-[44px] hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={product.stock === 0}
                     >
-                      <ShoppingBag className="w-3.5 h-3.5" />
-                      {product.stock === 0 ? 'Out of Stock' : 'Add'}
+                      {justAdded.has(product.id) ? (
+                        <><Check className="w-4 h-4" /> Added</>
+                      ) : (
+                        <><ShoppingCart className="w-4 h-4" /> {product.stock === 0 ? 'Out of Stock' : 'Add'}</>
+                      )}
                     </button>
                   </div>
                 </div>

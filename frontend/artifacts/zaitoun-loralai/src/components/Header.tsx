@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { ShoppingBag, Menu, X, User, ChevronDown, Package, LogOut } from "lucide-react";
+import { ShoppingCart, Menu, X, User, ChevronDown, Package, LogOut } from "lucide-react";
 import { BRAND } from "@/lib/constants";
 import { useCart } from "@/store/cart";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
@@ -128,12 +128,14 @@ export function Header() {
             className="p-3 bg-accent/10 rounded-full hover:bg-accent/20 transition-colors relative"
             title="Shopping cart"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingCart className="w-7 h-7" />
             {cartTotal > 0 && (
               <motion.span
+                key={cartTotal}
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute top-1 right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center"
+                animate={{ scale: [1, 1.35, 1] }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="absolute -top-0.5 -right-0.5 w-5.5 h-5.5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center"
               >
                 {cartTotal}
               </motion.span>

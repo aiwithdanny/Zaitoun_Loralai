@@ -2,7 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { useState, useMemo, useEffect } from "react";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { useParams, useLocation } from "wouter";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Zap, Star, MessageSquare, Loader2, Heart } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingCart, Check, Zap, Star, MessageSquare, Loader2, Heart } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { useWishlistList, useWishlistAdd, useWishlistRemove } from "@/hooks/useWishlist";
 import { useCart } from "@/store/cart";
@@ -32,6 +32,7 @@ export function ProductDetail() {
   const { group_id } = useParams<{ group_id: string }>();
   const [location, navigate] = useLocation();
   const addItem = useCart((state) => state.addItem);
+  const [justAdded, setJustAdded] = useState(false);
   const { customer } = useCustomerAuth();
 
   // Fetch all variants in this product group
@@ -145,7 +146,9 @@ export function ProductDetail() {
   const handleAddToCart = () => {
     if (!currentVariant || !inStock) return;
     addItem(getCartPayload(), quantity);
+    setJustAdded(true);
     toast.success(`${quantity} × ${currentVariant.name} added to cart`);
+    setTimeout(() => setJustAdded(false), 1500);
   };
 
   const handleBuyNow = () => {
@@ -355,10 +358,13 @@ export function ProductDetail() {
                 <Button
                   onClick={handleAddToCart}
                   disabled={!inStock}
-                  className="flex-1 sm:flex-none gap-2"
+                  className="flex-1 sm:flex-none gap-2 min-w-[160px]"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  Add to Cart
+                  {justAdded ? (
+                    <><Check className="w-5 h-5" /> Added!</>
+                  ) : (
+                    <><ShoppingCart className="w-5 h-5" /> Add to Cart</>
+                  )}
                 </Button>
                 <Button
                   onClick={handleBuyNow}
