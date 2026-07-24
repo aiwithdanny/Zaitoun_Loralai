@@ -1,8 +1,10 @@
 import { Droplet, ArrowRight, MessageCircle } from "lucide-react";
+import tankImg from "@assets/tank.png.png";
+import drumImg from "@assets/drum.png.png";
 
 const WHATSAPP_NUMBER = "923492882897";
 
-const bulkSizes = [100, 200, 300, 500, 1000, 1500];
+const bulkSizes = [100, 500, 1000];
 
 function createWhatsAppUrl(quantity?: number) {
   const message = quantity
@@ -32,11 +34,25 @@ export function WholesaleSection() {
           <h3 className="font-serif text-2xl md:text-3xl font-semibold text-primary-foreground text-center mb-4">
             Available Bulk Sizes
           </h3>
-          <p className="text-primary-foreground/80 text-center mb-16 max-w-xl mx-auto">
+          <p className="text-primary-foreground/80 text-center mb-12 max-w-xl mx-auto">
             Select your preferred size and contact us for a custom quote. Pricing depends on volume and delivery location.
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+          {/* Product Images */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
+            <img
+              src={tankImg}
+              alt="Stainless steel tank — 500L and 1000L sizes"
+              className="w-full h-64 object-contain rounded-xl bg-white/5 p-4"
+            />
+            <img
+              src={drumImg}
+              alt="Industrial drum — 100L size"
+              className="w-full h-64 object-contain rounded-xl bg-white/5 p-4"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto">
             {bulkSizes.map((size) => (
               <a
                 key={size}
