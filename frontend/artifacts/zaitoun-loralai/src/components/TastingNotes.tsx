@@ -10,11 +10,11 @@ export function TastingNotes() {
   ];
 
   return (
-    <section className="py-24 bg-primary text-primary-foreground">
+    <section className="py-24 bg-white">
       <div className="container mx-auto px-4 md:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-serif mb-4 text-white">Tasting Profile</h2>
+            <h2 className="text-3xl md:text-4xl font-serif mb-4 text-foreground">Tasting Profile</h2>
             <div className="h-px w-16 bg-accent mx-auto"></div>
           </div>
           
@@ -26,10 +26,10 @@ export function TastingNotes() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="border-b border-primary-foreground/20 pb-6"
+                className="border-b border-border pb-6"
               >
                 <h4 className="text-accent uppercase tracking-widest text-xs mb-2">{note.label}</h4>
-                <p className="font-serif text-xl text-white/90">{note.value}</p>
+                <p className="font-serif text-xl text-foreground/80">{note.value}</p>
               </motion.div>
             ))}
           </div>
