@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
+import { testimonialsApi, type TestimonialData } from "@/lib/api";
 
 /**
- * PLACEHOLDER TESTIMONIALS — Replace with real customer reviews.
+ * PLACEHOLDER TESTIMONIALS — Fallback used when API is unavailable.
  * Source: Actual Zaitoun Loralai customers (sample data).
  */
-const testimonials = [
+const FALLBACK_TESTIMONIALS: TestimonialData[] = [
   {
     id: 1,
     name: "Fatima Ansari",
@@ -42,16 +43,31 @@ const testimonials = [
 ];
 
 export function TestimonialSection() {
+  const [testimonials, setTestimonials] = useState<TestimonialData[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
+    testimonialsApi
+      .getActive()
+      .then((data) => {
+        if (data.length > 0) setTestimonials(data);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const activeTestimonials =
+    testimonials.length > 0 ? testimonials : FALLBACK_TESTIMONIALS;
+
+  useEffect(() => {
     if (isPaused) return;
     const id = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % testimonials.length);
+      setCurrent((prev) => (prev + 1) % activeTestimonials.length);
     }, 6000);
     return () => clearInterval(id);
-  }, [isPaused]);
+  }, [isPaused, activeTestimonials.length]);
 
   return (
     <section className="py-24 bg-background border-y border-border/50">
@@ -73,7 +89,7 @@ export function TestimonialSection() {
           <div className="relative min-h-[280px] md:min-h-[240px]">
             <AnimatePresence mode="wait">
               <motion.div
-                key={testimonials[current].id}
+                key={activeTestimonials[current].id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -86,7 +102,7 @@ export function TestimonialSection() {
                 </span>
 
                 <blockquote className="font-serif text-xl md:text-2xl text-white/90 leading-relaxed mb-8">
-                  {testimonials[current].quote}
+                  {activeTestimonials[current].quote}
                 </blockquote>
 
                 <div className="flex items-center justify-center gap-1 mb-3">
@@ -94,7 +110,7 @@ export function TestimonialSection() {
                     <Star
                       key={i}
                       className={`w-5 h-5 ${
-                        i < testimonials[current].rating
+                        i < activeTestimonials[current].rating
                           ? "text-accent fill-accent"
                           : "text-primary-foreground/20"
                       }`}
@@ -103,10 +119,10 @@ export function TestimonialSection() {
                 </div>
 
                 <p className="font-semibold text-white">
-                  {testimonials[current].name}
+                  {activeTestimonials[current].name}
                 </p>
                 <p className="text-sm text-primary-foreground/70">
-                  {testimonials[current].location}
+                  {activeTestimonials[current].location}
                 </p>
               </motion.div>
             </AnimatePresence>
@@ -114,7 +130,7 @@ export function TestimonialSection() {
 
           {/* Dot indicators */}
           <div className="flex items-center justify-center gap-1 mt-8">
-            {testimonials.map((_, i) => (
+            {activeTestimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}

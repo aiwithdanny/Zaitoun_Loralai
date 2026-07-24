@@ -651,6 +651,55 @@ export const adminApi = {
     const result = await response.json();
     return result.url;
   },
+
+  // ── Testimonials (admin) ──
+
+  getTestimonials: async (): Promise<TestimonialData[]> => {
+    const response = await apiFetch<{ success: boolean; data: TestimonialData[] }>('/admin/testimonials');
+    return response.data;
+  },
+
+  createTestimonial: async (data: Partial<TestimonialData>): Promise<TestimonialData> => {
+    const response = await apiFetch<{ success: boolean; data: TestimonialData }>('/admin/testimonials', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateTestimonial: async (id: number, data: Partial<TestimonialData>): Promise<TestimonialData> => {
+    const response = await apiFetch<{ success: boolean; data: TestimonialData }>(`/admin/testimonials/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteTestimonial: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/testimonials/${id}`, { method: 'DELETE' });
+  },
+
+  uploadTestimonialImage: async (file: File): Promise<string> => {
+    const token = localStorage.getItem('admin_token');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/admin/testimonials/upload-image`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Image upload failed' }));
+      throw new Error(errorData.detail || 'Image upload failed');
+    }
+
+    const result = await response.json();
+    return result.url;
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -984,5 +1033,29 @@ export const reviewsApi = {
 
     const result = await response.json();
     return result.url;
+  },
+};
+
+
+// ==================== TESTIMONIALS API ====================
+
+export interface TestimonialData {
+  id: number;
+  name: string;
+  location: string | null;
+  quote: string;
+  rating: number;
+  image_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const testimonialsApi = {
+  // Get active testimonials (public)
+  getActive: async (): Promise<TestimonialData[]> => {
+    const response = await apiFetch<TestimonialData[]>('/testimonials/');
+    return response;
   },
 };

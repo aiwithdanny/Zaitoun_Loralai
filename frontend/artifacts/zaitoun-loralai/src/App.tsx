@@ -16,6 +16,7 @@ import AdminFounder from "@/pages/admin/AdminFounder";
 import AdminHomepage from "@/pages/admin/AdminHomepage";
 import AdminStory from "@/pages/admin/AdminStory";
 import AdminRecipes from "@/pages/admin/AdminRecipes";
+import AdminTestimonials from "@/pages/admin/AdminTestimonials";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
@@ -70,6 +71,7 @@ function Router() {
       <Route path="/admin/homepage" component={ProtectedRoute(AdminHomepage, AdminLayout)} />
       <Route path="/admin/story" component={ProtectedRoute(AdminStory, AdminLayout)} />
       <Route path="/admin/recipes" component={ProtectedRoute(AdminRecipes, AdminLayout)} />
+      <Route path="/admin/testimonials" component={ProtectedRoute(AdminTestimonials, AdminLayout)} />
       <Route component={NotFound} />
     </Switch>
   );
