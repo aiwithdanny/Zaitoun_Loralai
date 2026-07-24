@@ -20,6 +20,9 @@
   --color-popover-foreground: hsl(var(--popover-foreground));
   --color-popover-border: hsl(var(--popover-border));
 
+  --color-hero-card: hsl(var(--hero-card));
+  --color-hero-card-foreground: hsl(var(--hero-card-foreground));
+
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-primary-border: var(--primary-border);
@@ -78,6 +81,9 @@
   --popover-foreground: 60 11% 10%;
   --popover-border: 37 23% 82%;
 
+  --hero-card: 85 55% 45%;
+  --hero-card-foreground: 40 33% 96%;
+
   --primary: 90 40% 23%;
   --primary-foreground: 40 33% 96%;
   --secondary: 40 35% 86%;
@@ -132,6 +138,9 @@
   --popover: 60 11% 12%;
   --popover-foreground: 40 33% 96%;
   --popover-border: 33 8% 24%;
+
+  --hero-card: 85 50% 55%;
+  --hero-card-foreground: 60 11% 10%;
 
   --primary: 90 40% 43%;
   --primary-foreground: 60 11% 10%;

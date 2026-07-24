@@ -36,7 +36,7 @@ export function Hero() {
           <div className="w-full h-72 md:h-full bg-muted animate-pulse" />
         </div>
         <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
-          <div className="bg-primary rounded-2xl shadow-2xl p-6 md:p-8 w-full">
+          <div className="bg-hero-card rounded-2xl shadow-2xl p-6 md:p-8 w-full">
             <div className="h-4 w-32 bg-muted-foreground/20 rounded animate-pulse mb-4" />
             <div className="h-8 w-64 bg-muted-foreground/20 rounded animate-pulse mb-4" />
             <div className="h-4 w-full bg-muted-foreground/20 rounded animate-pulse mb-2" />
@@ -62,12 +62,12 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
-        <div className="bg-primary rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
+        <div className="bg-hero-card rounded-2xl shadow-2xl p-6 md:p-8 text-center lg:text-left">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-accent uppercase tracking-[0.25em] text-sm md:text-base mb-4"
+            className="text-hero-card-foreground uppercase tracking-[0.25em] text-sm md:text-base mb-4"
           >
             {brandName}
           </motion.p>
@@ -76,7 +76,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-3xl lg:text-4xl font-serif text-primary-foreground mb-4 leading-tight"
+            className="text-xl md:text-3xl lg:text-4xl font-serif text-hero-card-foreground mb-4 leading-tight"
           >
             {headline}
           </motion.h1>
@@ -85,7 +85,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-sm md:text-base text-primary-foreground/80 mb-6 leading-relaxed"
+            className="text-sm md:text-base text-hero-card-foreground mb-6 leading-relaxed"
           >
             {description}
           </motion.p>
