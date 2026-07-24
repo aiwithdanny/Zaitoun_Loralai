@@ -1,18 +1,47 @@
 import { Helmet } from "react-helmet-async";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { Trash2, ShoppingBag, ArrowLeft, ShoppingCart, Check, Loader2 } from "lucide-react";
 import { useCart } from "@/store/cart";
+import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { formatPrice } from "@/utils/currency";
+import { productImages } from "@/lib/productImages";
 
 export function Cart() {
   const [_, navigate] = useLocation();
-  const { items, removeItem, updateQuantity, getTotalPrice, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, getTotalPrice, clearCart, addItem } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [justAdded, setJustAdded] = useState<Set<number>>(new Set());
+
+  const { data: allProducts, isPending } = useProducts();
+
+  // Products not already in cart, limit to 4
+  const suggested = useMemo(() => {
+    if (!allProducts) return [];
+    const cartIds = new Set(items.map((i) => i.id));
+    return allProducts.filter((p) => !cartIds.has(p.id)).slice(0, 4);
+  }, [allProducts, items]);
+
+  const handleAddSuggested = (product: any) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.discount_price || product.price,
+      image_url: product.image_url || productImages[product.slug],
+    });
+    setJustAdded((prev) => new Set(prev).add(product.id));
+    toast.success(`${product.name} added to cart`);
+    setTimeout(() => {
+      setJustAdded((prev) => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+    }, 1500);
+  };
 
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -185,6 +214,100 @@ export function Cart() {
             </div>
           </div>
         </div>
+
+        {/* You May Also Like */}
+        {suggested.length > 0 && (
+          <section className="mt-16">
+            <h2 className="font-serif text-2xl text-foreground mb-8">
+              You may also like
+            </h2>
+            {isPending ? (
+              <div className="flex items-center gap-2 text-muted-foreground py-8">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Loading suggestions...</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {suggested.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group bg-card border border-border rounded-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-500"
+                  >
+                    {/* Image */}
+                    <div className="relative aspect-[3/4] bg-muted/40 flex items-center justify-center overflow-hidden">
+                      {product.is_featured && (
+                        <span className="absolute top-3 left-3 z-10 text-[10px] uppercase tracking-widest bg-primary text-primary-foreground px-2 py-1">
+                          Featured
+                        </span>
+                      )}
+                      {product.discount_price && (
+                        <span className="absolute top-3 right-3 z-10 text-[10px] uppercase tracking-widest bg-accent text-accent-foreground px-2 py-1">
+                          Sale
+                        </span>
+                      )}
+                      {(product.image_url || productImages[product.slug]) ? (
+                        <img
+                          src={product.image_url || productImages[product.slug]}
+                          alt={product.name}
+                          loading="lazy"
+                          className="w-[80%] sm:w-[60%] h-[80%] object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground/40">
+                          <div className="w-16 h-32 rounded-sm border-2 border-dashed border-muted-foreground/20 flex items-center justify-center">
+                            <span className="text-[10px] uppercase tracking-widest rotate-90 whitespace-nowrap text-muted-foreground/30">
+                              Image
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Details */}
+                    <div className="p-5 flex flex-col flex-1">
+                      <p className="text-muted-foreground uppercase tracking-widest text-[10px] mb-1">
+                        {product.category || "Loralai, Pakistan"}
+                      </p>
+                      <h3 className="font-serif text-sm md:text-lg text-foreground leading-snug mb-1">
+                        {product.name}
+                      </h3>
+
+                      <div className="mt-auto flex items-center justify-between">
+                        <div className="flex flex-col">
+                          {product.discount_price ? (
+                            <>
+                              <span className="font-medium text-foreground text-base">
+                                {formatPrice(product.discount_price)}
+                              </span>
+                              <span className="text-xs text-muted-foreground line-through">
+                                {formatPrice(product.price)}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="font-medium text-foreground text-base">
+                              {formatPrice(product.price)}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => handleAddSuggested(product)}
+                          className="flex items-center gap-2 text-xs uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 min-h-[44px] hover:bg-primary/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={product.stock === 0}
+                        >
+                          {justAdded.has(product.id) ? (
+                            <><Check className="w-4 h-4" /> Added</>
+                          ) : (
+                            <><ShoppingCart className="w-4 h-4" /> {product.stock === 0 ? "Out of Stock" : "Add"}</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </div>
   );

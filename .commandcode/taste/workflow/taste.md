@@ -4,6 +4,7 @@
 - Implement in this order: database migration first (with verification), then backend files, then frontend files — with build/import checks after each major step. Keep backend and frontend phases strictly sequential: verify backend endpoints work via API testing before moving to frontend implementation. Confidence: 0.82
 - Show real proof at each checkpoint (e.g., before/after data snapshots, live request/response output) rather than just confirmation statements. Confidence: 0.77
 - Investigate and report findings with file/line references before proposing or implementing any fix. Confidence: 0.73
+- When proposing UI changes, include exact CSS class names (not just high-level descriptions) so the user can review the precise styling before approving. Confidence: 0.75
 - Use phased implementation plans: for each phase specify exact new/modified files, backend endpoints with response schemas, and build/test checkpoints between phases. Confidence: 0.78
 - Explicitly call out what is NOT in scope to maintain focus and prevent scope creep. Confidence: 0.73
 - When told to \"continue\" and the next task is ambiguous, ask the user to clarify what to continue with rather than picking up unrelated pending changes autonomously. Confidence: 0.85
