@@ -401,7 +401,36 @@ class Recipe(Base):
         }
 
 
+class Testimonial(Base):
+    __tablename__ = "testimonials"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    location = Column(String(255))
+    quote = Column(Text, nullable=False)
+    rating = Column(Integer, default=5)
+    image_url = Column(String(500))
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "location": self.location,
+            "quote": self.quote,
+            "rating": self.rating,
+            "image_url": self.image_url,
+            "sort_order": self.sort_order,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent", "StoryContent", "RecipeContent", "Recipe"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent", "StoryContent", "RecipeContent", "Recipe", "Testimonial"]
 
 
