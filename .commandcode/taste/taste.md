@@ -29,6 +29,7 @@ See [workflow/taste.md](workflow/taste.md)
 
 # content
 - Never fabricate health/quality claims, nutritional data, tasting notes, or specific product facts — use honest placeholder states ("Content coming soon", commented `// PLACEHOLDER - awaiting real content from client`) until real content is provided by the client. Confidence: 0.85
+- Homepage sections should follow a professional olive oil brand narrative flow: Hero (first impression) → ProductGrid (what we sell) → Story (heritage) → QualityFeatures (why we're better) → TastingNotes (sensory experience) → WholesaleSection (bulk opportunity) → TestimonialSection (social proof) → About (human connection) → Recipes (usage inspiration). Each section has a distinct narrative role. Confidence: 0.75
 
 # communication
 - When assigning a task, use a structured format with clear labelled sections (Current, Desired, Implementation, Files to Modify, Investigate/Report) — respond by following the same structured format with explicit file/line references and proposed changes. Confidence: 0.75

@@ -3,12 +3,12 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 
 import { ProductGrid } from "@/components/ProductGrid";
-import { WholesaleSection } from "@/components/WholesaleSection";
-import { QualityFeatures } from "@/components/QualityFeatures";
-import { TestimonialSection } from "@/components/TestimonialSection";
 import { Story } from "@/components/Story";
-import { About } from "@/components/About";
+import { QualityFeatures } from "@/components/QualityFeatures";
 import { TastingNotes } from "@/components/TastingNotes";
+import { WholesaleSection } from "@/components/WholesaleSection";
+import { TestimonialSection } from "@/components/TestimonialSection";
+import { About } from "@/components/About";
 import { Recipes } from "@/components/Recipes";
 import { Footer } from "@/components/Footer";
 import { SITE_URL, OG_IMAGE } from "@/lib/constants";
@@ -33,12 +33,12 @@ function Home() {
       <main>
         <Hero />
         <ProductGrid />
-        <WholesaleSection />
-        <QualityFeatures />
-        <TestimonialSection />
         <Story />
-        <About />
+        <QualityFeatures />
         <TastingNotes />
+        <WholesaleSection />
+        <TestimonialSection />
+        <About />
         <Recipes />
       </main>
       <Footer />
