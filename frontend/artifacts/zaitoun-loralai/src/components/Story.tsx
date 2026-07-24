@@ -67,6 +67,28 @@ export function Story() {
           </motion.div>
           
         </div>
+
+        {/* YouTube Video */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          className="mt-16 max-w-3xl mx-auto"
+        >
+          <p className="text-center text-xs uppercase tracking-widest text-accent mb-4">
+            Watch Our Story
+          </p>
+          <div className="aspect-video rounded-sm overflow-hidden shadow-lg">
+            <iframe
+              src="https://www.youtube.com/embed/dywW31FGlck"
+              title="Zaitoun Loralai — Our Story"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
+        </motion.div>
       </div>
     </section>
   );

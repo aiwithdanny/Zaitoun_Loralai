@@ -30,6 +30,10 @@ See [workflow/taste.md](workflow/taste.md)
 # content
 - Never fabricate health/quality claims, nutritional data, tasting notes, or specific product facts — use honest placeholder states ("Content coming soon", commented `// PLACEHOLDER - awaiting real content from client`) until real content is provided by the client. Confidence: 0.85
 
+# communication
+- When assigning a task, use a structured format with clear labelled sections (Current, Desired, Implementation, Files to Modify, Investigate/Report) — respond by following the same structured format with explicit file/line references and proposed changes. Confidence: 0.75
+- Defer providing sensitive/unique information (URLs, API keys, credentials) until after the investigation plan is confirmed and the user explicitly approves proceeding — provide the plan framework first, then receive the specific details. Confidence: 0.70
+
 # wouter
 - Use wouter's `<Link>` component (with a `to` prop) instead of plain `<a>` tags for internal SPA navigation to prevent full page reloads. Confidence: 0.75
 

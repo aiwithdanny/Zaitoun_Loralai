@@ -18,3 +18,4 @@
 - When a frontend operation reports failure (e.g. toast error, fallback to localStorage), also check the database directly to confirm whether the operation genuinely failed or only appeared to fail — the data may have been created successfully despite a false error report. Confidence: 0.70
 - When making a small/scoped fix, make only the exact change requested — do not add extra event handlers, wrappers, or complexity beyond what was explicitly asked for. Confidence: 0.70
 - After implementing approved changes, commit and push to the remote repository (git add, git commit, git push) — do not leave changes sitting uncommitted locally. Confidence: 0.80
+- Use descriptive, specific commit messages that summarize exactly what changed (e.g. "Update Wholesale: 3 sizes (100L, 500L, 1000L) + 2 images") rather than vague generic messages. Follow the user's exact commit message when explicitly provided. Confidence: 0.70
