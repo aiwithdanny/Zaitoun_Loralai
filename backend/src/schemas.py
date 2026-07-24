@@ -510,6 +510,47 @@ class RecipeResponse(BaseModel):
         from_attributes = True
 
 
+# ==================== TESTIMONIAL SCHEMAS ====================
+
+class TestimonialCreate(BaseModel):
+    """Schema for creating a testimonial"""
+    name: str = Field(..., min_length=1, max_length=255, description="Customer name")
+    location: Optional[str] = Field(None, max_length=255, description="Customer location")
+    quote: str = Field(..., min_length=1, description="Testimonial quote")
+    rating: int = Field(default=5, ge=1, le=5, description="Rating 1-5")
+    image_url: Optional[str] = Field(None, max_length=500, description="Optional customer photo URL")
+    sort_order: int = Field(default=0, description="Display order (lower = first)")
+    is_active: bool = Field(default=True, description="Whether this testimonial is active")
+
+
+class TestimonialUpdate(BaseModel):
+    """Schema for updating a testimonial (all fields optional)"""
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    location: Optional[str] = Field(None, max_length=255)
+    quote: Optional[str] = None
+    rating: Optional[int] = Field(None, ge=1, le=5)
+    image_url: Optional[str] = Field(None, max_length=500)
+    sort_order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class TestimonialResponse(BaseModel):
+    """Schema for testimonial response"""
+    id: int
+    name: str
+    location: Optional[str]
+    quote: str
+    rating: int
+    image_url: Optional[str]
+    sort_order: int
+    is_active: bool
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== GENERIC RESPONSE SCHEMAS ====================
 
 class SuccessResponse(BaseModel):

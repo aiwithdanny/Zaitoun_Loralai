@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate
 
 router = APIRouter()
 
@@ -692,6 +692,103 @@ async def upload_recipe_image(
         )
 
     url = upload_image(contents, f"recipes/{secrets.token_hex(8)}")
+    if not url:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to upload image to Cloudinary"
+        )
+
+    return {"success": True, "url": url, "message": "Image uploaded successfully"}
+
+
+# ─── TESTIMONIALS MANAGEMENT ─────────────────────────────────────
+
+
+@router.get("/testimonials")
+async def get_testimonials_admin(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get all testimonials. Admin only."""
+    testimonials = db.query(Testimonial).order_by(Testimonial.sort_order).all()
+    return {"success": True, "data": [t.to_dict() for t in testimonials]}
+
+
+@router.post("/testimonials")
+async def create_testimonial(
+    data: TestimonialCreate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a testimonial. Admin only."""
+    testimonial = Testimonial(**data.model_dump())
+    db.add(testimonial)
+    db.commit()
+    db.refresh(testimonial)
+    return {"success": True, "data": testimonial.to_dict(), "message": "Testimonial created successfully"}
+
+
+@router.put("/testimonials/{testimonial_id}")
+async def update_testimonial(
+    testimonial_id: int,
+    data: TestimonialUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update a testimonial. Admin only."""
+    testimonial = db.query(Testimonial).filter(Testimonial.id == testimonial_id).first()
+    if not testimonial:
+        raise HTTPException(status_code=404, detail="Testimonial not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(testimonial, field, value)
+
+    db.commit()
+    db.refresh(testimonial)
+    return {"success": True, "data": testimonial.to_dict(), "message": "Testimonial updated successfully"}
+
+
+@router.delete("/testimonials/{testimonial_id}")
+async def delete_testimonial(
+    testimonial_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a testimonial. Admin only."""
+    testimonial = db.query(Testimonial).filter(Testimonial.id == testimonial_id).first()
+    if not testimonial:
+        raise HTTPException(status_code=404, detail="Testimonial not found")
+
+    db.delete(testimonial)
+    db.commit()
+    return {"success": True, "message": "Testimonial deleted successfully"}
+
+
+@router.post("/testimonials/upload-image")
+async def upload_testimonial_image(
+    file: UploadFile = File(...),
+    current_user: str = Depends(get_current_user),
+):
+    """Upload a testimonial image. Admin only."""
+    from src.config.cloudinary import upload_image
+    import secrets
+
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed: {', '.join(allowed_types)}"
+        )
+
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(
+            status_code=400,
+            detail="File too large. Maximum size is 5MB"
+        )
+
+    url = upload_image(contents, f"testimonials/{secrets.token_hex(8)}")
     if not url:
         raise HTTPException(
             status_code=500,

@@ -81,7 +81,7 @@ async def root():
 
 
 # Import and include routers
-from src.api.v1 import products, orders, whatsapp, admin, newsletter, customers, upload, reviews, wishlist, coupons, founder, homepage, story, recipes
+from src.api.v1 import products, orders, whatsapp, admin, newsletter, customers, upload, reviews, wishlist, coupons, founder, homepage, story, recipes, testimonials
 
 app.include_router(products.router, prefix="/api/v1/products", tags=["Products"])
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
@@ -97,6 +97,7 @@ app.include_router(founder.router, prefix="/api/v1/founder", tags=["Founder"])
 app.include_router(homepage.router, prefix="/api/v1/homepage", tags=["Homepage"])
 app.include_router(story.router, prefix="/api/v1/story", tags=["Story"])
 app.include_router(recipes.router, prefix="/api/v1/recipes", tags=["Recipes"])
+app.include_router(testimonials.router, prefix="/api/v1/testimonials", tags=["Testimonials"])
 
 
 # ── Outer ASGI wrapper: handle OPTIONS preflight at the raw ASGI layer ──
