@@ -401,6 +401,31 @@ class Recipe(Base):
         }
 
 
+class QualityFeature(Base):
+    __tablename__ = "quality_features"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=False)
+    icon_name = Column(String(100), nullable=False, default="leaf")
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "icon_name": self.icon_name,
+            "sort_order": self.sort_order,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
 class Testimonial(Base):
     __tablename__ = "testimonials"
 
@@ -431,6 +456,6 @@ class Testimonial(Base):
 
 
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent", "StoryContent", "RecipeContent", "Recipe", "Testimonial"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent", "StoryContent", "RecipeContent", "Recipe", "Testimonial", "QualityFeature"]
 
 
