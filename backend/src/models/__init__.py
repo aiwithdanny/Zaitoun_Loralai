@@ -426,6 +426,29 @@ class QualityFeature(Base):
         }
 
 
+class TastingNote(Base):
+    __tablename__ = "tasting_notes"
+
+    id = Column(Integer, primary_key=True)
+    label = Column(String(100), nullable=False)
+    value = Column(Text, nullable=False)
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "label": self.label,
+            "value": self.value,
+            "sort_order": self.sort_order,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
 class Testimonial(Base):
     __tablename__ = "testimonials"
 
@@ -456,6 +479,6 @@ class Testimonial(Base):
 
 
 # Export all models
-__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent", "StoryContent", "RecipeContent", "Recipe", "Testimonial", "QualityFeature"]
+__all__ = ["Product", "Order", "OrderItem", "AdminUser", "Customer", "NewsletterSubscription", "Review", "Wishlist", "Coupon", "Founder", "HomepageContent", "StoryContent", "RecipeContent", "Recipe", "Testimonial", "QualityFeature", "TastingNote"]
 
 
