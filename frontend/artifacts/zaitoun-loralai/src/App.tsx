@@ -19,6 +19,7 @@ import AdminRecipes from "@/pages/admin/AdminRecipes";
 import AdminTestimonials from "@/pages/admin/AdminTestimonials";
 import AdminQualityFeatures from "@/pages/admin/AdminQualityFeatures";
 import AdminTastingNotes from "@/pages/admin/AdminTastingNotes";
+import AdminWholesale from "@/pages/admin/AdminWholesale";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
@@ -76,6 +77,7 @@ function Router() {
       <Route path="/admin/testimonials" component={ProtectedRoute(AdminTestimonials, AdminLayout)} />
       <Route path="/admin/quality-features" component={ProtectedRoute(AdminQualityFeatures, AdminLayout)} />
       <Route path="/admin/tasting-notes" component={ProtectedRoute(AdminTastingNotes, AdminLayout)} />
+      <Route path="/admin/wholesale" component={ProtectedRoute(AdminWholesale, AdminLayout)} />
       <Route component={NotFound} />
     </Switch>
   );
