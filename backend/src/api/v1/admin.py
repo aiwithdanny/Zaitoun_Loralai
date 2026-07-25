@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial, QualityFeature, TastingNote, WholesaleConfig, WholesaleSize
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial, QualityFeature, TastingNote, WholesaleConfig, WholesaleSize, SiteConfig
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate, QualityFeatureCreate, QualityFeatureUpdate, TastingNoteCreate, TastingNoteUpdate, WholesaleConfigUpdate, WholesaleSizeCreate, WholesaleSizeUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate, QualityFeatureCreate, QualityFeatureUpdate, TastingNoteCreate, TastingNoteUpdate, WholesaleConfigUpdate, WholesaleSizeCreate, WholesaleSizeUpdate, SiteConfigUpdate
 
 router = APIRouter()
 
@@ -920,6 +920,43 @@ async def delete_wholesale_size(
     db.delete(size)
     db.commit()
     return {"success": True, "message": "Wholesale size deleted successfully"}
+
+
+# ─── SITE CONFIG MANAGEMENT ──────────────────────────────────────
+
+
+@router.get("/site-config")
+async def get_site_config_admin(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get site config. Admin only."""
+    config = db.query(SiteConfig).first()
+    if not config:
+        return {"success": True, "data": None}
+    return {"success": True, "data": config.to_dict()}
+
+
+@router.put("/site-config")
+async def update_site_config(
+    data: SiteConfigUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create or update site config. Admin only."""
+    config = db.query(SiteConfig).first()
+    update_data = data.model_dump(exclude_unset=True)
+
+    if config:
+        for field, value in update_data.items():
+            setattr(config, field, value)
+    else:
+        config = SiteConfig(**update_data)
+        db.add(config)
+
+    db.commit()
+    db.refresh(config)
+    return {"success": True, "data": config.to_dict(), "message": "Site config saved successfully"}
 
 
 # ─── TESTIMONIALS MANAGEMENT ─────────────────────────────────────
