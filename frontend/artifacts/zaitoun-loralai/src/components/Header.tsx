@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { ShoppingCart, Menu, X, User, ChevronDown, Package, LogOut } from "lucide-react";
+import { siteConfigApi, type SiteConfigData } from "@/lib/api";
 import { BRAND } from "@/lib/constants";
 import { useCart } from "@/store/cart";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
@@ -11,9 +12,14 @@ export function Header() {
   const [_, navigate] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [config, setConfig] = useState<SiteConfigData | null>(null);
   const accountRef = useRef<HTMLDivElement>(null);
   const cartTotal = useCart((state: any) => state.getTotalItems());
   const { isLoggedIn, customer, logout } = useCustomerAuth();
+
+  useEffect(() => {
+    siteConfigApi.getActive().then((data) => setConfig(data)).catch(() => {});
+  }, []);
 
   // Close account dropdown on outside click
   useEffect(() => {
@@ -25,6 +31,9 @@ export function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const navLinks = config?.nav_links ?? BRAND.navLinks;
+  const siteName = config?.site_name ?? BRAND.name;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-border py-3">
@@ -44,28 +53,13 @@ export function Header() {
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               className="absolute inset-0 rounded-full pointer-events-none"
             />
-            <img src={logoUrl} alt={BRAND.name} className="h-full w-full object-cover" />
+            <img src={logoUrl} alt={siteName} className="h-full w-full object-cover" />
           </motion.div>
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {BRAND.navLinks.slice(0, 1).map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-sm tracking-wide font-semibold text-foreground hover:text-primary transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
-          <a
-            href="#wholesale"
-            className="text-sm tracking-wide font-semibold text-foreground hover:text-primary transition-colors"
-          >
-            Wholesale
-          </a>
-          {BRAND.navLinks.slice(1).map((link) => (
+          {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
@@ -168,7 +162,7 @@ export function Header() {
                 className="h-12 w-12 rounded-full overflow-hidden ring-2 ring-[hsl(var(--accent))] ring-offset-2 ring-offset-background shadow-lg"
                 style={{ background: "white" }}
               >
-                <img src={logoUrl} alt={BRAND.name} className="h-full w-full object-cover" />
+                <img src={logoUrl} alt={siteName} className="h-full w-full object-cover" />
               </motion.div>
               <button
                 className="p-3 hover:bg-muted rounded-full"
@@ -179,7 +173,7 @@ export function Header() {
             </div>
 
             <nav className="flex flex-col gap-6 text-center">
-              {BRAND.navLinks.map((link) => (
+              {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
