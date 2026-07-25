@@ -727,6 +727,33 @@ export const adminApi = {
   deleteQualityFeature: async (id: number): Promise<{ success: boolean; message: string }> => {
     return apiFetch(`/admin/quality-features/${id}`, { method: 'DELETE' });
   },
+
+  // ── Tasting Notes (admin) ──
+
+  getTastingNotes: async (): Promise<TastingNoteData[]> => {
+    const response = await apiFetch<{ success: boolean; data: TastingNoteData[] }>('/admin/tasting-notes');
+    return response.data;
+  },
+
+  createTastingNote: async (data: Partial<TastingNoteData>): Promise<TastingNoteData> => {
+    const response = await apiFetch<{ success: boolean; data: TastingNoteData }>('/admin/tasting-notes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateTastingNote: async (id: number, data: Partial<TastingNoteData>): Promise<TastingNoteData> => {
+    const response = await apiFetch<{ success: boolean; data: TastingNoteData }>(`/admin/tasting-notes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteTastingNote: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/tasting-notes/${id}`, { method: 'DELETE' });
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -1104,6 +1131,26 @@ export const qualityFeaturesApi = {
   // Get active quality features (public)
   getActive: async (): Promise<QualityFeatureData[]> => {
     const response = await apiFetch<QualityFeatureData[]>('/quality-features/');
+    return response;
+  },
+};
+
+// ==================== TASTING NOTES API ====================
+
+export interface TastingNoteData {
+  id: number;
+  label: string;
+  value: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const tastingNotesApi = {
+  // Get active tasting notes (public)
+  getActive: async (): Promise<TastingNoteData[]> => {
+    const response = await apiFetch<TastingNoteData[]>('/tasting-notes/');
     return response;
   },
 };
