@@ -166,6 +166,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location === "/admin/recipes"}>
+                  <a href="/admin/recipes">
+                    <UtensilsCrossed className="h-4 w-4" />
+                    <span>Recipes</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
