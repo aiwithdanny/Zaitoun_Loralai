@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial, QualityFeature, TastingNote
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial, QualityFeature, TastingNote, WholesaleConfig, WholesaleSize
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate, QualityFeatureCreate, QualityFeatureUpdate, TastingNoteCreate, TastingNoteUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate, QualityFeatureCreate, QualityFeatureUpdate, TastingNoteCreate, TastingNoteUpdate, WholesaleConfigUpdate, WholesaleSizeCreate, WholesaleSizeUpdate
 
 router = APIRouter()
 
@@ -827,6 +827,99 @@ async def delete_tasting_note(
     db.delete(note)
     db.commit()
     return {"success": True, "message": "Tasting note deleted successfully"}
+
+
+# ─── WHOLESALE MANAGEMENT ─────────────────────────────────────────
+
+
+@router.get("/wholesale")
+async def get_wholesale_admin(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get wholesale config and sizes. Admin only."""
+    config = db.query(WholesaleConfig).first()
+    sizes = db.query(WholesaleSize).order_by(WholesaleSize.sort_order).all()
+    return {
+        "success": True,
+        "data": {
+            "config": config.to_dict() if config else None,
+            "sizes": [s.to_dict() for s in sizes],
+        },
+    }
+
+
+@router.put("/wholesale/config")
+async def update_wholesale_config(
+    data: WholesaleConfigUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create or update wholesale config. Admin only."""
+    config = db.query(WholesaleConfig).first()
+    update_data = data.model_dump(exclude_unset=True)
+
+    if config:
+        for field, value in update_data.items():
+            setattr(config, field, value)
+    else:
+        config = WholesaleConfig(**update_data)
+        db.add(config)
+
+    db.commit()
+    db.refresh(config)
+    return {"success": True, "data": config.to_dict(), "message": "Wholesale config saved successfully"}
+
+
+@router.post("/wholesale/sizes")
+async def create_wholesale_size(
+    data: WholesaleSizeCreate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a wholesale size. Admin only."""
+    size = WholesaleSize(**data.model_dump())
+    db.add(size)
+    db.commit()
+    db.refresh(size)
+    return {"success": True, "data": size.to_dict(), "message": "Wholesale size created successfully"}
+
+
+@router.put("/wholesale/sizes/{size_id}")
+async def update_wholesale_size(
+    size_id: int,
+    data: WholesaleSizeUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update a wholesale size. Admin only."""
+    size = db.query(WholesaleSize).filter(WholesaleSize.id == size_id).first()
+    if not size:
+        raise HTTPException(status_code=404, detail="Wholesale size not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(size, field, value)
+
+    db.commit()
+    db.refresh(size)
+    return {"success": True, "data": size.to_dict(), "message": "Wholesale size updated successfully"}
+
+
+@router.delete("/wholesale/sizes/{size_id}")
+async def delete_wholesale_size(
+    size_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a wholesale size. Admin only."""
+    size = db.query(WholesaleSize).filter(WholesaleSize.id == size_id).first()
+    if not size:
+        raise HTTPException(status_code=404, detail="Wholesale size not found")
+
+    db.delete(size)
+    db.commit()
+    return {"success": True, "message": "Wholesale size deleted successfully"}
 
 
 # ─── TESTIMONIALS MANAGEMENT ─────────────────────────────────────
