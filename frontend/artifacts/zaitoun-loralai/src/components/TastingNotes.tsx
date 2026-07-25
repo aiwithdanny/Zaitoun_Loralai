@@ -1,13 +1,32 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { tastingNotesApi, type TastingNoteData } from "@/lib/api";
 import { BRAND } from "@/lib/constants";
 
+const FALLBACK_NOTES: TastingNoteData[] = [
+  { id: 1, label: "Profile", value: BRAND.tasting.profile, sort_order: 0, is_active: true },
+  { id: 2, label: "Aroma", value: BRAND.tasting.aroma, sort_order: 1, is_active: true },
+  { id: 3, label: "Acidity", value: BRAND.tasting.acidity, sort_order: 2, is_active: true },
+  { id: 4, label: "Perfect For", value: BRAND.tasting.pairings, sort_order: 3, is_active: true },
+];
+
 export function TastingNotes() {
-  const notes = [
-    { label: "Profile", value: BRAND.tasting.profile },
-    { label: "Aroma", value: BRAND.tasting.aroma },
-    { label: "Acidity", value: BRAND.tasting.acidity },
-    { label: "Perfect For", value: BRAND.tasting.pairings },
-  ];
+  const [notes, setNotes] = useState<TastingNoteData[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    tastingNotesApi
+      .getActive()
+      .then((data) => {
+        if (data.length > 0) setNotes(data);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const activeNotes = notes.length > 0
+    ? [...notes].sort((a, b) => a.sort_order - b.sort_order)
+    : FALLBACK_NOTES;
 
   return (
     <section className="py-24 bg-white">
@@ -19,9 +38,9 @@ export function TastingNotes() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-            {notes.map((note, index) => (
+            {activeNotes.map((note, index) => (
               <motion.div 
-                key={index}
+                key={note.id ?? index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
