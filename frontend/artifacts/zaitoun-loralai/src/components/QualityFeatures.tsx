@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Droplet, Leaf, MapPin, Award } from "lucide-react";
+import { qualityFeaturesApi, type QualityFeatureData } from "@/lib/api";
 import { BRAND } from "@/lib/constants";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -8,6 +10,15 @@ const iconMap: Record<string, React.ReactNode> = {
   "map-pin": <MapPin className="w-8 h-8 stroke-1" />,
   "award": <Award className="w-8 h-8 stroke-1" />
 };
+
+const FALLBACK_FEATURES: QualityFeatureData[] = BRAND.quality.map((f, i) => ({
+  id: i + 1,
+  title: f.title,
+  description: f.description,
+  icon_name: f.icon,
+  sort_order: i,
+  is_active: true,
+}));
 
 const container = {
   hidden: { opacity: 0 },
@@ -25,6 +36,21 @@ const item = {
 };
 
 export function QualityFeatures() {
+  const [features, setFeatures] = useState<QualityFeatureData[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    qualityFeaturesApi
+      .getActive()
+      .then((data) => {
+        if (data.length > 0) setFeatures(data);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const activeFeatures = features.length > 0 ? features : FALLBACK_FEATURES;
+
   return (
     <section id="quality" className="py-24 bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 md:px-8">
@@ -40,10 +66,10 @@ export function QualityFeatures() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
         >
-          {BRAND.quality.map((feature, i) => (
-            <motion.div key={i} variants={item} className="flex flex-col items-center text-center group">
+          {activeFeatures.map((feature, i) => (
+            <motion.div key={feature.id ?? i} variants={item} className="flex flex-col items-center text-center group">
               <div className="w-16 h-16 rounded-full bg-primary-foreground/10 border border-primary-foreground/20 flex items-center justify-center text-accent mb-6 group-hover:scale-110 transition-transform duration-500">
-                {iconMap[feature.icon]}
+                {iconMap[feature.icon_name]}
               </div>
               <h3 className="font-serif text-xl text-white mb-3">{feature.title}</h3>
               <p className="text-primary-foreground/80 text-sm leading-relaxed">
