@@ -586,6 +586,38 @@ class QualityFeatureResponse(BaseModel):
         from_attributes = True
 
 
+# ==================== TASTING NOTE SCHEMAS ====================
+
+class TastingNoteCreate(BaseModel):
+    """Schema for creating a tasting note"""
+    label: str = Field(..., min_length=1, max_length=100, description="Note label (e.g. Profile, Aroma)")
+    value: str = Field(..., min_length=1, description="Note value text")
+    sort_order: int = Field(default=0, description="Display order (lower = first)")
+    is_active: bool = Field(default=True, description="Whether this note is active")
+
+
+class TastingNoteUpdate(BaseModel):
+    """Schema for updating a tasting note (all fields optional)"""
+    label: Optional[str] = Field(None, min_length=1, max_length=100)
+    value: Optional[str] = None
+    sort_order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class TastingNoteResponse(BaseModel):
+    """Schema for tasting note response"""
+    id: int
+    label: str
+    value: str
+    sort_order: int
+    is_active: bool
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== GENERIC RESPONSE SCHEMAS ====================
 
 class SuccessResponse(BaseModel):
