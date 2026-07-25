@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial, QualityFeature
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial, QualityFeature, TastingNote
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate, QualityFeatureCreate, QualityFeatureUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate, QualityFeatureCreate, QualityFeatureUpdate, TastingNoteCreate, TastingNoteUpdate
 
 router = APIRouter()
 
@@ -763,6 +763,70 @@ async def delete_quality_feature(
     db.delete(feature)
     db.commit()
     return {"success": True, "message": "Quality feature deleted successfully"}
+
+
+# ─── TASTING NOTES MANAGEMENT ─────────────────────────────────────
+
+
+@router.get("/tasting-notes")
+async def get_tasting_notes_admin(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get all tasting notes. Admin only."""
+    notes = db.query(TastingNote).order_by(TastingNote.sort_order).all()
+    return {"success": True, "data": [n.to_dict() for n in notes]}
+
+
+@router.post("/tasting-notes")
+async def create_tasting_note(
+    data: TastingNoteCreate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a tasting note. Admin only."""
+    note = TastingNote(**data.model_dump())
+    db.add(note)
+    db.commit()
+    db.refresh(note)
+    return {"success": True, "data": note.to_dict(), "message": "Tasting note created successfully"}
+
+
+@router.put("/tasting-notes/{note_id}")
+async def update_tasting_note(
+    note_id: int,
+    data: TastingNoteUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update a tasting note. Admin only."""
+    note = db.query(TastingNote).filter(TastingNote.id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Tasting note not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(note, field, value)
+
+    db.commit()
+    db.refresh(note)
+    return {"success": True, "data": note.to_dict(), "message": "Tasting note updated successfully"}
+
+
+@router.delete("/tasting-notes/{note_id}")
+async def delete_tasting_note(
+    note_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a tasting note. Admin only."""
+    note = db.query(TastingNote).filter(TastingNote.id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Tasting note not found")
+
+    db.delete(note)
+    db.commit()
+    return {"success": True, "message": "Tasting note deleted successfully"}
 
 
 # ─── TESTIMONIALS MANAGEMENT ─────────────────────────────────────
