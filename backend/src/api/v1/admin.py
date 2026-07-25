@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timedelta
 
-from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial
+from src.models import AdminUser, Product, Order, OrderItem, Customer, Review, Coupon, Founder, HomepageContent, StoryContent, RecipeContent, Recipe, Testimonial, QualityFeature
 from src.models.database import get_db
 from src.config.auth import (
     hash_password,
@@ -14,7 +14,7 @@ from src.config.auth import (
     create_access_token,
     get_current_user,
 )
-from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate
+from src.schemas import AdminLogin, AdminRegister, FounderCreate, FounderUpdate, HomepageContentUpdate, StoryContentUpdate, RecipeContentUpdate, RecipeCreate, RecipeUpdate, TestimonialCreate, TestimonialUpdate, QualityFeatureCreate, QualityFeatureUpdate
 
 router = APIRouter()
 
@@ -699,6 +699,70 @@ async def upload_recipe_image(
         )
 
     return {"success": True, "url": url, "message": "Image uploaded successfully"}
+
+
+# ─── QUALITY FEATURES MANAGEMENT ─────────────────────────────────
+
+
+@router.get("/quality-features")
+async def get_quality_features_admin(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get all quality features. Admin only."""
+    features = db.query(QualityFeature).order_by(QualityFeature.sort_order).all()
+    return {"success": True, "data": [f.to_dict() for f in features]}
+
+
+@router.post("/quality-features")
+async def create_quality_feature(
+    data: QualityFeatureCreate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a quality feature. Admin only."""
+    feature = QualityFeature(**data.model_dump())
+    db.add(feature)
+    db.commit()
+    db.refresh(feature)
+    return {"success": True, "data": feature.to_dict(), "message": "Quality feature created successfully"}
+
+
+@router.put("/quality-features/{feature_id}")
+async def update_quality_feature(
+    feature_id: int,
+    data: QualityFeatureUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update a quality feature. Admin only."""
+    feature = db.query(QualityFeature).filter(QualityFeature.id == feature_id).first()
+    if not feature:
+        raise HTTPException(status_code=404, detail="Quality feature not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(feature, field, value)
+
+    db.commit()
+    db.refresh(feature)
+    return {"success": True, "data": feature.to_dict(), "message": "Quality feature updated successfully"}
+
+
+@router.delete("/quality-features/{feature_id}")
+async def delete_quality_feature(
+    feature_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a quality feature. Admin only."""
+    feature = db.query(QualityFeature).filter(QualityFeature.id == feature_id).first()
+    if not feature:
+        raise HTTPException(status_code=404, detail="Quality feature not found")
+
+    db.delete(feature)
+    db.commit()
+    return {"success": True, "message": "Quality feature deleted successfully"}
 
 
 # ─── TESTIMONIALS MANAGEMENT ─────────────────────────────────────
