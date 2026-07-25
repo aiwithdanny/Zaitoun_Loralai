@@ -754,6 +754,41 @@ export const adminApi = {
   deleteTastingNote: async (id: number): Promise<{ success: boolean; message: string }> => {
     return apiFetch(`/admin/tasting-notes/${id}`, { method: 'DELETE' });
   },
+
+  // ── Wholesale (admin) ──
+
+  getWholesale: async (): Promise<{ config: WholesaleConfigData | null; sizes: WholesaleSizeData[] }> => {
+    const response = await apiFetch<{ success: boolean; data: { config: WholesaleConfigData | null; sizes: WholesaleSizeData[] } }>('/admin/wholesale');
+    return response.data;
+  },
+
+  updateWholesaleConfig: async (data: Partial<WholesaleConfigData>): Promise<WholesaleConfigData> => {
+    const response = await apiFetch<{ success: boolean; data: WholesaleConfigData }>('/admin/wholesale/config', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  createWholesaleSize: async (data: Partial<WholesaleSizeData>): Promise<WholesaleSizeData> => {
+    const response = await apiFetch<{ success: boolean; data: WholesaleSizeData }>('/admin/wholesale/sizes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateWholesaleSize: async (id: number, data: Partial<WholesaleSizeData>): Promise<WholesaleSizeData> => {
+    const response = await apiFetch<{ success: boolean; data: WholesaleSizeData }>(`/admin/wholesale/sizes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteWholesaleSize: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/wholesale/sizes/${id}`, { method: 'DELETE' });
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -1151,6 +1186,37 @@ export const tastingNotesApi = {
   // Get active tasting notes (public)
   getActive: async (): Promise<TastingNoteData[]> => {
     const response = await apiFetch<TastingNoteData[]>('/tasting-notes/');
+    return response;
+  },
+};
+
+// ==================== WHOLESALE API ====================
+
+export interface WholesaleConfigData {
+  id: number;
+  heading: string | null;
+  description: string | null;
+  cta_heading: string | null;
+  cta_description: string | null;
+  whatsapp_number: string | null;
+  whatsapp_message: string | null;
+  is_active: boolean;
+  updated_at: string;
+}
+
+export interface WholesaleSizeData {
+  id: number;
+  size_liters: number;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const wholesaleApi = {
+  // Get active wholesale config + sizes (public)
+  getActive: async (): Promise<{ config: WholesaleConfigData | null; sizes: WholesaleSizeData[] }> => {
+    const response = await apiFetch<{ config: WholesaleConfigData | null; sizes: WholesaleSizeData[] }>('/wholesale/');
     return response;
   },
 };
