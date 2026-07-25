@@ -551,6 +551,41 @@ class TestimonialResponse(BaseModel):
         from_attributes = True
 
 
+# ==================== QUALITY FEATURE SCHEMAS ====================
+
+class QualityFeatureCreate(BaseModel):
+    """Schema for creating a quality feature"""
+    title: str = Field(..., min_length=1, max_length=255, description="Feature title")
+    description: str = Field(..., min_length=1, description="Feature description")
+    icon_name: str = Field(default="leaf", max_length=100, description="Lucide icon name")
+    sort_order: int = Field(default=0, description="Display order (lower = first)")
+    is_active: bool = Field(default=True, description="Whether this feature is active")
+
+
+class QualityFeatureUpdate(BaseModel):
+    """Schema for updating a quality feature (all fields optional)"""
+    title: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    icon_name: Optional[str] = Field(None, max_length=100)
+    sort_order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class QualityFeatureResponse(BaseModel):
+    """Schema for quality feature response"""
+    id: int
+    title: str
+    description: str
+    icon_name: str
+    sort_order: int
+    is_active: bool
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== GENERIC RESPONSE SCHEMAS ====================
 
 class SuccessResponse(BaseModel):
