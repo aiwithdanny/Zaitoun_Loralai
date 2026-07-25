@@ -700,6 +700,33 @@ export const adminApi = {
     const result = await response.json();
     return result.url;
   },
+
+  // ── Quality Features (admin) ──
+
+  getQualityFeatures: async (): Promise<QualityFeatureData[]> => {
+    const response = await apiFetch<{ success: boolean; data: QualityFeatureData[] }>('/admin/quality-features');
+    return response.data;
+  },
+
+  createQualityFeature: async (data: Partial<QualityFeatureData>): Promise<QualityFeatureData> => {
+    const response = await apiFetch<{ success: boolean; data: QualityFeatureData }>('/admin/quality-features', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateQualityFeature: async (id: number, data: Partial<QualityFeatureData>): Promise<QualityFeatureData> => {
+    const response = await apiFetch<{ success: boolean; data: QualityFeatureData }>(`/admin/quality-features/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteQualityFeature: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/quality-features/${id}`, { method: 'DELETE' });
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -1056,6 +1083,27 @@ export const testimonialsApi = {
   // Get active testimonials (public)
   getActive: async (): Promise<TestimonialData[]> => {
     const response = await apiFetch<TestimonialData[]>('/testimonials/');
+    return response;
+  },
+};
+
+// ==================== QUALITY FEATURES API ====================
+
+export interface QualityFeatureData {
+  id: number;
+  title: string;
+  description: string;
+  icon_name: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const qualityFeaturesApi = {
+  // Get active quality features (public)
+  getActive: async (): Promise<QualityFeatureData[]> => {
+    const response = await apiFetch<QualityFeatureData[]>('/quality-features/');
     return response;
   },
 };
