@@ -789,6 +789,21 @@ export const adminApi = {
   deleteWholesaleSize: async (id: number): Promise<{ success: boolean; message: string }> => {
     return apiFetch(`/admin/wholesale/sizes/${id}`, { method: 'DELETE' });
   },
+
+  // ── Site Config (admin) ──
+
+  getSiteConfig: async (): Promise<SiteConfigData | null> => {
+    const response = await apiFetch<{ success: boolean; data: SiteConfigData | null }>('/admin/site-config');
+    return response.data;
+  },
+
+  updateSiteConfig: async (data: Partial<SiteConfigData>): Promise<SiteConfigData> => {
+    const response = await apiFetch<{ success: boolean; data: SiteConfigData }>('/admin/site-config', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
 };
 
 // ==================== CUSTOMER API ====================
@@ -1218,5 +1233,43 @@ export const wholesaleApi = {
   getActive: async (): Promise<{ config: WholesaleConfigData | null; sizes: WholesaleSizeData[] }> => {
     const response = await apiFetch<{ config: WholesaleConfigData | null; sizes: WholesaleSizeData[] }>('/wholesale/');
     return response;
+  },
+};
+
+// ==================== SITE CONFIG API ====================
+
+export interface NavLinkItem {
+  label: string;
+  href: string;
+}
+
+export interface SiteConfigData {
+  id: number;
+  site_name: string | null;
+  tagline: string | null;
+  logo_url: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  facebook_url: string | null;
+  instagram_url: string | null;
+  x_url: string | null;
+  youtube_url: string | null;
+  footer_about_text: string | null;
+  footer_copyright_text: string | null;
+  nav_links: NavLinkItem[] | null;
+  is_active: boolean;
+  updated_at: string;
+}
+
+export const siteConfigApi = {
+  // Get active site config (public)
+  getActive: async (): Promise<SiteConfigData | null> => {
+    try {
+      const response = await apiFetch<SiteConfigData>('/site-config/');
+      return response;
+    } catch {
+      return null;
+    }
   },
 };
