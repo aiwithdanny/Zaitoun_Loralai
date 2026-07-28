@@ -13,7 +13,7 @@ from datetime import datetime
 from src.models.database import get_db
 from src.models import Order
 from src.schemas import WhatsAppMessage, WhatsAppPaymentLink
-from src.payment_processor import process_payment_webhook
+from src.services.payment_processor import process_payment_webhook
 from src.utils.currency import format_price
 
 router = APIRouter()

@@ -31,7 +31,8 @@ Thumbs.db
 *.db
 test.db
 
-# Duplicate root-level images (originals in frontend/attached_assets/ and @assets alias)
+# Root-level assets moved into app assets
+# (originals were in frontend/attached_assets/)
 /*.png
 /*.webp
 

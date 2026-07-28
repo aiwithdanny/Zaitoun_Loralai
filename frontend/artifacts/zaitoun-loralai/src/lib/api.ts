@@ -3,7 +3,7 @@
  * Connects frontend to FastAPI backend using native fetch
  */
 
-import { MOCK_PRODUCTS } from './mockData';
+import { MOCK_PRODUCTS } from '../data/mockData';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 // API Base URL - Use env var for production, fallback to localhost for dev

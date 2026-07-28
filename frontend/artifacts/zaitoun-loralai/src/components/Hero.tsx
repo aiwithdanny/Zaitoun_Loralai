@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/constants";
 import { homepageApi, type HomepageData } from "@/lib/api";
 import { optimizeCloudinaryUrl } from "@/utils/cloudinary";
-import heroImg from "@/assets/zl-home-page.png.png";
+import heroImg from "@assets/zl-home-page.png.png";
 
 export function Hero() {
   const [content, setContent] = useState<HomepageData | null>(null);

@@ -6,6 +6,8 @@
 See [workflow/taste.md](workflow/taste.md)
 # architecture
 - Follow existing project patterns when adding similar features — reuse the same architectural approach (e.g., single-row config + multi-row CRUD pattern from Founder/Story) rather than inventing new patterns for each new feature. Confidence: 0.70
+- Prefer project structure organized by professional standards: clean frontend/backend separation, modular domain-driven organization, consistent naming conventions, scalable hierarchy, and clear purpose for every directory — not flat or ad-hoc layouts. Confidence: 0.70
+- When a feature needs both a configuration object (headings, descriptions, settings) and multiple child items (sizes, options, tiers), use a hybrid architectural pattern: a single-row DB table for config + a multi-row DB table for items, served together in a single public API response as `{config, items}`, and managed on one admin page with separate config form and items table sections. Confidence: 0.65
 
 # currency
 - Use PKR (Pakistani Rupees) for all pricing, displayed as "Rs. X,XXX" format with comma-separated thousands and no decimals. Confidence: 0.75
@@ -27,17 +29,16 @@ See [workflow/taste.md](workflow/taste.md)
 # documentation
 - For documentation/config sync/audit tasks: only update genuinely outdated or missing content based on actual built state; do not restructure documents, add new sections beyond what's needed, delete accurate content, or add speculative/future features. Confidence: 0.70
 
+# icons
+- For dynamic/admin-editable content sections that use icons, store icon component names (e.g., lucide-react icon names like "Leaf", "Clock", "MapPin", "Package") as strings in the database rather than icon URLs, image paths, or other representations. This enables rendering the actual icon component from the stored name. Confidence: 0.65
+
 # content
 - Never fabricate health/quality claims, nutritional data, tasting notes, or specific product facts — use honest placeholder states ("Content coming soon", commented `// PLACEHOLDER - awaiting real content from client`) until real content is provided by the client. Confidence: 0.85
 - Homepage sections should follow a professional olive oil brand narrative flow: Hero (first impression) → ProductGrid (what we sell) → Story (heritage) → QualityFeatures (why we're better) → TastingNotes (sensory experience) → WholesaleSection (bulk opportunity) → TestimonialSection (social proof) → About (human connection) → Recipes (usage inspiration). Each section has a distinct narrative role. Confidence: 0.75
 - Sections should maintain visual consistency — use the same background scheme (white/light) across all sections on a page unless there is an intentional design rationale for a different background. Avoid having a single section with a contrasting dark background that breaks the visual flow of the rest of the website. Confidence: 0.70
 
 # communication
-- When assigning a task, use a structured format with clear labelled sections (Current, Desired, Implementation, Files to Modify, Investigate/Report) — respond by following the same structured format with explicit file/line references and proposed changes. Confidence: 0.75
-- When planning implementation of new features, specify phases and prioritize them by business value (e.g., social proof > trust signals > product experience > B2B > navigation) with clear rationale labels — not by technical convenience. Confidence: 0.75
-- When performing an audit or inventory of codebase components (e.g. static vs dynamic status), present results as a comprehensive table with standardized columns per item (Status, Admin Editor, What's Dynamic, What Needs to Change) rather than prose descriptions — include a summary table plus detailed per-section breakdowns. Confidence: 0.70
-- Defer providing sensitive/unique information (URLs, API keys, credentials) until after the investigation plan is confirmed and the user explicitly approves proceeding — provide the plan framework first, then receive the specific details. Confidence: 0.70
-
+See [communication/taste.md](communication/taste.md)
 # wouter
 - Use wouter's `<Link>` component (with a `to` prop) instead of plain `<a>` tags for internal SPA navigation to prevent full page reloads. Confidence: 0.75
 

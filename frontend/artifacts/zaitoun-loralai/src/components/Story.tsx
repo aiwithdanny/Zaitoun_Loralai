@@ -1,15 +1,29 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/constants";
-import { storyApi, type StoryData } from "@/lib/api";
+import { storyApi, siteConfigApi, type StoryData } from "@/lib/api";
 import { optimizeCloudinaryUrl } from "@/utils/cloudinary";
-import storyImg from "@/assets/story.png";
+import storyImg from "@assets/story.png";
+
+function extractYouTubeId(url: string): string | null {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
 
 export function Story() {
   const [content, setContent] = useState<StoryData | null>(null);
+  const [siteConfig, setSiteConfig] = useState<{ youtube_url: string | null } | null>(null);
 
   useEffect(() => {
     storyApi.getActive().then(setContent).catch(() => {});
+    siteConfigApi.getActive().then(setSiteConfig).catch(() => {});
   }, []);
 
   const sectionTag = content?.section_tag || "Our Heritage";
@@ -68,27 +82,32 @@ export function Story() {
           
         </div>
 
-        {/* YouTube Video */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
-          className="mt-16 max-w-3xl mx-auto"
-        >
-          <p className="text-center text-xs uppercase tracking-widest text-accent mb-4">
-            Watch Our Story
-          </p>
-          <div className="aspect-video rounded-sm overflow-hidden shadow-lg">
-            <iframe
-              src="https://www.youtube.com/embed/dywW31FGlck"
-              title="Zaitoun Loralai — Our Story"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
-          </div>
-        </motion.div>
+        {(() => {
+          const videoId = siteConfig?.youtube_url ? extractYouTubeId(siteConfig.youtube_url) : null;
+          if (!videoId) return null;
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className="mt-16 max-w-3xl mx-auto"
+            >
+              <p className="text-center text-xs uppercase tracking-widest text-accent mb-4">
+                Watch Our Story
+              </p>
+              <div className="aspect-video rounded-sm overflow-hidden shadow-lg">
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title="Zaitoun Loralai — Our Story"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+              </div>
+            </motion.div>
+          );
+        })()}
       </div>
     </section>
   );

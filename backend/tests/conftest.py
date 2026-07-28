@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
-from main import app
+from src.main import app
 from src.models.database import Base, get_db
 from src.config.auth import create_access_token
 

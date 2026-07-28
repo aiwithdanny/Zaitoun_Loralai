@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/constants";
 import { recipesApi, type RecipeContentData, type RecipeData } from "@/lib/api";
 import { optimizeCloudinaryUrl } from "@/utils/cloudinary";
-import vegImg from "@/assets/recipe-roasted-veg.webp";
-import breadImg from "@/assets/recipe-bread.webp";
-import saladImg from "@/assets/recipe-salad.webp";
+import vegImg from "@assets/recipe-roasted-veg.webp";
+import breadImg from "@assets/recipe-bread.webp";
+import saladImg from "@assets/recipe-salad.webp";
 
 const fallbackImages = [vegImg, breadImg, saladImg];
 

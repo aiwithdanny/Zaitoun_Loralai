@@ -1,6 +1,7 @@
 # workflow
 - Use `npm run dev` from the project root (not standalone `npx vite`) to start the full stack; the dev server runs on port 3000, not 5173. Confidence: 0.75
 - Present a plan and get user approval before writing any code or final content. Confidence: 0.85
+- When presenting a plan, include the full plan content directly in the chat response — do not only reference a file path or say the plan is "saved" somewhere. The user expects to see the plan inline. Confidence: 0.80
 - Implement in this order: database migration first (with verification), then backend files, then frontend files — with build/import checks after each major step. Keep backend and frontend phases strictly sequential: verify backend endpoints work via API testing before moving to frontend implementation. Confidence: 0.82
 - Show real proof at each checkpoint (e.g., before/after data snapshots, live request/response output) rather than just confirmation statements. Confidence: 0.77
 - Investigate and report findings with file/line references before proposing or implementing any fix. Confidence: 0.73
@@ -10,7 +11,8 @@
 - Explicitly call out what is NOT in scope to maintain focus and prevent scope creep. Confidence: 0.73
 - When told to \"continue\" and the next task is ambiguous, ask the user to clarify what to continue with rather than picking up unrelated pending changes autonomously. Confidence: 0.85
 - Show a dry-run/preview before executing any data-modifying operations (database updates, backfills, bulk changes) — let the user review and approve before running the real thing. Confidence: 0.80
-- Investigate first without making any code changes — user will explicitly say when to proceed to implementation; do not skip ahead to proposing or writing fixes during the investigation phase. Confidence: 0.82
+- Investigate first without making any code changes — user will explicitly say when to proceed to implementation; do not skip ahead to proposing or writing fixes during the investigation phase. Confidence: 0.90
+- For project structure reorganization: do NOT modify source code logic or delete files — only move, rename, or restructure directories and files. Import path updates are acceptable as part of restructuring (they are not considered "logic changes"), but no business logic, component logic, or behavioral code should be altered. Report extra/unnecessary items without deleting them. Confidence: 0.80
 - When debugging, prefer direct code reading and analysis over runtime reproduction/tooling — if browser automation or similar tools repeatedly fail, switch to reading the relevant source files and reasoning through the logic by hand. Confidence: 0.80
 - Do not re-verify already-confirmed facts (e.g. backend verified working) — once confirmed, move on to the actual root cause and do not re-test the same thing repeatedly. Confidence: 0.80
 - For design refinements: read current implementation first, present proposed changes in a comparison table (current vs. proposed), get explicit user approval before implementing, then build check, let user visually confirm, and commit/push only after confirmation. Confidence: 0.80
@@ -19,4 +21,8 @@
 - When a frontend operation reports failure (e.g. toast error, fallback to localStorage), also check the database directly to confirm whether the operation genuinely failed or only appeared to fail — the data may have been created successfully despite a false error report. Confidence: 0.70
 - When making a small/scoped fix, make only the exact change requested — do not add extra event handlers, wrappers, or complexity beyond what was explicitly asked for. Confidence: 0.70
 - After implementing approved changes, commit and push to the remote repository (git add, git commit, git push) — do not leave changes sitting uncommitted locally. Confidence: 0.80
+- Commit and push after each individual implementation step (per the numbered order), not batching multiple steps into a single commit. Confidence: 0.78
 - Use descriptive, specific commit messages that summarize exactly what changed (e.g. "Update Wholesale: 3 sizes (100L, 500L, 1000L) + 2 images") rather than vague generic messages. Follow the user's exact commit message when explicitly provided. Confidence: 0.70
+- Before starting a new phase, verify that the previous phase's commits are pushed to the remote, deployed (e.g. to Vercel), and testable live — confirm the deployment status and ask if the user wants to test before proceeding, rather than assuming everything is already live. Confidence: 0.70
+- Admin sidebar must be exhaustive — every admin page route should have a corresponding sidebar navigation link; audit for missing links whenever a new admin page is added or when reviewing admin routes. Confidence: 0.78
+- When the user asks for a status check between phases, respond with a structured checklist covering: (1) committed locally and pushed to remote, (2) deployed to production (if applicable), (3) testable live on the website, (4) latest commit hash — answer each explicitly rather than giving a single yes/no. Confidence: 0.70
