@@ -6,6 +6,7 @@ import { useCart } from "@/store/cart";
 import { toast } from "sonner";
 import { formatPrice } from "@/utils/currency";
 import { productImages } from "@/lib/productImages";
+import { homepageApi } from "@/lib/api";
 import { ProductGroupCard } from "./ProductGroupCard";
 
 const container = {
@@ -30,6 +31,11 @@ const sortOptions = [
 export function ProductGrid() {
   const addItem = useCart((state) => state.addItem);
   const [justAdded, setJustAdded] = useState<Set<number>>(new Set());
+  const [homepageContent, setHomepageContent] = useState<{ product_section_tag: string | null; product_section_heading: string | null; product_section_description: string | null } | null>(null);
+
+  useEffect(() => {
+    homepageApi.getActive().then(setHomepageContent).catch(() => {});
+  }, []);
 
   // Filter state
   const [searchInput, setSearchInput] = useState('');
@@ -131,12 +137,12 @@ export function ProductGrid() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <p className="text-accent uppercase tracking-[0.2em] text-xs mb-4">Our Family Of Olive Oils</p>
+          <p className="text-accent uppercase tracking-[0.2em] text-xs mb-4">{homepageContent?.product_section_tag || "Our Family Of Olive Oils"}</p>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-foreground">
-            Choose Your Bottle
+            {homepageContent?.product_section_heading || "Choose Your Bottle"}
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto text-sm leading-relaxed">
-            From everyday kitchen essentials to premium gifts — find the perfect size for every need, all sharing the same uncompromising quality.
+            {homepageContent?.product_section_description || "From everyday kitchen essentials to premium gifts — find the perfect size for every need, all sharing the same uncompromising quality."}
           </p>
         </motion.div>
 

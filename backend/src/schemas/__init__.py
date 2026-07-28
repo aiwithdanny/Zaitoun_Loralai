@@ -18,6 +18,7 @@ from src.schemas.content import (
     TestimonialCreate, TestimonialUpdate, TestimonialResponse,
     QualityFeatureCreate, QualityFeatureUpdate, QualityFeatureResponse,
     TastingNoteCreate, TastingNoteUpdate, TastingNoteResponse,
+    ProductAccordionCreate, ProductAccordionUpdate, ProductAccordionResponse,
 )
 from src.schemas.wholesale import (
     WholesaleConfigUpdate, WholesaleConfigResponse,

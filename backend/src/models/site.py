@@ -24,6 +24,7 @@ class SiteConfig(Base):
     footer_about_text = Column(Text)
     footer_copyright_text = Column(String(500))
     nav_links = Column(JSON)
+    footer_legal_links = Column(JSON)
     is_active = Column(Boolean, default=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -43,6 +44,7 @@ class SiteConfig(Base):
             "footer_about_text": self.footer_about_text,
             "footer_copyright_text": self.footer_copyright_text,
             "nav_links": self.nav_links,
+            "footer_legal_links": self.footer_legal_links,
             "is_active": self.is_active,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

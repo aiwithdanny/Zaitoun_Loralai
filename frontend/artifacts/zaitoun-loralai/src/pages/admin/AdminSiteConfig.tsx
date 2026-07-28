@@ -23,6 +23,7 @@ const emptyForm = {
   footer_about_text: '',
   footer_copyright_text: '',
   nav_links: [{ label: '', href: '' }] as { label: string; href: string }[],
+  footer_legal_links: [] as { label: string; href: string }[],
   is_active: true,
 };
 
@@ -56,6 +57,9 @@ export default function AdminSiteConfig() {
           nav_links: config.nav_links && config.nav_links.length > 0
             ? config.nav_links.map(n => ({ label: n.label, href: n.href }))
             : [{ label: '', href: '' }],
+          footer_legal_links: config.footer_legal_links && config.footer_legal_links.length > 0
+            ? config.footer_legal_links.map(n => ({ label: n.label, href: n.href }))
+            : [],
           is_active: config.is_active ?? true,
         });
       }
@@ -70,7 +74,12 @@ export default function AdminSiteConfig() {
     try {
       setSaving(true);
       const cleanNavLinks = form.nav_links.filter(n => n.label.trim() && n.href.trim());
-      await adminApi.updateSiteConfig({ ...form, nav_links: cleanNavLinks.length > 0 ? cleanNavLinks : [] });
+      const cleanLegalLinks = form.footer_legal_links.filter(n => n.label.trim() && n.href.trim());
+      await adminApi.updateSiteConfig({
+        ...form,
+        nav_links: cleanNavLinks.length > 0 ? cleanNavLinks : [],
+        footer_legal_links: cleanLegalLinks.length > 0 ? cleanLegalLinks : [],
+      });
       toast.success('Site config saved successfully');
       await fetchData();
     } catch (err: any) {
@@ -92,6 +101,20 @@ export default function AdminSiteConfig() {
     const updated = [...form.nav_links];
     updated[index] = { ...updated[index], [field]: value };
     setForm({ ...form, nav_links: updated });
+  };
+
+  const addLegalLink = () => {
+    setForm({ ...form, footer_legal_links: [...form.footer_legal_links, { label: '', href: '' }] });
+  };
+
+  const removeLegalLink = (index: number) => {
+    setForm({ ...form, footer_legal_links: form.footer_legal_links.filter((_, i) => i !== index) });
+  };
+
+  const updateLegalLink = (index: number, field: 'label' | 'href', value: string) => {
+    const updated = [...form.footer_legal_links];
+    updated[index] = { ...updated[index], [field]: value };
+    setForm({ ...form, footer_legal_links: updated });
   };
 
   if (loading) {
@@ -315,6 +338,53 @@ export default function AdminSiteConfig() {
               />
               <button
                 onClick={() => removeNavLink(i)}
+                className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                title="Remove link"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Legal Links */}
+      <div className="bg-white rounded-lg shadow mb-8">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Legal Links</h2>
+            <p className="text-xs text-gray-500 mt-0.5">These appear in the footer</p>
+          </div>
+          <button
+            onClick={addLegalLink}
+            className="flex items-center gap-1 px-3 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition"
+          >
+            <Plus className="w-4 h-4" />
+            Add Link
+          </button>
+        </div>
+        <div className="p-6 space-y-3">
+          {form.footer_legal_links.length === 0 && (
+            <p className="text-sm text-gray-400 italic">No legal links added yet.</p>
+          )}
+          {form.footer_legal_links.map((link, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <input
+                type="text"
+                value={link.label}
+                onChange={(e) => updateLegalLink(i, 'label', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                placeholder="Label (e.g. Privacy Policy)"
+              />
+              <input
+                type="text"
+                value={link.href}
+                onChange={(e) => updateLegalLink(i, 'href', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                placeholder="Href (e.g. /privacy-policy)"
+              />
+              <button
+                onClick={() => removeLegalLink(i)}
                 className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
                 title="Remove link"
               >

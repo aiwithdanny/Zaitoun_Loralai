@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from src.models import (
     Founder, HomepageContent, StoryContent, RecipeContent, Recipe,
     Testimonial, QualityFeature, TastingNote,
+    ProductAccordion,
     WholesaleConfig, WholesaleSize, SiteConfig,
 )
 from src.models.database import get_db
@@ -20,6 +21,7 @@ from src.schemas import (
     TestimonialCreate, TestimonialUpdate,
     QualityFeatureCreate, QualityFeatureUpdate,
     TastingNoteCreate, TastingNoteUpdate,
+    ProductAccordionCreate, ProductAccordionUpdate,
     WholesaleConfigUpdate, WholesaleSizeCreate, WholesaleSizeUpdate,
     SiteConfigUpdate,
 )
@@ -501,3 +503,57 @@ async def update_site_config(
     db.commit()
     db.refresh(config)
     return {"success": True, "data": config.to_dict(), "message": "Site config saved successfully"}
+
+
+# ─── PRODUCT ACCORDIONS ──────────────────────────────────────────────
+
+@router.get("/product-accordions")
+async def get_product_accordions_admin(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    sections = db.query(ProductAccordion).order_by(ProductAccordion.sort_order).all()
+    return {"success": True, "data": [s.to_dict() for s in sections]}
+
+
+@router.post("/product-accordions")
+async def create_product_accordion(
+    data: ProductAccordionCreate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    section = ProductAccordion(**data.model_dump())
+    db.add(section)
+    db.commit()
+    db.refresh(section)
+    return {"success": True, "data": section.to_dict(), "message": "Accordion section created successfully"}
+
+
+@router.put("/product-accordions/{section_id}")
+async def update_product_accordion(
+    section_id: int, data: ProductAccordionUpdate,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    section = db.query(ProductAccordion).filter(ProductAccordion.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Accordion section not found")
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(section, field, value)
+    db.commit()
+    db.refresh(section)
+    return {"success": True, "data": section.to_dict(), "message": "Accordion section updated successfully"}
+
+
+@router.delete("/product-accordions/{section_id}")
+async def delete_product_accordion(
+    section_id: int,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    section = db.query(ProductAccordion).filter(ProductAccordion.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Accordion section not found")
+    db.delete(section)
+    db.commit()
+    return {"success": True, "message": "Accordion section deleted successfully"}

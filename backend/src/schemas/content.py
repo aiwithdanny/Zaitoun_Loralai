@@ -66,6 +66,9 @@ class HomepageContentUpdate(BaseModel):
     hero_description: Optional[str] = None
     hero_primary_cta_text: Optional[str] = Field(None, max_length=255)
     hero_secondary_cta_text: Optional[str] = Field(None, max_length=255)
+    product_section_tag: Optional[str] = Field(None, max_length=255)
+    product_section_heading: Optional[str] = Field(None, max_length=255)
+    product_section_description: Optional[str] = None
     is_active: Optional[bool] = None
 
 
@@ -78,6 +81,9 @@ class HomepageContentResponse(BaseModel):
     hero_description: Optional[str]
     hero_primary_cta_text: Optional[str]
     hero_secondary_cta_text: Optional[str]
+    product_section_tag: Optional[str]
+    product_section_heading: Optional[str]
+    product_section_description: Optional[str]
     is_active: bool
     updated_at: Optional[datetime]
 
@@ -267,6 +273,38 @@ class TastingNoteResponse(BaseModel):
     id: int
     label: str
     value: str
+    sort_order: int
+    is_active: bool
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        from_attributes = True
+
+
+# ==================== PRODUCT ACCORDION SCHEMAS ====================
+
+class ProductAccordionCreate(BaseModel):
+    """Schema for creating a product accordion section"""
+    title: str = Field(..., min_length=1, max_length=255, description="Accordion title")
+    content: str = Field(..., min_length=1, description="Accordion content (HTML supported)")
+    sort_order: int = Field(default=0, description="Display order (lower = first)")
+    is_active: bool = Field(default=True, description="Whether this section is active")
+
+
+class ProductAccordionUpdate(BaseModel):
+    """Schema for updating a product accordion section (all fields optional)"""
+    title: Optional[str] = Field(None, min_length=1, max_length=255)
+    content: Optional[str] = None
+    sort_order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class ProductAccordionResponse(BaseModel):
+    """Schema for product accordion response"""
+    id: int
+    title: str
+    content: str
     sort_order: int
     is_active: bool
     created_at: Optional[datetime]

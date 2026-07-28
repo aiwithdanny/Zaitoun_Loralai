@@ -16,6 +16,9 @@ const emptyForm = {
   hero_description: '',
   hero_primary_cta_text: '',
   hero_secondary_cta_text: '',
+  product_section_tag: '',
+  product_section_heading: '',
+  product_section_description: '',
   is_active: true,
 };
 
@@ -46,6 +49,9 @@ export default function AdminHomepage() {
           hero_description: data.hero_description || '',
           hero_primary_cta_text: data.hero_primary_cta_text || '',
           hero_secondary_cta_text: data.hero_secondary_cta_text || '',
+          product_section_tag: data.product_section_tag || '',
+          product_section_heading: data.product_section_heading || '',
+          product_section_description: data.product_section_description || '',
           is_active: data.is_active,
         });
       }
@@ -237,18 +243,6 @@ export default function AdminHomepage() {
               placeholder="Learn More"
             />
           </div>
-
-          {/* Active toggle */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="is_active"
-              checked={form.is_active}
-              onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Active</label>
-          </div>
         </div>
 
         {/* Live Preview */}
@@ -293,6 +287,58 @@ export default function AdminHomepage() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Products Section */}
+      <div className="bg-white rounded-lg shadow p-6 space-y-5 mt-6">
+        <h2 className="text-lg font-semibold text-gray-900">Products Section</h2>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Section Tag</label>
+          <input
+            type="text"
+            value={form.product_section_tag}
+            onChange={(e) => setForm({ ...form, product_section_tag: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Our Family Of Olive Oils"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Heading</label>
+          <input
+            type="text"
+            value={form.product_section_heading}
+            onChange={(e) => setForm({ ...form, product_section_heading: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Choose Your Bottle"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea
+            value={form.product_section_description}
+            onChange={(e) => setForm({ ...form, product_section_description: e.target.value })}
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-vertical"
+            placeholder="From everyday kitchen essentials to premium gifts — find the perfect size for every need, all sharing the same uncompromising quality."
+          />
+        </div>
+      </div>
+
+      {/* Active toggle */}
+      <div className="bg-white rounded-lg shadow p-6 mt-6">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="is_active"
+            checked={form.is_active}
+            onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
+            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Active</label>
         </div>
       </div>
 

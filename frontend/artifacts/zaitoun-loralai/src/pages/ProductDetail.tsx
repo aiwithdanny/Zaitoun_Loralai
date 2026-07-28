@@ -11,6 +11,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { productImages } from "@/lib/productImages";
 import { formatPrice } from "@/utils/currency";
+import { productAccordionApi, type ProductAccordionData } from "@/lib/api";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -94,6 +95,12 @@ export function ProductDetail() {
     total_count: 0,
     distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
   };
+
+  // Accordion sections
+  const [accordionSections, setAccordionSections] = useState<ProductAccordionData[]>([]);
+  useEffect(() => {
+    productAccordionApi.getActive().then(setAccordionSections).catch(() => {});
+  }, []);
 
   const groupName = sorted.length > 0 ? stripSizeSuffix(sorted[0].name) : "";
   const category = sorted.length > 0 ? (sorted[0].category || "Loralai, Pakistan") : "";
@@ -390,111 +397,16 @@ export function ProductDetail() {
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="quality">
-                  <AccordionTrigger className="font-serif text-lg text-foreground">
-                    Quality &amp; Health Benefits
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-3">
-                    <p>
-                      Zaitoun Extra Virgin Olive Oil is rich in heart-healthy monounsaturated fats and natural antioxidants. Our cold-pressed oil retains high levels of polyphenols (557 mg/kg) that help reduce inflammation and protect against chronic diseases.
-                    </p>
-                    <div>
-                      <p className="font-medium text-foreground mb-1">Key benefits:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Supports cardiovascular health by maintaining healthy cholesterol levels</li>
-                        <li>Rich in Vitamin E and natural antioxidants</li>
-                        <li>Anti-inflammatory properties</li>
-                        <li>Promotes digestive health</li>
-                        <li>May help regulate blood sugar levels</li>
-                      </ul>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="usage">
-                  <AccordionTrigger className="font-serif text-lg text-foreground">
-                    How To Use / Best For
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-3">
-                    <p>
-                      Perfect for everyday cooking and direct consumption. With a medium-high smoke point (210°C), it's ideal for:
-                    </p>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Salad dressings and vinaigrettes</li>
-                      <li>Drizzling over grilled vegetables, pasta, and bread</li>
-                      <li>Sautéing and light frying</li>
-                      <li>Pakistani dishes (daal, sabzi, karahi)</li>
-                      <li>Finishing dishes for extra flavor</li>
-                    </ul>
-                    <p>
-                      Store in a cool, dark place away from direct sunlight. Best used within 6 months of opening.
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="flavour">
-                  <AccordionTrigger className="font-serif text-lg text-foreground">
-                    Flavour Profile
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-3">
-                    <p>Zaitoun Extra Virgin Olive Oil offers a balanced, harmonious flavor profile:</p>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Medium fruitiness with fresh, grassy notes</li>
-                      <li>Pleasant peppery finish (indicates high polyphenol content)</li>
-                      <li>Subtle hints of green almond and fresh herbs</li>
-                      <li>Smooth, clean, and well-rounded taste</li>
-                      <li>Distinctive without being overpowering</li>
-                    </ul>
-                    <p>Perfect for those who appreciate authentic, premium olive oil.</p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="ingredients">
-                  <AccordionTrigger className="font-serif text-lg text-foreground">
-                    Ingredients
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed space-y-3">
-                    <p className="font-medium text-foreground">100% Pure Extra Virgin Olive Oil</p>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Cold-pressed from premium olives</li>
-                      <li>No additives</li>
-                      <li>No preservatives</li>
-                      <li>No artificial flavors</li>
-                      <li>No blending with other oils</li>
-                    </ul>
-                    <p>Sourced from carefully selected olives grown in the rich soils of Loralai, Pakistan.</p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="nutrition">
-                  <AccordionTrigger className="font-serif text-lg text-foreground">
-                    Nutritional Info
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Per 100ml</p>
-                    <div className="w-full text-sm divide-y divide-border/50">
-                      {[
-                        ["Energy", "884 kcal"],
-                        ["Total Fat", "100g"],
-                        ["Saturated Fat", "14g"],
-                        ["Monounsaturated Fat", "73g"],
-                        ["Polyunsaturated Fat", "11g"],
-                        ["Cholesterol", "0mg"],
-                        ["Sodium", "0mg"],
-                        ["Total Carbohydrate", "0g"],
-                        ["Protein", "0g"],
-                        ["Vitamin E", "12mg (80% RDA)"],
-                      ].map(([label, value], i) => (
-                        <div key={i} className="flex justify-between py-1.5">
-                          <span className={label.includes("Fat") && i >= 2 ? "text-muted-foreground/70 pl-4" : "text-muted-foreground"}>
-                            {label}
-                          </span>
-                          <span className="font-medium">{value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                {accordionSections.map((section) => (
+                  <AccordionItem key={section.id} value={`accordion-${section.id}`}>
+                    <AccordionTrigger className="font-serif text-lg text-foreground">
+                      {section.title}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                      <div dangerouslySetInnerHTML={{ __html: section.content }} />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
               </Accordion>
             </div>
           </div>

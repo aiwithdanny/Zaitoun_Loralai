@@ -15,6 +15,7 @@ from .content import (
     Founder, HomepageContent, StoryContent,
     RecipeContent, Recipe,
     Testimonial, QualityFeature, TastingNote,
+    ProductAccordion,
 )
 from .review import Review
 from .wishlist import Wishlist
@@ -31,6 +32,7 @@ __all__ = [
     "Founder", "HomepageContent", "StoryContent",
     "RecipeContent", "Recipe",
     "Testimonial", "QualityFeature", "TastingNote",
+    "ProductAccordion",
     "WholesaleConfig", "WholesaleSize",
     "SiteConfig",
 ]

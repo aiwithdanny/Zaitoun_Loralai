@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell, Tag, Crown, Home, BookOpen, UtensilsCrossed, Star, Award, Wine, Truck, Settings } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, MessageSquare, LogOut, Bell, Tag, Crown, Home, BookOpen, UtensilsCrossed, Star, Award, Wine, Truck, Settings, FileText } from "lucide-react";
 import logoSrc from "@assets/logo-2.png";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { adminApi } from "@/lib/api";
@@ -75,6 +75,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <a href="/admin/products">
                     <Package className="h-4 w-4" />
                     <span>Products</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location === "/admin/product-accordions"}>
+                  <a href="/admin/product-accordions">
+                    <FileText className="h-4 w-4" />
+                    <span>Product Info</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>

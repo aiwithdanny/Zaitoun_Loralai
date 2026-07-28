@@ -755,6 +755,33 @@ export const adminApi = {
     return apiFetch(`/admin/tasting-notes/${id}`, { method: 'DELETE' });
   },
 
+  // ── Product Accordions (admin) ──
+
+  getProductAccordions: async (): Promise<ProductAccordionData[]> => {
+    const response = await apiFetch<{ success: boolean; data: ProductAccordionData[] }>('/admin/product-accordions');
+    return response.data;
+  },
+
+  createProductAccordion: async (data: Partial<ProductAccordionData>): Promise<ProductAccordionData> => {
+    const response = await apiFetch<{ success: boolean; data: ProductAccordionData }>('/admin/product-accordions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  updateProductAccordion: async (id: number, data: Partial<ProductAccordionData>): Promise<ProductAccordionData> => {
+    const response = await apiFetch<{ success: boolean; data: ProductAccordionData }>(`/admin/product-accordions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+
+  deleteProductAccordion: async (id: number): Promise<{ success: boolean; message: string }> => {
+    return apiFetch(`/admin/product-accordions/${id}`, { method: 'DELETE' });
+  },
+
   // ── Wholesale (admin) ──
 
   getWholesale: async (): Promise<{ config: WholesaleConfigData | null; sizes: WholesaleSizeData[] }> => {
@@ -1030,6 +1057,9 @@ export interface HomepageData {
   hero_description: string | null;
   hero_primary_cta_text: string | null;
   hero_secondary_cta_text: string | null;
+  product_section_tag: string | null;
+  product_section_heading: string | null;
+  product_section_description: string | null;
   is_active: boolean;
   updated_at: string;
 }
@@ -1205,6 +1235,26 @@ export const tastingNotesApi = {
   },
 };
 
+// ==================== PRODUCT ACCORDION API ====================
+
+export interface ProductAccordionData {
+  id: number;
+  title: string;
+  content: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const productAccordionApi = {
+  // Get active product accordion sections (public)
+  getActive: async (): Promise<ProductAccordionData[]> => {
+    const response = await apiFetch<ProductAccordionData[]>('/product-accordions/');
+    return response;
+  },
+};
+
 // ==================== WHOLESALE API ====================
 
 export interface WholesaleConfigData {
@@ -1243,6 +1293,11 @@ export interface NavLinkItem {
   href: string;
 }
 
+export interface FooterLegalLinkItem {
+  label: string;
+  href: string;
+}
+
 export interface SiteConfigData {
   id: number;
   site_name: string | null;
@@ -1258,6 +1313,7 @@ export interface SiteConfigData {
   footer_about_text: string | null;
   footer_copyright_text: string | null;
   nav_links: NavLinkItem[] | null;
+  footer_legal_links: FooterLegalLinkItem[] | null;
   is_active: boolean;
   updated_at: string;
 }

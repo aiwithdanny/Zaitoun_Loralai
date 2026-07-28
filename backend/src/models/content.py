@@ -63,6 +63,9 @@ class HomepageContent(Base):
     hero_description = Column(Text)
     hero_primary_cta_text = Column(String(255))
     hero_secondary_cta_text = Column(String(255))
+    product_section_tag = Column(String(255))
+    product_section_heading = Column(String(255))
+    product_section_description = Column(Text)
     is_active = Column(Boolean, default=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -75,6 +78,9 @@ class HomepageContent(Base):
             "hero_description": self.hero_description,
             "hero_primary_cta_text": self.hero_primary_cta_text,
             "hero_secondary_cta_text": self.hero_secondary_cta_text,
+            "product_section_tag": self.product_section_tag,
+            "product_section_heading": self.product_section_heading,
+            "product_section_description": self.product_section_description,
             "is_active": self.is_active,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
@@ -219,6 +225,29 @@ class TastingNote(Base):
             "id": self.id,
             "label": self.label,
             "value": self.value,
+            "sort_order": self.sort_order,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class ProductAccordion(Base):
+    __tablename__ = "product_accordions"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(255), nullable=False)
+    content = Column(Text, nullable=False)
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "content": self.content,
             "sort_order": self.sort_order,
             "is_active": self.is_active,
             "created_at": self.created_at.isoformat() if self.created_at else None,

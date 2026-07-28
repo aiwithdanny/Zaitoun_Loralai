@@ -34,6 +34,14 @@ export function Footer() {
   const xUrl = config?.x_url ?? "https://x.com/zaitoun_loralai";
   const copyrightText = config?.footer_copyright_text ?? `${BRAND.name}. All rights reserved.`;
   const aboutText = config?.footer_about_text ?? `${BRAND.tagline}. Purveyors of exceptionally crafted extra virgin olive oil from the mountains.`;
+  const legalLinks = config?.footer_legal_links ?? [
+    { label: "Wholesale", href: "#wholesale" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Service", href: "/terms-of-service" },
+    { label: "Refund Policy", href: "/refund-policy" },
+    { label: "FAQs", href: "/faqs" },
+    { label: "Track Order", href: "/track-order" },
+  ];
 
   return (
     <footer id="contact" className="bg-[#1C1C16] text-[#FAF7F2] py-20">
@@ -116,12 +124,13 @@ export function Footer() {
         <div className="pt-8 border-t border-[#FAF7F2]/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#FAF7F2]/40">
           <p>&copy; {new Date().getFullYear()} {copyrightText}</p>
           <div className="flex flex-wrap gap-4 md:gap-6">
-            <a href="#wholesale" className="hover:text-white transition-colors">Wholesale</a>
-            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
-            <Link href="/faqs" className="hover:text-white transition-colors">FAQs</Link>
-            <Link href="/track-order" className="hover:text-white transition-colors">Track Order</Link>
+            {legalLinks.map((link) => (
+              link.href.startsWith("#") ? (
+                <a key={link.label} href={link.href} className="hover:text-white transition-colors">{link.label}</a>
+              ) : (
+                <Link key={link.label} href={link.href} className="hover:text-white transition-colors">{link.label}</Link>
+              )
+            ))}
           </div>
         </div>
       </div>

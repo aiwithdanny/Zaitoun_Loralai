@@ -13,6 +13,12 @@ class NavLinkItem(BaseModel):
     href: str
 
 
+class FooterLegalLinkItem(BaseModel):
+    """Schema for a single footer legal link"""
+    label: str
+    href: str
+
+
 class SiteConfigUpdate(BaseModel):
     """Schema for updating site config (all fields optional)"""
     site_name: Optional[str] = None
@@ -28,6 +34,7 @@ class SiteConfigUpdate(BaseModel):
     footer_about_text: Optional[str] = None
     footer_copyright_text: Optional[str] = None
     nav_links: Optional[List[NavLinkItem]] = None
+    footer_legal_links: Optional[List[FooterLegalLinkItem]] = None
     is_active: Optional[bool] = None
 
 
@@ -47,6 +54,7 @@ class SiteConfigResponse(BaseModel):
     footer_about_text: Optional[str]
     footer_copyright_text: Optional[str]
     nav_links: Optional[List[NavLinkItem]]
+    footer_legal_links: Optional[List[FooterLegalLinkItem]]
     is_active: bool
     updated_at: Optional[datetime]
 
