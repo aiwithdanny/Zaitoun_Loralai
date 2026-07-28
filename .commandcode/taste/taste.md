@@ -5,7 +5,7 @@
 # workflow
 See [workflow/taste.md](workflow/taste.md)
 # architecture
-- Follow existing project patterns when adding similar features — reuse the same architectural approach (e.g., single-row config + multi-row CRUD pattern from Founder/Story) rather than inventing new patterns for each new feature. Confidence: 0.70
+- Follow existing project patterns when adding similar features — reuse the same architectural approach (e.g., single-row config + multi-row CRUD pattern from Founder/Story) rather than inventing new patterns for each new feature. Confidence: 0.75
 - Prefer project structure organized by professional standards: clean frontend/backend separation, modular domain-driven organization, consistent naming conventions, scalable hierarchy, and clear purpose for every directory — not flat or ad-hoc layouts. Confidence: 0.70
 - When a feature needs both a configuration object (headings, descriptions, settings) and multiple child items (sizes, options, tiers), use a hybrid architectural pattern: a single-row DB table for config + a multi-row DB table for items, served together in a single public API response as `{config, items}`, and managed on one admin page with separate config form and items table sections. Confidence: 0.65
 
@@ -35,6 +35,7 @@ See [workflow/taste.md](workflow/taste.md)
 
 # content
 - Never fabricate health/quality claims, nutritional data, tasting notes, or specific product facts — use honest placeholder states ("Content coming soon", commented `// PLACEHOLDER - awaiting real content from client`) until real content is provided by the client. Confidence: 0.85
+- Prefer giving admins full control over content (store as text/HTML for admin editing) rather than leaving sections hardcoded — when given the choice between making only certain items dynamic versus making everything dynamic with rich text support, choose full admin flexibility. Confidence: 0.65
 - Homepage sections should follow a professional olive oil brand narrative flow: Hero (first impression) → ProductGrid (what we sell) → Story (heritage) → QualityFeatures (why we're better) → TastingNotes (sensory experience) → WholesaleSection (bulk opportunity) → TestimonialSection (social proof) → About (human connection) → Recipes (usage inspiration). Each section has a distinct narrative role. Confidence: 0.75
 - Sections should maintain visual consistency — use the same background scheme (white/light) across all sections on a page unless there is an intentional design rationale for a different background. Avoid having a single section with a contrasting dark background that breaks the visual flow of the rest of the website. Confidence: 0.70
 

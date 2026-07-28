@@ -1,6 +1,7 @@
 # workflow
 - Use `npm run dev` from the project root (not standalone `npx vite`) to start the full stack; the dev server runs on port 3000, not 5173. Confidence: 0.75
 - Present a plan and get user approval before writing any code or final content. Confidence: 0.85
+- Label implementation phases as "Phase X" (Phase A, Phase B, etc.) with clear priority levels (High, Medium, Low) — the user uses this convention to organize and track progress across multiple sequential work items. Confidence: 0.75
 - When presenting a plan, include the full plan content directly in the chat response — do not only reference a file path or say the plan is "saved" somewhere. The user expects to see the plan inline. Confidence: 0.80
 - Implement in this order: database migration first (with verification), then backend files, then frontend files — with build/import checks after each major step. Keep backend and frontend phases strictly sequential: verify backend endpoints work via API testing before moving to frontend implementation. Confidence: 0.82
 - Show real proof at each checkpoint (e.g., before/after data snapshots, live request/response output) rather than just confirmation statements. Confidence: 0.77
@@ -25,4 +26,5 @@
 - Use descriptive, specific commit messages that summarize exactly what changed (e.g. "Update Wholesale: 3 sizes (100L, 500L, 1000L) + 2 images") rather than vague generic messages. Follow the user's exact commit message when explicitly provided. Confidence: 0.70
 - Before starting a new phase, verify that the previous phase's commits are pushed to the remote, deployed (e.g. to Vercel), and testable live — confirm the deployment status and ask if the user wants to test before proceeding, rather than assuming everything is already live. Confidence: 0.70
 - Admin sidebar must be exhaustive — every admin page route should have a corresponding sidebar navigation link; audit for missing links whenever a new admin page is added or when reviewing admin routes. Confidence: 0.78
+- When adding new admin sidebar items, place them in a logical position near related items (e.g., "Product Info" between "Products" and "Reviews") rather than at the end or in an arbitrary spot. Confidence: 0.60
 - When the user asks for a status check between phases, respond with a structured checklist covering: (1) committed locally and pushed to remote, (2) deployed to production (if applicable), (3) testable live on the website, (4) latest commit hash — answer each explicitly rather than giving a single yes/no. Confidence: 0.70
