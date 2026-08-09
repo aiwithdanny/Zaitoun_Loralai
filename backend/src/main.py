@@ -105,16 +105,21 @@ app.include_router(site_config.router, prefix="/api/v1/site-config", tags=["Site
 # catches OPTIONS at the outermost layer and responds with CORS headers directly.
 # For non-OPTIONS requests it passes through to FastAPI (which handles CORS via
 # the CORSMiddleware above).
+#
+# The wrapper is implemented by subclassing FastAPI and overriding __call__,
+# so the module-level `app` stays a real FastAPI instance. This keeps platform
+# entry-point discovery working (e.g. FastAPI Cloud requires the entrypoint to
+# resolve to a FastAPI instance) while preserving the raw-ASGI CORS behavior.
 
-_fastapi_app = app  # save the fully-configured FastAPI app
+_fastapi_app = app  # the fully-configured FastAPI app
 
 # Build the FULL middleware stack (CORSMiddleware + RateLimitMiddleware + server
-# error middleware). The outer ASGI wrapper must dispatch through this stack —
-# calling the bare app would bypass every middleware.
+# error middleware). The ASGI wrapper must dispatch through this stack — calling
+# the bare app would bypass every middleware.
 _middleware_stack = app.build_middleware_stack()
 
 
-async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
+async def _outer_asgi_call(scope: Scope, receive: Receive, send: Send) -> None:
     if scope["type"] != "http":
         await _middleware_stack(scope, receive, send)
         return
@@ -161,5 +166,20 @@ async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
     await _middleware_stack(scope, receive, _send_with_cors)
 
 
-# Replace app with the ASGI-wrapped version
-app = _outer_asgi_app
+class WrappedFastAPI(FastAPI):
+    """FastAPI app that routes all ASGI calls through the outer CORS wrapper.
+
+    Reassigning the existing app instance's ``__class__`` to this subclass
+    keeps every route/middleware/exception handler already registered while
+    changing ``__call__`` resolution to the wrapper — and the module-level
+    ``app`` stays a real ``FastAPI`` instance, which entry-point discovery
+    tools (fastapi CLI, FastAPI Cloud) require.
+    """
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        await _outer_asgi_call(scope, receive, send)
+
+
+# `app` remains the FastAPI instance (with all routes/middleware/handlers
+# registered above) but now serves every request through the CORS wrapper.
+app.__class__ = WrappedFastAPI
