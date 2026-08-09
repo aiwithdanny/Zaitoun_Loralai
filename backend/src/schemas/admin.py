@@ -2,9 +2,11 @@
 Admin schemas
 """
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 from datetime import datetime
+
+from src.config.auth import validate_password_strength
 
 
 class AdminLogin(BaseModel):
@@ -27,12 +29,10 @@ class AdminRegister(BaseModel):
     email: EmailStr = Field(..., description="Admin email")
     password: str = Field(..., min_length=8, description="Admin password (min 8 chars for security)")
 
-    @validator("password")
+    @field_validator("password")
+    @classmethod
     def password_must_be_strong(cls, v):
-        if not any(c.isupper() for c in v):
-            raise ValueError("Password must contain at least one uppercase letter")
-        if not any(c.isdigit() for c in v):
-            raise ValueError("Password must contain at least one digit")
+        validate_password_strength(v)
         return v
 
     class Config:

@@ -2,9 +2,11 @@
 Customer schemas
 """
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 from datetime import datetime
+
+from src.config.auth import validate_password_strength
 
 
 class CustomerRegister(BaseModel):
@@ -13,6 +15,12 @@ class CustomerRegister(BaseModel):
     email: EmailStr = Field(..., description="Customer email")
     phone: str = Field(..., min_length=10, max_length=20, description="Customer phone number")
     password: str = Field(..., min_length=8, description="Password (min 8 chars)")
+
+    @field_validator("password")
+    @classmethod
+    def password_must_be_strong(cls, v):
+        validate_password_strength(v)
+        return v
 
     class Config:
         json_schema_extra = {
