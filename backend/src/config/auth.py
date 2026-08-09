@@ -11,9 +11,20 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 
 # Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
+SECRET_KEY = os.getenv("SECRET_KEY", "")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
+
+_DEV_FALLBACK_KEYS = {
+    "dev-secret-key-change-in-production",
+    "dev-secret-key-very-insecure-change-in-production",
+    "your-secret-key-change-in-production",
+}
+if not SECRET_KEY or SECRET_KEY in _DEV_FALLBACK_KEYS:
+    raise RuntimeError(
+        "SECRET_KEY is missing or set to a known dev placeholder. "
+        "Set a strong random SECRET_KEY in the environment before starting."
+    )
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
