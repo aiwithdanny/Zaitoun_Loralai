@@ -41,6 +41,7 @@ app.add_exception_handler(Exception, generic_exception_handler)
 # rejected by the browser (no Access-Control-Allow-Origin header).
 from src.config.cors import build_cors_origins, is_origin_allowed
 from src.config.rate_limit import RateLimitMiddleware
+from src.config.security_headers import SecurityHeadersMiddleware
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,6 +50,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RateLimitMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 @app.get("/health")
