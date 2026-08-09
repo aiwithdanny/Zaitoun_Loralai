@@ -36,24 +36,14 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
 # ── CORS Middleware ──
-# FRONTEND_URL and CORS_ORIGINS env vars allow explicit Vercel/production domains.
-# "*" is kept as fallback so the API works from any deployment preview branch.
-def _build_cors_origins():
-    origins = ["*"]
-    fe_url = os.getenv("FRONTEND_URL", "").strip()
-    if fe_url and fe_url not in origins:
-        origins.append(fe_url)
-    extra = os.getenv("CORS_ORIGINS", "").strip()
-    if extra:
-        for origin in extra.split(","):
-            origin = origin.strip()
-            if origin and origin not in origins:
-                origins.append(origin)
-    return origins
+# Origins come from src/config/cors.py — production domains plus FRONTEND_URL
+# / CORS_ORIGINS env overrides. No wildcard fallback: unlisted origins are
+# rejected by the browser (no Access-Control-Allow-Origin header).
+from src.config.cors import build_cors_origins, is_origin_allowed
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_build_cors_origins(),
+    allow_origins=build_cors_origins(),
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
@@ -130,10 +120,11 @@ async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
     # ── Handle OPTIONS preflight here (before FastAPI sees it) ──
     if scope["method"] == "OPTIONS":
         res = Response(status_code=204)
-        res.headers["Access-Control-Allow-Origin"] = origin if origin else "*"
-        res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-        res.headers["Access-Control-Allow-Headers"] = "*"
-        res.headers["Access-Control-Max-Age"] = "86400"
+        if is_origin_allowed(origin):
+            res.headers["Access-Control-Allow-Origin"] = origin
+            res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+            res.headers["Access-Control-Allow-Headers"] = "*"
+            res.headers["Access-Control-Max-Age"] = "86400"
         await res(scope, receive, send)
         return
 
@@ -147,8 +138,8 @@ async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
             headers = list(message.get("headers", []))
             # Only add if not already present (avoid duplication with CORSMiddleware)
             has_cors = any(h[0] == b"access-control-allow-origin" for h in headers)
-            if not has_cors:
-                headers.append((b"access-control-allow-origin", origin.encode() if origin else b"*"))
+            if not has_cors and origin and is_origin_allowed(origin):
+                headers.append((b"access-control-allow-origin", origin.encode()))
                 headers.append((b"access-control-allow-methods", b"GET, POST, PUT, DELETE, OPTIONS, PATCH"))
                 headers.append((b"access-control-allow-headers", b"*"))
                 message["headers"] = headers

@@ -129,11 +129,14 @@ class ExternalServiceError(ZaitounException):
 
 # Exception handlers
 def _cors_response(request, resp: JSONResponse) -> JSONResponse:
-    """Add CORS headers to an error response."""
+    """Add CORS headers to an error response (only for allowlisted origins)."""
+    from src.config.cors import is_origin_allowed
+
     origin = request.headers.get("origin", "")
-    resp.headers["Access-Control-Allow-Origin"] = origin if origin else "*"
-    resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-    resp.headers["Access-Control-Allow-Headers"] = "*"
+    if origin and is_origin_allowed(origin):
+        resp.headers["Access-Control-Allow-Origin"] = origin
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        resp.headers["Access-Control-Allow-Headers"] = "*"
     return resp
 
 
