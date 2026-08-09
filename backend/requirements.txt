@@ -1,5 +1,6 @@
 fastapi
 uvicorn[standard]
+slowapi
 python-multipart
 sqlalchemy==2.0.32
 pymysql==1.1.0

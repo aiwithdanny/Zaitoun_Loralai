@@ -40,6 +40,7 @@ app.add_exception_handler(Exception, generic_exception_handler)
 # / CORS_ORIGINS env overrides. No wildcard fallback: unlisted origins are
 # rejected by the browser (no Access-Control-Allow-Origin header).
 from src.config.cors import build_cors_origins, is_origin_allowed
+from src.config.rate_limit import RateLimitMiddleware
 
 app.add_middleware(
     CORSMiddleware,
@@ -47,6 +48,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
+app.add_middleware(RateLimitMiddleware)
 
 
 @app.get("/health")
@@ -104,11 +106,20 @@ app.include_router(site_config.router, prefix="/api/v1/site-config", tags=["Site
 
 _fastapi_app = app  # save the fully-configured FastAPI app
 
+# Build the FULL middleware stack (CORSMiddleware + RateLimitMiddleware + server
+# error middleware). The outer ASGI wrapper must dispatch through this stack —
+# calling the bare app would bypass every middleware.
+_middleware_stack = app.build_middleware_stack()
+
 
 async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
     if scope["type"] != "http":
-        await _fastapi_app(scope, receive, send)
+        await _middleware_stack(scope, receive, send)
         return
+
+    # Make sure the FastAPI app is exposed on the scope so middleware that
+    # reads request.app (e.g. the rate limiter) sees the real app.
+    scope["app"] = _fastapi_app
 
     # Read Origin once at the top
     origin = ""
@@ -145,7 +156,7 @@ async def _outer_asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
                 message["headers"] = headers
         await send(message)
 
-    await _fastapi_app(scope, receive, _send_with_cors)
+    await _middleware_stack(scope, receive, _send_with_cors)
 
 
 # Replace app with the ASGI-wrapped version
