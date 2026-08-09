@@ -219,7 +219,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </button>
           {user && (
             <span className="text-sm text-muted-foreground">
-              {user.username}
+              Welcome, Admin
             </span>
           )}
         </header>
