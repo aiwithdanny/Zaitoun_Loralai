@@ -3,15 +3,17 @@ Image upload endpoint — admin only.
 Accepts multipart/form-data file, uploads to Cloudinary, returns the URL.
 """
 
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Depends
 
 from src.config.auth import get_current_user
-from src.config.cloudinary import upload_image
+from src.services.image_service import (
+    MAX_SIZE,
+    validate_image_type,
+    validate_image_size,
+    upload_image_bytes,
+)
 
 router = APIRouter()
-
-ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
-MAX_SIZE = 5 * 1024 * 1024  # 5MB
 
 
 @router.post("/upload-image")
@@ -24,30 +26,16 @@ async def upload_product_image(
     Accepted formats: JPEG, PNG, WebP. Max size: 5MB."""
 
     # Validate content type
-    if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type '{file.content_type}'. Allowed: {', '.join(sorted(ALLOWED_TYPES))}",
-        )
+    validate_image_type(file.content_type)
 
     # Read file bytes
     file_bytes = await file.read()
 
     # Validate size
-    if len(file_bytes) > MAX_SIZE:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"File too large ({len(file_bytes) / 1024 / 1024:.1f}MB). Maximum: 5MB.",
-        )
+    validate_image_size(file_bytes)
 
     # Upload to Cloudinary
-    try:
-        url = upload_image(file_bytes, file.filename or "product.jpg")
-    except RuntimeError as e:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=str(e),
-        )
+    url = upload_image_bytes(file_bytes, file.filename or "product.jpg")
 
     return {
         "success": True,

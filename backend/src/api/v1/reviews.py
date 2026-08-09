@@ -11,13 +11,15 @@ from typing import Optional
 from src.models import Review, Customer, Order, OrderItem, Product
 from src.models.database import get_db
 from src.config.auth import get_current_customer, get_current_user
-from src.config.cloudinary import upload_image
+from src.services.image_service import (
+    MAX_SIZE,
+    validate_image_type,
+    validate_image_size,
+    upload_image_bytes,
+)
 from src.schemas import ReviewCreate
 
 router = APIRouter()
-
-ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
-MAX_SIZE = 5 * 1024 * 1024  # 5MB
 
 
 def _compute_aggregate(product_group_id: str, db: Session) -> dict:
@@ -110,27 +112,13 @@ async def upload_review_image(
     """Upload a review photo to Cloudinary. Requires customer JWT.
     Accepted formats: JPEG, PNG, WebP. Max size: 5MB."""
 
-    if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type '{file.content_type}'. Allowed: {', '.join(sorted(ALLOWED_TYPES))}",
-        )
+    validate_image_type(file.content_type)
 
     file_bytes = await file.read()
 
-    if len(file_bytes) > MAX_SIZE:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"File too large ({len(file_bytes) / 1024 / 1024:.1f}MB). Maximum: 5MB.",
-        )
+    validate_image_size(file_bytes)
 
-    try:
-        url = upload_image(file_bytes, file.filename or "review.jpg")
-    except RuntimeError as e:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=str(e),
-        )
+    url = upload_image_bytes(file_bytes, file.filename or "review.jpg")
 
     return {
         "success": True,

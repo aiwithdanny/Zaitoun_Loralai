@@ -4,24 +4,32 @@ Admin image upload endpoints
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, status
 from src.config.auth import get_current_user
+from src.services.image_service import (
+    ALLOWED_TYPES,
+    MAX_SIZE,
+    upload_image,
+)
 
 router = APIRouter()
 
 
 def _validate_and_upload(file: UploadFile, folder: str) -> str:
-    """Common file validation and Cloudinary upload logic."""
-    from src.config.cloudinary import upload_image
+    """Common file validation and Cloudinary upload logic.
+
+    Preserves the original admin/uploads.py behavior: brief error
+    messages, sync file read, RuntimeError from Cloudinary bubbles up
+    (generic 500 handler) — matching the pre-refactor endpoint.
+    """
     import secrets
 
-    allowed_types = {"image/jpeg", "image/png", "image/webp"}
-    if file.content_type not in allowed_types:
+    if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid file type. Allowed: {', '.join(allowed_types)}"
+            detail=f"Invalid file type. Allowed: {', '.join(ALLOWED_TYPES)}"
         )
 
     contents = file.file.read()
-    if len(contents) > 5 * 1024 * 1024:
+    if len(contents) > MAX_SIZE:
         raise HTTPException(
             status_code=400,
             detail="File too large. Maximum size is 5MB"
