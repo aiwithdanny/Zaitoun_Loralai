@@ -165,12 +165,17 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         })
 
     logger.warning(f"Validation error: {errors}")
+    # Surface the first specific reason at the top level so clients can
+    # show the real problem (e.g. "Password must be at least 8 characters
+    # long") instead of a generic "Request validation failed". The full
+    # errors list is still included for callers that need every issue.
+    detail = errors[0]["message"] if errors else "Request validation failed"
     return _cors_response(request, JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "success": False,
             "error_code": "VALIDATION_ERROR",
-            "detail": "Request validation failed",
+            "detail": detail,
             "errors": errors,
             "timestamp": __import__('datetime').datetime.utcnow().isoformat()
         }

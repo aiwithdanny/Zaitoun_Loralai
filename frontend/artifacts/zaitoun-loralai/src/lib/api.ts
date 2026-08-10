@@ -75,7 +75,15 @@ async function apiFetch<T>(
     const errorData = await response.json().catch(() => ({
       detail: `HTTP error ${response.status}`,
     }));
-    throw new Error(errorData.detail || `Request failed with status ${response.status}`);
+    // Prefer the specific validation reason when present (e.g. the
+    // backend surfaces the first field error in `errors[0].message` /
+    // `detail` for 422s), so users see the real problem instead of a
+    // generic "Request validation failed".
+    const specificError =
+      errorData?.errors?.[0]?.message || errorData?.detail;
+    throw new Error(
+      specificError || `Request failed with status ${response.status}`,
+    );
   }
 
   return response.json();

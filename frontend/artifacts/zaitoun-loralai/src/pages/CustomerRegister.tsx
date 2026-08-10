@@ -122,6 +122,7 @@ export default function CustomerRegister() {
                   disabled={loading}
                   className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition disabled:bg-muted"
                 />
+                <p className="mt-1 text-xs text-muted-foreground">At least 8 characters</p>
               </div>
 
               <button

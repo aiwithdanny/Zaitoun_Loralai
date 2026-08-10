@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 from datetime import datetime
 
-from src.config.auth import validate_password_strength
+from src.config.auth import validate_customer_password
 
 
 class CustomerRegister(BaseModel):
@@ -18,8 +18,8 @@ class CustomerRegister(BaseModel):
 
     @field_validator("password")
     @classmethod
-    def password_must_be_strong(cls, v):
-        validate_password_strength(v)
+    def password_meets_min_length(cls, v):
+        validate_customer_password(v)
         return v
 
     class Config:

@@ -37,8 +37,12 @@ PASSWORD_MIN_LENGTH = 8
 
 
 def validate_password_strength(password: str) -> None:
-    """Enforce the app-wide password policy; raise ValueError with the
-    first violated rule. Applied on registration (admin + customer)."""
+    """Enforce the STRICT password policy; raise ValueError with the
+    first violated rule. Applied on ADMIN registration only — admin
+    accounts control the whole site and need stronger protection.
+
+    Rules: min 8 chars + lowercase + uppercase + digit.
+    """
     if len(password) < PASSWORD_MIN_LENGTH:
         raise ValueError(
             f"Password must be at least {PASSWORD_MIN_LENGTH} characters long"
@@ -49,6 +53,18 @@ def validate_password_strength(password: str) -> None:
         raise ValueError("Password must contain at least one uppercase letter")
     if not any(c.isdigit() for c in password):
         raise ValueError("Password must contain at least one digit")
+
+
+def validate_customer_password(password: str) -> None:
+    """Enforce the CUSTOMER password policy — minimum length only.
+
+    Deliberately lighter than the admin policy so customer signup stays
+    frictionless; raised ValueError carries the specific reason.
+    """
+    if len(password) < PASSWORD_MIN_LENGTH:
+        raise ValueError(
+            f"Password must be at least {PASSWORD_MIN_LENGTH} characters long"
+        )
 
 
 def _prepare_password(password: str) -> str:
