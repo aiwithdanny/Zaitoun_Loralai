@@ -32,7 +32,13 @@ export function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const navLinks = config?.nav_links ?? BRAND.navLinks;
+  // Fall back to the brand default links when the DB config has no custom
+  // links (an empty array should NOT suppress the nav — only a null/absent
+  // config or a non-empty array is meaningful).
+  const navLinks =
+    config?.nav_links && config.nav_links.length > 0
+      ? config.nav_links
+      : BRAND.navLinks;
   const siteName = config?.site_name ?? BRAND.name;
 
   return (

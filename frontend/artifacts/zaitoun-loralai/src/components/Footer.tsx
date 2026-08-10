@@ -24,7 +24,12 @@ export function Footer() {
   };
 
   const siteName = config?.site_name ?? BRAND.name;
-  const navLinks = config?.nav_links ?? BRAND.navLinks;
+  // Empty nav_links in the DB config should fall back to the brand defaults
+  // (an empty array means "no custom links configured", not "hide the nav").
+  const navLinks =
+    config?.nav_links && config.nav_links.length > 0
+      ? config.nav_links
+      : BRAND.navLinks;
   const tagline = config?.tagline ?? BRAND.tagline;
   const emailAddr = config?.email ?? "info@Zaitoun.loralai@gmail.com";
   const phone = config?.phone ?? "03425583198";
