@@ -15,6 +15,9 @@ env/
 *.sqlite
 *.sqlite3
 
+# Local database backups (may contain customer data — never commit)
+backups/
+
 # IDE
 .idea/
 .vscode/
