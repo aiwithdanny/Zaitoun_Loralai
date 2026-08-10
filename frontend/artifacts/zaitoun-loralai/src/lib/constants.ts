@@ -1,6 +1,21 @@
 export const SITE_URL = "https://zaitoun-loralai-1mtz.vercel.app";
 export const OG_IMAGE = `${SITE_URL}/opengraph.jpg`;
 
+/**
+ * Return `value` when it is a non-empty string, otherwise `fallback`.
+ *
+ * Treats empty strings the same as null/undefined so DB-backed config
+ * values that are blank (e.g. an unconfigured site_config row with "")
+ * fall back to the brand/hardcoded defaults instead of wiping them.
+ * (`??` only handles nullish, so `"" ?? fallback` keeps the empty string.)
+ */
+export function valueOr(
+  value: string | null | undefined,
+  fallback: string,
+): string {
+  return value && value.trim().length > 0 ? value : fallback;
+}
+
 export const BRAND = {
   name: "Zaitoun Loralai",
   tagline: "Crafted from the heart of Pakistan",

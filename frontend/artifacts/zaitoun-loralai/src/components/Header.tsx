@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { ShoppingCart, Menu, X, User, ChevronDown, Package, LogOut } from "lucide-react";
 import { siteConfigApi, type SiteConfigData } from "@/lib/api";
-import { BRAND } from "@/lib/constants";
+import { BRAND, valueOr } from "@/lib/constants";
 import { useCart } from "@/store/cart";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import logoUrl from "@assets/Official_Logo_1782757596768.webp";
@@ -39,7 +39,7 @@ export function Header() {
     config?.nav_links && config.nav_links.length > 0
       ? config.nav_links
       : BRAND.navLinks;
-  const siteName = config?.site_name ?? BRAND.name;
+  const siteName = valueOr(config?.site_name, BRAND.name);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-border py-3">

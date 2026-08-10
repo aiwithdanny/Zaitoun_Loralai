@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { siteConfigApi, type SiteConfigData } from "@/lib/api";
-import { BRAND } from "@/lib/constants";
+import { BRAND, valueOr } from "@/lib/constants";
 import { useNewsletterSubscription } from "@/hooks/useNewsletter";
 import logoUrl from "@assets/Official_Logo_1782757596768.webp";
 import { Facebook, ArrowRight, Loader2 } from "lucide-react";
@@ -23,22 +23,22 @@ export function Footer() {
     }
   };
 
-  const siteName = config?.site_name ?? BRAND.name;
+  const siteName = valueOr(config?.site_name, BRAND.name);
   // Empty nav_links in the DB config should fall back to the brand defaults
   // (an empty array means "no custom links configured", not "hide the nav").
   const navLinks =
     config?.nav_links && config.nav_links.length > 0
       ? config.nav_links
       : BRAND.navLinks;
-  const tagline = config?.tagline ?? BRAND.tagline;
-  const emailAddr = config?.email ?? "info@Zaitoun.loralai@gmail.com";
-  const phone = config?.phone ?? "03425583198";
-  const address = config?.address ?? "Loralai, Balochistan";
-  const facebookUrl = config?.facebook_url ?? "https://www.facebook.com/zaitounloralai";
-  const instagramUrl = config?.instagram_url ?? "https://www.instagram.com/zaitounloralai";
-  const xUrl = config?.x_url ?? "https://x.com/zaitoun_loralai";
-  const copyrightText = config?.footer_copyright_text ?? `${BRAND.name}. All rights reserved.`;
-  const aboutText = config?.footer_about_text ?? `${BRAND.tagline}. Purveyors of exceptionally crafted extra virgin olive oil from the mountains.`;
+  const tagline = valueOr(config?.tagline, BRAND.tagline);
+  const emailAddr = valueOr(config?.email, "info@Zaitoun.loralai@gmail.com");
+  const phone = valueOr(config?.phone, "03425583198");
+  const address = valueOr(config?.address, "Loralai, Balochistan");
+  const facebookUrl = valueOr(config?.facebook_url, "https://www.facebook.com/zaitounloralai");
+  const instagramUrl = valueOr(config?.instagram_url, "https://www.instagram.com/zaitounloralai");
+  const xUrl = valueOr(config?.x_url, "https://x.com/zaitoun_loralai");
+  const copyrightText = valueOr(config?.footer_copyright_text, `${BRAND.name}. All rights reserved.`);
+  const aboutText = valueOr(config?.footer_about_text, `${BRAND.tagline}. Purveyors of exceptionally crafted extra virgin olive oil from the mountains.`);
   const legalLinks = config?.footer_legal_links ?? [
     { label: "Wholesale", href: "#wholesale" },
     { label: "Privacy Policy", href: "/privacy-policy" },
