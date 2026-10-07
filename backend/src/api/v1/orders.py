@@ -78,11 +78,19 @@ async def create_order(
     order_items = []
 
     for item in order_data.items:
-        product = db.query(Product).filter(Product.id == item.product_id).first()
+        # FOR UPDATE: lock the product row for the whole transaction so two
+        # concurrent orders can't both pass the stock check and oversell.
+        product = db.query(Product).filter(Product.id == item.product_id).with_for_update().first()
         if not product:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Product with ID {item.product_id} not found"
+            )
+
+        if not product.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"{product.name} is not available for purchase"
             )
 
         if product.stock < item.quantity:
@@ -91,13 +99,16 @@ async def create_order(
                 detail=f"Insufficient stock for {product.name}"
             )
 
-        subtotal = product.price * item.quantity
+        # Charge the effective (sale) price — the storefront shows
+        # discount_price, so the backend must honor it too.
+        effective_price = product.discount_price if product.discount_price else product.price
+        subtotal = effective_price * item.quantity
         total_amount += subtotal
 
         order_items.append({
             "product_id": product.id,
             "product_name": product.name,
-            "product_price": product.price,
+            "product_price": effective_price,
             "quantity": item.quantity,
             "subtotal": subtotal
         })
@@ -108,7 +119,9 @@ async def create_order(
     # ── Coupon validation ──
     discount_amount = 0.0
     if order_data.coupon_code:
-        coupon = db.query(Coupon).filter(Coupon.code == order_data.coupon_code.upper().strip()).first()
+        # FOR UPDATE: lock the coupon row so concurrent orders can't both
+        # consume the last use and exceed usage_limit.
+        coupon = db.query(Coupon).filter(Coupon.code == order_data.coupon_code.upper().strip()).with_for_update().first()
         if not coupon:
             raise HTTPException(status_code=400, detail="Coupon not found")
         if not coupon.is_active:
