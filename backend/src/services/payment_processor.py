@@ -4,6 +4,7 @@ Handles extracting order numbers from messages and processing payments
 """
 
 import re
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from datetime import datetime
 from src.models import Order
@@ -23,13 +24,17 @@ def extract_order_number(text: str) -> str | None:
 
 def extract_confirmation_keywords(text: str) -> bool:
     """
-    Check if message contains payment confirmation keywords
+    Check if message contains payment confirmation keywords.
+
+    NOTE: deliberately excludes bare single-word replies like "ok",
+    "yes", "done" — those are far too ambiguous ("Is this ok?" would
+    falsely confirm). Require explicit payment language.
     """
     confirmation_keywords = [
         'paid', 'payment confirmed', 'payment done', 'payment received',
-        'transfer done', 'amount sent', 'confirmed', 'payment successful',
+        'transfer done', 'amount sent', 'payment successful',
         'جی ہے', 'paid ha', 'bheji',  # Urdu/Pakistani variations
-        'ok', 'yes', 'yes sir', 'done', 'completed'
+        'yes sir', 'completed payment',
     ]
 
     text_lower = text.lower()
@@ -64,10 +69,16 @@ def process_payment_webhook(
             'message': 'No order number found in message'
         }
 
-    # Find order in database
+    # Find order in database. Phone must match the order's customer phone
+    # (with or without leading '+'). Uses sqlalchemy.or_ — a plain Python
+    # `or` between SQLAlchemy clauses raises TypeError and would crash
+    # every webhook call.
     order = db.query(Order).filter(
         Order.order_number == order_number,
-        Order.customer_phone == from_phone or Order.customer_phone == from_phone.lstrip('+')
+        or_(
+            Order.customer_phone == from_phone,
+            Order.customer_phone == from_phone.lstrip('+'),
+        ),
     ).first()
 
     if not order:
@@ -76,6 +87,16 @@ def process_payment_webhook(
             'order_number': order_number,
             'action_taken': 'order_not_found',
             'message': f'Order {order_number} not found or phone number mismatch'
+        }
+
+    # Idempotency: never re-process an order that is already paid —
+    # duplicate webhook deliveries must not overwrite state.
+    if order.payment_status == 'paid':
+        return {
+            'success': True,
+            'order_number': order_number,
+            'action_taken': 'already_paid',
+            'message': f'Order {order_number} is already marked as paid'
         }
 
     # Check if message contains payment confirmation

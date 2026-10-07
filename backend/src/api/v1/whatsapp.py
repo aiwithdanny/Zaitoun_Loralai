@@ -15,6 +15,7 @@ from src.models import Order
 from src.schemas import WhatsAppMessage, WhatsAppPaymentLink
 from src.services.payment_processor import process_payment_webhook
 from src.utils.currency import format_price
+from src.config.auth import get_current_user
 
 router = APIRouter()
 
@@ -23,17 +24,25 @@ WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
 WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
 WHATSAPP_API_URL = "https://graph.facebook.com/v18.0"
 WEBHOOK_VERIFY_TOKEN = os.getenv("WEBHOOK_VERIFY_TOKEN", "zaitoun-webhook-token")
-WEBHOOK_APP_SECRET = os.getenv("WHATSAPP_API_TOKEN")
+# Meta signs webhooks with the App Secret (NOT the API token). The server
+# operator MUST set WHATSAPP_APP_SECRET — without it, webhook verification
+# refuses all requests instead of silently using the wrong secret.
+WEBHOOK_APP_SECRET = os.getenv("WHATSAPP_APP_SECRET")
 
 
 @router.post("/send-message")
 async def send_whatsapp_message(
-    phone_number: str,
-    message: str,
-    component_name: str = "button",
-    button_text: str = "Contact Us"
+    body: WhatsAppMessage,
+    current_user: str = Depends(get_current_user),
 ):
-    """Send a WhatsApp message to customer"""
+    """Send a WhatsApp message to a customer (admin only).
+
+    Requires admin authentication — an open endpoint would let anyone
+    send messages as the business (spam/phishing, Meta account risk).
+    Body params (not query params) so phone/message don't land in logs.
+    """
+    phone_number = body.phone_number
+    message = body.message
     if not WHATSAPP_API_TOKEN or not WHATSAPP_PHONE_NUMBER_ID:
         raise HTTPException(
             status_code=500,
@@ -68,17 +77,31 @@ async def send_whatsapp_message(
 
 @router.post("/payment-link")
 async def create_payment_link(
-    phone_number: str,
-    amount: float,
-    description: str,
-    order_number: str,
+    body: WhatsAppPaymentLink,
+    current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Generate WhatsApp payment link and update order"""
+    """Generate WhatsApp payment link and update order (admin only).
+
+    The amount MUST equal the order's total — never trust a caller-supplied
+    amount, otherwise anyone could mint payment requests for arbitrary sums.
+    """
+    phone_number = body.phone_number
+    amount = body.amount
+    description = body.description
+    order_number = body.order_number
+
     # Validate order exists
     order = db.query(Order).filter(Order.order_number == order_number).first()
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+
+    # Amount must match the order total exactly (Pydantic already enforces gt=0)
+    if abs(float(amount) - float(order.total_amount)) > 0.01:
+        raise HTTPException(
+            status_code=400,
+            detail="Amount does not match order total",
+        )
 
     # Create payment message
     message = (
@@ -199,12 +222,19 @@ async def whatsapp_webhook(request: Request, db: Session = Depends(get_db)):
 async def get_payment_template(
     order_number: str,
     amount: float,
+    current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get a standardized payment template message"""
+    """Get a standardized payment template message (admin only)."""
     order = db.query(Order).filter(Order.order_number == order_number).first()
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+
+    if abs(float(amount) - float(order.total_amount)) > 0.01:
+        raise HTTPException(
+            status_code=400,
+            detail="Amount does not match order total",
+        )
 
     template = (
         f"*Zaitoun Loralai - Payment Confirmation*\n\n"
@@ -219,5 +249,6 @@ async def get_payment_template(
     return {
         "success": True,
         "template": template,
-        "order": order.to_dict()
+        "order_number": order.order_number,
+        "total_amount": order.total_amount,
     }
