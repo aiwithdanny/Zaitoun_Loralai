@@ -108,32 +108,16 @@ export function Checkout() {
         coupon_code: appliedCoupon?.code,
       };
 
-      // Try to place order via API, fallback to local storage if API fails
-      try {
-        const order = await ordersApi.createOrder(orderData);
-        setOrderNumber(order.order_number);
-        setIsSuccess(true);
-        clearCart();
-        toast.success("Order placed successfully!");
-      } catch (apiError) {
-        // Fallback: Save order locally
-        const localOrderNumber = `LOCAL-${Date.now()}`;
-        const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-        orders.push({
-          order_number: localOrderNumber,
-          ...orderData,
-          total_amount: getTotalPrice(),
-          created_at: new Date().toISOString(),
-          status: "pending",
-        });
-        localStorage.setItem("orders", JSON.stringify(orders));
-        setOrderNumber(localOrderNumber);
-        setIsSuccess(true);
-        clearCart();
-        toast.success("Order placed locally (API unavailable)");
-      }
+      // Place order via the API. Never fake a success: if the API call
+      // fails, show an error and keep the cart intact so the customer
+      // can retry. A "confirmed" order must always come from the backend.
+      const order = await ordersApi.createOrder(orderData);
+      setOrderNumber(order.order_number);
+      setIsSuccess(true);
+      clearCart();
+      toast.success("Order placed successfully!");
     } catch (error: any) {
-      toast.error(error.message || "Failed to place order");
+      toast.error(error.message || "Failed to place order. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
