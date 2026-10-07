@@ -11,6 +11,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { productImages } from "@/lib/productImages";
 import { formatPrice } from "@/utils/currency";
+import { SITE_URL } from "@/lib/constants";
 import { productAccordionApi, type ProductAccordionData } from "@/lib/api";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -225,8 +226,32 @@ export function ProductDetail() {
       <Helmet>
         <title>{groupName} — Zaitoun Loralai</title>
         <meta name="description" content={`Shop ${groupName} — premium cold-pressed extra virgin olive oil from Zaitoun Loralai, sourced from Loralai, Pakistan.`} />
+        <link rel="canonical" href={`${SITE_URL}/product/${group_id}`} />
         <meta property="og:title" content={`${groupName} — Zaitoun Loralai`} />
         <meta property="og:description" content={`Shop ${groupName} — premium cold-pressed extra virgin olive oil from Zaitoun Loralai.`} />
+        <meta property="og:url" content={`${SITE_URL}/product/${group_id}`} />
+        <meta property="og:type" content="product" />
+        {imgSrc && <meta property="og:image" content={imgSrc} />}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: groupName,
+            description: `Premium cold-pressed extra virgin olive oil from Zaitoun Loralai, sourced from Loralai, Pakistan.`,
+            category,
+            image: imgSrc ? [imgSrc] : undefined,
+            brand: { "@type": "Brand", name: "Zaitoun Loralai" },
+            offers: {
+              "@type": "Offer",
+              url: `${SITE_URL}/product/${group_id}`,
+              priceCurrency: "PKR",
+              price: currentPrice,
+              availability: inStock
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+            },
+          })}
+        </script>
       </Helmet>
       <Header />
 

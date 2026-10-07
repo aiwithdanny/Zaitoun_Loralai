@@ -19,6 +19,7 @@ function Home() {
       <Helmet>
         <title>Zaitoun Loralai — Premium Extra Virgin Olive Oil from Pakistan</title>
         <meta name="description" content="Shop Zaitoun Loralai's cold-pressed extra virgin olive oil, sourced from the rich soils of Loralai, Pakistan. 100% pure, no additives, medium-robust flavor." />
+        <link rel="canonical" href={SITE_URL} />
         <meta property="og:title" content="Zaitoun Loralai — Premium Extra Virgin Olive Oil from Pakistan" />
         <meta property="og:description" content="Shop Zaitoun Loralai's cold-pressed extra virgin olive oil, sourced from the rich soils of Loralai, Pakistan." />
         <meta property="og:url" content={SITE_URL} />
@@ -28,6 +29,17 @@ function Home() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Zaitoun Loralai — Premium Extra Virgin Olive Oil from Pakistan" />
         <meta name="twitter:description" content="Shop Zaitoun Loralai's cold-pressed extra virgin olive oil, sourced from the rich soils of Loralai, Pakistan." />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Zaitoun Loralai",
+            url: SITE_URL,
+            logo: `${SITE_URL}/favicon.png`,
+            description: "Cold-pressed extra virgin olive oil from Loralai, Pakistan. 100% pure, no additives.",
+            sameAs: [],
+          })}
+        </script>
       </Helmet>
       <Header />
       <main>
