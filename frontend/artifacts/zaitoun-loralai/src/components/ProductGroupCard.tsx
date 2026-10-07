@@ -1,7 +1,10 @@
 import { useMemo } from "react";
 import { useLocation } from "wouter";
 import { Heart } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@/lib/api";
+import { productsApi } from "@/lib/api";
+import { productKeys } from "@/hooks/useProducts";
 import { formatPrice } from "@/utils/currency";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { useWishlistList, useWishlistAdd, useWishlistRemove } from "@/hooks/useWishlist";
@@ -20,6 +23,7 @@ function stripSizeSuffix(name: string): string {
 
 export function ProductGroupCard({ variants, category: categoryProp, productImages }: ProductGroupCardProps) {
   const [, navigate] = useLocation();
+  const queryClient = useQueryClient();
   const { isLoggedIn } = useCustomerAuth();
   const { data: wishlist } = useWishlistList(isLoggedIn);
   const addMutation = useWishlistAdd();
@@ -78,10 +82,23 @@ export function ProductGroupCard({ variants, category: categoryProp, productImag
     }
   };
 
+  // Prefetch the product detail data on hover so the detail page opens
+  // instantly. Respects the 5-min staleTime — no refetch if already fresh.
+  const handlePrefetch = () => {
+    if (!groupId) return;
+    const filters = { product_group_id: groupId };
+    queryClient.prefetchQuery({
+      queryKey: productKeys.list(filters),
+      queryFn: () => productsApi.getProducts(filters),
+      staleTime: 1000 * 60 * 5,
+    });
+  };
+
   return (
     <div
       className="group bg-card border border-border rounded-sm overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-500 cursor-pointer"
       onClick={handleNavigate}
+      onMouseEnter={handlePrefetch}
     >
       {/* Image area */}
       <div className="relative aspect-[3/4] bg-muted/40 flex items-center justify-center overflow-hidden">

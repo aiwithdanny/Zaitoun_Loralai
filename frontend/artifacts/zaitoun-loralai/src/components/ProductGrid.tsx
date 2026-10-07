@@ -8,6 +8,25 @@ import { formatPrice } from "@/utils/currency";
 import { productImages } from "@/lib/productImages";
 import { homepageApi } from "@/lib/api";
 import { ProductGroupCard } from "./ProductGroupCard";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Skeleton matching the product card shape (image + text) so the layout
+// doesn't jump when real data arrives.
+function ProductCardSkeleton() {
+  return (
+    <div className="bg-card border border-border rounded-sm overflow-hidden flex flex-col">
+      <Skeleton className="aspect-[3/4] rounded-none" />
+      <div className="p-5 flex flex-col gap-2 flex-1">
+        <Skeleton className="h-3 w-1/3" />
+        <Skeleton className="h-5 w-3/4" />
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <Skeleton className="h-5 w-20" />
+          <Skeleton className="h-11 w-24" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const container = {
   hidden: {},
@@ -192,11 +211,13 @@ export function ProductGrid() {
           </select>
         </div>
 
-        {/* Initial Loading State (only on very first load — no data yet) */}
+        {/* Initial Loading State (only on very first load — no data yet).
+            Skeleton cards mirror the real layout so there's no jump. */}
         {isPending && (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <span className="ml-3 text-muted-foreground">Loading products...</span>
+          <div className="grid grid-cols-2 max-sm:grid-cols-1 lg:grid-cols-4 gap-6" aria-label="Loading products">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         )}
 

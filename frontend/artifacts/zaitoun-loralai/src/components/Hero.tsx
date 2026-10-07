@@ -7,16 +7,17 @@ import heroImg from "@assets/zl-home-page.png.png";
 
 export function Hero() {
   const [content, setContent] = useState<HomepageData | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch in background — the hero renders INSTANTLY with BRAND fallbacks
+    // below, then swaps in the CMS content when it arrives. Never block
+    // first paint on this API call.
     homepageApi
       .getActive()
       .then(setContent)
       .catch(() => {
-        // Fall back to constants on error
-      })
-      .finally(() => setLoading(false));
+        // Fall back to constants on error (already the default below)
+      });
   }, []);
 
   const brandName = content?.hero_brand_name || BRAND.name;
@@ -28,28 +29,6 @@ export function Hero() {
   const backgroundImage = content?.hero_image_url
     ? (optimizeCloudinaryUrl(content.hero_image_url, { width: 1920, quality: "auto", format: "auto" }) ?? heroImg)
     : heroImg;
-
-  if (loading) {
-    return (
-      <section className="relative pt-16 pb-8 md:pb-0 md:min-h-[120vh] md:flex md:items-center md:justify-start">
-        <div className="w-full md:absolute md:inset-0 md:z-0">
-          <div className="w-full h-72 md:h-full bg-muted animate-pulse" />
-        </div>
-        <div className="relative z-10 container mx-auto px-4 lg:ml-[8%] max-w-md lg:max-w-lg">
-          <div className="bg-hero-card rounded-2xl shadow-2xl p-6 md:p-8 w-full">
-            <div className="h-4 w-32 bg-muted-foreground/20 rounded animate-pulse mb-4" />
-            <div className="h-8 w-64 bg-muted-foreground/20 rounded animate-pulse mb-4" />
-            <div className="h-4 w-full bg-muted-foreground/20 rounded animate-pulse mb-2" />
-            <div className="h-4 w-3/4 bg-muted-foreground/20 rounded animate-pulse mb-6" />
-            <div className="flex gap-4">
-              <div className="h-12 w-32 bg-muted-foreground/20 rounded animate-pulse" />
-              <div className="h-12 w-32 bg-muted-foreground/20 rounded animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="relative pt-16 pb-8 md:pb-0 md:min-h-[120vh] md:flex md:items-center md:justify-start">

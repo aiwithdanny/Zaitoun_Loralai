@@ -22,6 +22,7 @@ import { ReviewList } from "@/components/ReviewList";
 import { ReviewSummary } from "@/components/ReviewSummary";
 import { ProductGroupCard } from "@/components/ProductGroupCard";
 import { useReviews, useRefreshReviews } from "@/hooks/useReviews";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Product } from "@/lib/api";
 
 /** Strip a trailing " — size" or " - size" suffix from a product name. */
@@ -164,7 +165,8 @@ export function ProductDetail() {
     navigate("/checkout");
   };
 
-  // Loading state
+  // Loading state — skeleton mirrors the detail layout (image + info)
+  // so there's no jump when data arrives.
   if (isPending) {
     return (
       <div className="min-h-screen bg-background">
@@ -172,10 +174,23 @@ export function ProductDetail() {
           <title>Loading Product — Zaitoun Loralai</title>
         </Helmet>
         <Header />
-        <div className="flex justify-center items-center py-40">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="ml-3 text-muted-foreground">Loading product...</span>
-        </div>
+        <main className="container mx-auto px-4 md:px-8 py-8">
+          <Skeleton className="h-5 w-28 mb-8" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            <Skeleton className="aspect-[3/4] rounded-sm" />
+            <div className="flex flex-col justify-center gap-4">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-8 w-32" />
+              <div className="flex gap-3 pt-2">
+                <Skeleton className="h-12 w-32" />
+                <Skeleton className="h-12 w-40" />
+              </div>
+              <Skeleton className="h-20 w-full mt-4" />
+            </div>
+          </div>
+        </main>
         <Footer />
       </div>
     );
