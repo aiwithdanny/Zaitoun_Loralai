@@ -3,7 +3,6 @@
  * Connects frontend to FastAPI backend using native fetch
  */
 
-import { MOCK_PRODUCTS } from '../data/mockData';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 // API Base URL - Use env var for production, fallback to localhost for dev
@@ -151,12 +150,10 @@ export const productsApi = {
         image_url: optimizeCloudinaryUrl(p.image_url) ?? null,
       }));
     } catch (error) {
-      // Fallback to mock data
-      console.warn('API unavailable, using mock data:', error);
-      return MOCK_PRODUCTS.map((p) => ({
-        ...p,
-        image_url: optimizeCloudinaryUrl(p.image_url) ?? null,
-      }));
+      // Never silently serve fake products with hardcoded prices.
+      // Let the UI show its error state instead so outages are visible.
+      console.error('Failed to load products:', error);
+      throw error;
     }
   },
 
@@ -169,10 +166,10 @@ export const productsApi = {
         image_url: optimizeCloudinaryUrl(response.data.image_url) ?? null,
       };
     } catch (error) {
-      // Fallback to mock data
-      const product = MOCK_PRODUCTS.find((p) => p.slug === slug);
-      if (product) return product;
-      throw new Error('Product not found');
+      // Never silently serve a fake product. Let the UI show its
+      // error state instead so outages are visible.
+      console.error('Failed to load product:', error);
+      throw error instanceof Error ? error : new Error('Product not found');
     }
   },
 
