@@ -183,13 +183,31 @@ async def create_order(
 
 @router.get("/{order_number}")
 async def get_order(order_number: str, db: Session = Depends(get_db)):
-    """Get order by order number - Public endpoint"""
+    """Get order by order number - Public endpoint (PII redacted).
+
+    Customer name, email, phone and address are NEVER exposed here —
+    order numbers travel in shared WhatsApp links and are guessable.
+    Returns status/totals/items only.
+    """
     order = db.query(Order).filter(Order.order_number == order_number).first()
 
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    return {"success": True, "data": order.to_dict()}
+    return {
+        "success": True,
+        "data": {
+            "order_number": order.order_number,
+            "status": order.status,
+            "payment_status": order.payment_status,
+            "payment_method": order.payment_method,
+            "total_amount": order.total_amount,
+            "discount_amount": order.discount_amount,
+            "coupon_code": order.coupon_code,
+            "created_at": order.created_at.isoformat() if order.created_at else None,
+            "updated_at": order.updated_at.isoformat() if order.updated_at else None,
+        },
+    }
 
 
 @router.put("/{order_number}/status")
