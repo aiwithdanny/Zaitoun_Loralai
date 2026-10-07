@@ -15,7 +15,7 @@ from src.models import Product
 router = APIRouter()
 
 # Public site URL for sitemap loc entries (env-driven, no hardcode)
-SITE_URL = os.getenv("SITE_URL", "https://zaitoun-loralai-1mtz.vercel.app").rstrip("/")
+SITE_URL = os.getenv("SITE_URL", "https://www.zaitounloralai.com").rstrip("/")
 
 # Static public routes (paths only — no admin, no auth, no API)
 STATIC_ROUTES = [

@@ -1,6 +1,6 @@
-// Env-driven so staging/custom domains don't hardcode the Vercel URL.
-// Set VITE_SITE_URL in Vercel env vars when the domain changes.
-export const SITE_URL = (import.meta.env.VITE_SITE_URL as string || "https://zaitoun-loralai-1mtz.vercel.app").replace(/\/$/, "");
+// Env-driven so staging/custom domains don't hardcode a URL.
+// Set VITE_SITE_URL in Vercel env vars (production: https://www.zaitounloralai.com).
+export const SITE_URL = (import.meta.env.VITE_SITE_URL as string || "https://www.zaitounloralai.com").replace(/\/$/, "");
 export const OG_IMAGE = `${SITE_URL}/opengraph.jpg`;
 
 /**
