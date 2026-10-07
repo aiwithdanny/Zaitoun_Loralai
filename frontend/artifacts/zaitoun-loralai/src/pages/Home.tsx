@@ -1,15 +1,18 @@
+import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 
 import { ProductGrid } from "@/components/ProductGrid";
-import { Story } from "@/components/Story";
-import { QualityFeatures } from "@/components/QualityFeatures";
-import { TastingNotes } from "@/components/TastingNotes";
-import { WholesaleSection } from "@/components/WholesaleSection";
-import { TestimonialSection } from "@/components/TestimonialSection";
-import { About } from "@/components/About";
-import { Recipes } from "@/components/Recipes";
+// Below-the-fold sections: lazy-loaded so they don't bloat the initial
+// bundle. They load in the background while the user sees Hero + products.
+const Story = lazy(() => import("@/components/Story").then((m) => ({ default: m.Story })));
+const QualityFeatures = lazy(() => import("@/components/QualityFeatures").then((m) => ({ default: m.QualityFeatures })));
+const TastingNotes = lazy(() => import("@/components/TastingNotes").then((m) => ({ default: m.TastingNotes })));
+const WholesaleSection = lazy(() => import("@/components/WholesaleSection").then((m) => ({ default: m.WholesaleSection })));
+const TestimonialSection = lazy(() => import("@/components/TestimonialSection").then((m) => ({ default: m.TestimonialSection })));
+const About = lazy(() => import("@/components/About").then((m) => ({ default: m.About })));
+const Recipes = lazy(() => import("@/components/Recipes").then((m) => ({ default: m.Recipes })));
 import { Footer } from "@/components/Footer";
 import { SITE_URL, OG_IMAGE } from "@/lib/constants";
 
@@ -45,13 +48,15 @@ function Home() {
       <main>
         <Hero />
         <ProductGrid />
-        <Story />
-        <QualityFeatures />
-        <TastingNotes />
-        <WholesaleSection />
-        <TestimonialSection />
-        <About />
-        <Recipes />
+        <Suspense fallback={null}>
+          <Story />
+          <QualityFeatures />
+          <TastingNotes />
+          <WholesaleSection />
+          <TestimonialSection />
+          <About />
+          <Recipes />
+        </Suspense>
       </main>
       <Footer />
     </div>
