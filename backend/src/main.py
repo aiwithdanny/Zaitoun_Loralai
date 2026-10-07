@@ -75,7 +75,10 @@ async def root():
 
 
 # Import and include routers
-from src.api.v1 import products, orders, whatsapp, admin, newsletter, customers, upload, reviews, wishlist, coupons, founder, homepage, story, recipes, testimonials, quality_features, tasting_notes, product_accordions, wholesale, site_config
+from src.api.v1 import products, orders, whatsapp, admin, newsletter, customers, upload, reviews, wishlist, coupons, founder, homepage, story, recipes, testimonials, quality_features, tasting_notes, product_accordions, wholesale, site_config, seo
+
+# SEO: sitemap served at root (/sitemap.xml) — standard crawler location
+app.include_router(seo.router, prefix="", tags=["SEO"])
 
 app.include_router(products.router, prefix="/api/v1/products", tags=["Products"])
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
